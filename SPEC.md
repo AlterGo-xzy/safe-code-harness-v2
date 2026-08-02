@@ -1,137 +1,137 @@
-# SafeCodeHarness v2 Specification
+# SafeCodeHarness v2 设计规约
 
-## 1. Problem Statement
+## 1. 问题陈述
 
-SafeCodeHarness v2 is a deployable coding-agent harness for developers who need to run bounded code-repair and code-audit workflows without delegating execution authority to an LLM. The product accepts an operator task and a controlled workspace, asks a replaceable action provider for one structured next action, and applies deterministic local governance before any tool can execute.
+SafeCodeHarness v2 是一个可部署的 Coding Agent Harness。它服务于需要在受控工作区中执行代码审计、测试与有限修复的开发者：模型只提出一个结构化的下一步动作，本项目自行编写的代码负责上下文、动作解析、工具分发、治理、反馈、记忆、配置和停机。
 
-The project addresses the reliability gap between a model that can suggest a coding step and a system that can safely execute, verify, explain, and stop that step. It is a real operator tool rather than a demonstration wrapper: operators can inspect a run, configure policy, review pending changes, and use deterministic test feedback to drive a bounded repair loop.
+项目解决的不是“模型能否想到下一步”，而是“如何让模型提出的动作被安全、可验证、可解释地执行”。操作者能查看运行时间线、配置策略、审查待执行命令或文件差异，并以确定性的测试反馈驱动下一步。因此它是可用的运维控制台，而不是只演示固定脚本的 UI 包装。
 
-Primary users are individual developers and evaluators who want inspectable local coding automation. The primary engineering contribution is governance: policy evaluation, sandboxing, and human approval are implemented as deterministic project code rather than prompt instructions.
+目标用户是希望使用本地、可审计代码自动化的开发者与评估者。项目的主要工程贡献是治理：策略评估、路径沙箱和人工审批都由确定性代码实现，而非依赖提示词要求模型“注意安全”。
 
-## 2. User Stories
+## 2. 用户故事
 
-1. As a developer, I can start a repair run for a controlled workspace and see every proposed action and result.
-2. As an operator, I can configure which tools are allowed and which commands or paths are blocked without editing Python source.
-3. As an operator, I can inspect a pending command or file diff and explicitly approve or reject it before it changes the workspace.
-4. As a developer, I can see a failed test result returned to the action provider and verify that the next mock action changes accordingly.
-5. As an evaluator, I can run all core mechanism tests without network access or a real LLM key.
-6. As a user of an optional OpenAI-compatible planner, I can enter, update, inspect the masked status of, and clear a provider key without the plaintext key appearing in Git, logs, API responses, or settings JSON.
-7. As a hosted user, I can upload a safe zip workspace and run it in an isolated server-side workspace.
+1. 作为开发者，我可以为受控工作区启动一次修复或审计运行，并查看每个建议动作和执行结果。
+2. 作为操作者，我可以不修改 Python 源码而配置允许的工具、阻断的路径和命令。
+3. 作为操作者，我可以在命令或文件写入发生前查看命令或 diff，并明确批准或拒绝。
+4. 作为开发者，我可以看到失败测试被回灌给动作提供方，并在 Mock LLM 中验证下一动作因此改变。
+5. 作为评估者，我可以在没有网络、没有真实 LLM key 的情况下运行所有核心机制测试。
+6. 作为可选 OpenAI 兼容 Planner 的用户，我可以安全录入、更新、查看掩码状态并清除 key，而明文不会出现在 Git、日志、API 响应或普通设置 JSON 中。
+7. 作为线上用户，我可以上传安全的 zip 工作区，并在隔离的服务端目录中运行它。
 
-## 3. Functional Specification
+## 3. 功能规约
 
-### 3.1 Agent Loop
+### 3.1 Agent 主循环
 
-Input: operator task, controlled workspace, runtime policy, a maximum step count, and an injected `LLMClient`.
+输入：操作者任务、受控工作区、运行时策略、最大步数与可注入的 `LLMClient`。
 
-Behavior: build bounded context; request one JSON action; parse it; enforce configured tool permissions; audit it with deterministic rules; apply sandbox, command, and approval policy; dispatch only permitted actions; record events; convert the result into structured feedback; stop on finish, block, parse failure, rejected approval, or maximum steps.
+行为：构造有界上下文；请求一个 JSON 动作；解析动作；检查允许工具；进行本地确定性规则审计；执行路径、命令和审批策略；仅分发已许可动作；记录事件；将结果转成结构化反馈；在完成、阻断、解析失败、拒绝审批或达到最大步数时停止。
 
-Output: a persistent run summary plus an ordered event timeline. Invalid JSON, unknown tools, invalid arguments, disabled tools, tool errors, unsafe paths, and blocked commands are surfaced as structured events and feedback rather than silently ignored.
+输出：可持久化的运行摘要与有序事件时间线。非法 JSON、未知工具、非法参数、禁用工具、工具错误、不安全路径和阻断命令都必须成为结构化事件与反馈，不得静默忽略。
 
-### 3.2 Action and Tool Protocol
+### 3.2 动作与工具协议
 
-Every action is a JSON object with `type`, object `args`, and optional short `thought`. Supported actions are `list_files`, `read_file`, `write_file`, `run_tests`, `run_command`, `remember`, and `finish`.
+每个动作是包含 `type`、对象类型 `args` 和可选简短 `thought` 的 JSON 对象。支持的动作包括 `list_files`、`read_file`、`write_file`、`run_tests`、`run_command`、`remember` 和 `finish`。
 
-Tools have one responsibility each. File tools use the path sandbox. Test and shell tools use the controlled command policy. Memory tools validate keys and preserve bounded records. The dispatcher is the only execution entry point.
+工具职责单一：文件工具必须经路径沙箱；测试和命令工具必须经受控命令策略；记忆工具验证键并保存有界记录。工具分发器是唯一执行入口。
 
-### 3.3 Governance and Human Approval
+### 3.3 治理与人工审批
 
-The governance module is the principal contribution. It resolves all paths before access, blocks workspace escapes and configured sensitive paths, normalizes commands before matching, blocks configured destructive patterns, and evaluates rules before dispatch.
+治理模块是主要贡献。它在访问前解析全部路径，阻断工作区逃逸和已配置敏感路径；在匹配前规范化命令，阻断配置的破坏性模式，并在分发前完成规则审计。
 
-Configured shell commands and file writes can require approval. A pending write exposes a unified diff without touching disk. A pending command exposes the normalized command. Approval executes the stored action through the same policy path; rejection terminates the run as blocked. Unclear or malformed actions fail closed.
+被配置为需要审批的 shell 命令和文件写入必须暂停。待写入动作仅生成统一 diff，不能修改磁盘；待命令动作显示规范化后的命令。批准后仍通过同一策略链执行，拒绝后运行以 `blocked` 终止。模糊或格式错误的动作必须失败关闭。
 
-### 3.4 Feedback and Memory
+### 3.4 反馈与记忆
 
-Feedback converts test exits, command results, parse failures, audit results, and guardrail results into concise structured records for the next action-provider call. A deterministic mock sequence must prove that a failed test produces feedback and changes the following action.
+反馈模块把测试退出状态和输出、命令结果、解析失败、规则结论与护栏结论转换为下一轮可用的简洁结构化记录。确定性 Mock 序列必须证明：失败测试产生反馈，且后续动作随之改变。
 
-Memory stores small, validated operator or run notes and returns only task-relevant bounded entries in context. It is never a substitute for loading arbitrary workspace files.
+记忆模块保存小型、经验证的操作者或运行笔记，只在构造上下文时返回任务相关的有界条目；它不能替代任意加载整个工作区。
 
-### 3.5 API and WebUI
+### 3.5 API 与 WebUI
 
-FastAPI exposes run lifecycle, timeline, approval, workspace, preflight, configuration, memory, and planner-setting endpoints. The API never bypasses the sandbox or policy layers.
+FastAPI 提供运行生命周期、时间线、审批、工作区、预检、配置、记忆与 Planner 设置接口。任何 API 路由都不得绕过沙箱或策略层。
 
-The React WebUI is an operator console: create/resume runs, inspect filtered event timelines, browse permitted files, inspect diffs, approve/reject pending work, edit policy, inspect memory, and configure an optional Planner. It is not the security authority.
+React WebUI 是操作者控制台：创建/恢复运行、筛选时间线、浏览许可文件、查看 diff、批准/拒绝待处理工作、编辑策略、查看记忆、配置可选 Planner。界面不承担安全决策。
 
-### 3.6 Workspaces and Upload
+### 3.6 工作区与上传
 
-Local workspaces are explicit configuration. Hosted zip uploads extract only into isolated workspaces. Upload handling rejects non-zip archives, traversal paths, symbolic links, oversized archives, excessive file counts, and sensitive/generated entries such as `.git`, `.env`, `node_modules`, and caches.
+本地工作区必须显式配置。线上 zip 上传只解压至隔离工作区，拒绝非 zip、路径穿越、符号链接、超限压缩包、超量文件和敏感/生成内容，例如 `.git`、`.env`、`node_modules` 与缓存目录。
 
-## 4. Domain and Mechanism Design
+## 4. 领域与机制设计
 
-The domain is controlled coding work. Its objective feedback signals are test exit status and failure output, command exit status, parser errors, local rule decisions, guardrail decisions, and approval outcomes. These signals are produced by project code, recorded in events, and converted into the next model-feedback message.
+领域是受控 Coding 工作流。客观反馈信号是测试退出状态与失败输出、命令退出状态、解析错误、本地规则结论、护栏结论和审批结果。这些信号由项目代码产生、记录为事件并回灌给下一轮动作提供方。
 
-Dangerous actions are workspace escape, access to sensitive paths, destructive or remote-execution shell commands, unapproved file writes, and any attempt to persist or expose a secret-like value. The available tools are sandboxed file inspection/editing, a configured test runner, a controlled command runner, and bounded memory notes. Cross-session memory is limited to explicit notes, persisted policy, and workspace metadata; code context is loaded on demand from permitted paths.
+危险动作包括工作区逃逸、访问敏感路径、破坏性或远程执行 shell 命令、未经批准的文件写入，以及任何试图保存或暴露疑似凭据的值。可用工具是受沙箱约束的文件读写、配置的测试运行、受控命令运行和有界记忆笔记。跨会话只记忆明确笔记、持久化策略与工作区元数据；代码上下文按需从许可路径加载。
 
-Governance is the deep dimension. The rule evaluator, path sandbox, command guard, approval state machine, policy configuration, and event evidence are all deterministic code. They remain testable after the real action provider is removed and replaced with a mock sequence.
+治理是深入维度。规则评估器、路径沙箱、命令护栏、审批状态机、策略配置和事件证据均为确定性代码。移除真实动作提供方并替换为 Mock 序列后，这些机制仍必须可单测验证。
 
-## 5. Non-Functional Requirements
+## 5. 非功能性需求
 
-- Core mechanism tests are deterministic, offline, and use mock/stub LLM clients.
-- The product must not use a high-level agent framework or host-agent loop as its Harness runtime.
-- No real credential may enter source, Git history, logs, terminal output, or plaintext settings files.
-- Windows stores persisted optional Planner credentials in Windows Credential Manager. On platforms without an implemented secure store, persistent Planner credentials are disabled rather than falling back to plaintext.
-- The event model makes policy, feedback, approval, and stop decisions observable.
-- A normal API control operation completes within two seconds excluding a configured test or shell command. Test and shell actions have explicit configurable timeouts and report timeout failures as feedback.
-- A failed optional Planner request, unavailable credential store, unavailable uploaded workspace, or failed tool action returns a clear event and leaves the run stopped or blocked rather than silently continuing.
-- The WebUI remains usable on narrow and desktop screens, with iOS-inspired restrained visual treatment and minimal explanatory copy.
-- All safety-sensitive decisions fail closed.
+- 核心机制测试离线、确定性运行，使用 Mock/stub LLM。
+- 交付产物不得使用高层 agent 框架或宿主 agent loop 充当 Harness 运行时。
+- 真实凭据不得进入源代码、Git 历史、日志、终端输出或明文设置文件。
+- Windows 上可选 Planner 的持久化 key 使用 Windows Credential Manager；其他平台在没有已实现安全存储适配器时禁用持久化，不回退到明文文件。
+- 事件模型必须使策略、反馈、审批与停机决定可观察。
+- 除配置的测试或 shell 命令外，普通 API 控制操作应在两秒内完成；测试和命令具有明确的可配置超时，并把超时作为反馈记录。
+- 可选 Planner 请求失败、凭据存储不可用、上传工作区不可用或工具失败时，必须产生清晰事件并停止或阻断，不能静默继续。
+- WebUI 必须在窄屏和桌面可用，采用简洁的 iOS 风格操作界面与最少说明文字。
+- 所有安全敏感决定失败关闭。
 
-## 6. Architecture and Data Flow
+## 6. 系统架构与数据流
 
 ```text
 React WebUI -> FastAPI API -> Run Service -> AgentLoop
-                                      |-> Context and Memory
+                                      |-> Context 与 Memory
                                       |-> LLMClient
                                       |-> Action Parser
-                                      |-> Rule Evaluator and Guardrails
+                                      |-> Rule Evaluator 与 Guardrails
                                       |-> Tool Dispatcher
                                       |     |-> File Sandbox
-                                      |     |-> Test and Command Runner
+                                      |     |-> Test 与 Command Runner
                                       |     |-> Memory Store
-                                      |-> Feedback Evaluator and Event Log
+                                      |-> Feedback Evaluator 与 Event Log
 ```
 
-The model can propose actions only. The project-owned parser, rule evaluator, guardrails, dispatcher, and approval state machine decide whether anything executes.
+模型只能提出动作。是否执行由本项目拥有的解析器、规则评估器、护栏、分发器和审批状态机决定。
 
-## 7. Data Model
+## 7. 数据模型
 
-- `Action`: `type`, `args`, `thought`.
-- `ToolResult`: `ok`, `output`, `error`, `metadata`.
-- `HarnessEvent`: event id, run id, step, type, title, detail, timestamp, payload.
-- `RunState`: run id, task, workspace id, mode, status, step count, pending action, final result.
-- `RuntimePolicy`: allowed tools, blocked paths, blocked command fragments, approval-required tools, test command, maximum steps.
-- `Workspace`: id, root path, origin, created time, size constraints.
-- `PlannerSettings`: provider base URL, model, credential configured state, credential store label; no plaintext API key field.
+- `Action`：`type`、`args`、`thought`。
+- `ToolResult`：`ok`、`output`、`error`、`metadata`。
+- `HarnessEvent`：事件 id、运行 id、步骤、类型、标题、详情、时间戳、负载。
+- `RunState`：运行 id、任务、工作区 id、模式、状态、步骤数、待处理动作、最终结果。
+- `RuntimePolicy`：允许工具、阻断路径、阻断命令片段、需审批工具、测试命令、最大步数。
+- `Workspace`：id、根路径、来源、创建时间、尺寸约束。
+- `PlannerSettings`：供应商 base URL、模型、凭据是否已配置、凭据存储标签；没有明文 API key 字段。
 
-## 8. Credentials and Distribution
+## 8. 凭据与分发设计
 
-The default offline mode needs no external key. The optional Planner setup supports first-use hidden entry, masked status, update, and clear. Windows uses Credential Manager. Non-Windows persistent storage remains unavailable until a platform secure-store adapter is implemented.
+默认离线模式无需外部 key。可选 Planner 支持首次隐藏输入、掩码状态、更新和清除。Windows 使用 Credential Manager；非 Windows 的持久化能力在实现相应安全存储适配器前不可用。
 
-Distribution is a public OCI image at GitHub Container Registry. `docker build` and `docker run` must work locally, while the README provides public `docker pull` and run commands, security configuration, supported platforms, and known limitations. GitHub Actions builds, tests, runs browser E2E, and publishes the image. A Render deployment uses the same image and exposes a public WebUI.
+正式分发形态是 GitHub Container Registry 上的公开 OCI 镜像。`docker build` 与 `docker run` 必须在本地工作；README 必须提供公开 `docker pull` 与运行命令、目标机安全配置、支持平台与已知限制。GitHub Actions 负责构建、测试、浏览器 E2E 与镜像发布。Render 使用同一镜像部署公开 WebUI。
 
-## 9. Technology Choices
+## 9. 技术选型与理由
 
-- Python and FastAPI: explicit, testable Harness mechanics and a compact API.
-- React, TypeScript, and Vite: responsive operator console with tested client behavior.
-- Pytest, Vitest, and Playwright: deterministic unit/integration/browser verification.
-- Docker/OCI and GHCR: repeatable distribution.
-- Windows Credential Manager: native secure storage for the target Windows development platform.
-- Design system: Open Design is the visual reference and implementation skill to be applied during WebUI work. The UI will use its iOS-style patterns while retaining a dense operational console layout.
+- Python + FastAPI：适合显式、可单测的 Harness 机制和精简 API。
+- React + TypeScript + Vite：构建可测试的响应式操作者控制台。
+- Pytest、Vitest、Playwright：覆盖确定性单元、集成和浏览器行为。
+- Docker/OCI + GHCR：可重复的公开分发。
+- Windows Credential Manager：目标 Windows 开发平台的原生安全存储。
+- 前端采用 Open Design 作为设计系统参考，并在前端任务中使用其对应设计工作流；界面保持 iOS 风格但优先高密度、可扫描的操作台布局。
 
-## 10. Acceptance Criteria
+## 10. 验收标准
 
-- `make test`, frontend tests, frontend production build, and Playwright E2E pass from a clean checkout.
-- Mock LLM tests prove path/command blocking, feedback-driven action changes, memory behavior, tool dispatch, stop behavior, and approval transitions without network access.
-- Mechanism demonstrations deterministically show a dangerous-action block, failed-test feedback changing the next action, and the governance approval state machine.
-- API routes cannot bypass file sandboxing or policy.
-- A pending write does not modify the file before approval and shows its exact diff.
-- Planner key APIs never return plaintext and Windows persistence is visible in Credential Manager, not Git-tracked files.
-- CI passes on the final commit; the public image can be pulled and started; the public WebUI is reachable.
-- Every implementation task has a worktree, PR, red-green test record, two-stage review, `PLAN.md` update, and `AGENT_LOG.md` entry.
+- 干净 checkout 上 `make test`、前端测试、前端生产构建和 Playwright E2E 全部通过。
+- Mock LLM 测试离线证明路径/命令阻断、反馈驱动的动作改变、记忆、工具分发、停机和审批状态转移。
+- 机制演示可重复展示：危险动作阻断、失败测试反馈改变下一动作、治理审批状态机。
+- API 路由无法绕过文件沙箱或策略。
+- 待写入动作在批准前不修改文件，并显示精确 diff。
+- Planner key API 永不返回明文，Windows 持久化可由 Credential Manager 验证且不出现于 Git 跟踪文件。
+- 最终提交 CI 通过，公开镜像能 pull 并启动，公开 WebUI 可访问。
+- 每项实现任务都有 worktree、PR、红绿测试记录、两阶段审查、`PLAN.md` 更新和 `AGENT_LOG.md` 条目。
 
-## 11. Risks and Open Questions
+## 11. 风险与未决问题
 
-- A different-type cold-start agent may not be available in the current environment. The project must pause before implementation until this is resolved without misrepresenting a same-type subagent as independent evidence.
-- External Planner providers may return malformed or unsafe actions; local governance remains mandatory and fail-closed.
-- Hosted environments have filesystem and secret-store limits; unavailable secure credential storage disables persistent Planner credentials.
-- Docker registry visibility and public deployment are external-state checks and cannot be claimed until independently verified.
+- 当前环境可能没有与主开发 agent 类型不同的冷启动 agent。实现前必须解决该问题，不能把同类型 Codex subagent 伪装成独立证据。
+- 外部 Planner 可能返回格式错误或不安全动作；本地治理始终强制且失败关闭。
+- 托管环境存在文件系统和密钥服务限制；安全存储不可用时禁用持久化 Planner 凭据。
+- Registry 可见性和公开部署属于外部状态，未独立验证前不得声明完成。

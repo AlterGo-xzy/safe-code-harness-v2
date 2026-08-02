@@ -1,50 +1,51 @@
-# Specification Process
+# 规约生成过程
 
-## Process Boundary
+## 过程边界
 
-This repository starts as a clean rebuild. The previous `safe-code-harness` repository is a read-only technical reference, not a source of imported implementation history. No production Harness source is committed before this specification, the implementation plan, and an independent cold-start validation are complete.
+本仓库是全新重建。旧 `safe-code-harness` 仓库只能作为只读技术参考，不能作为新仓库的实现历史。`SPEC.md`、`PLAN.md` 与独立冷启动验证完成前，禁止提交任何生产 Harness 源代码。
 
-## Brainstorming Record
+## Brainstorming 记录
 
-### Iteration 1: Repository and Product Boundary
+### 迭代 1：仓库与产品边界
 
-Question: should the final submission keep the original repository history or begin a clean rebuild?
+问题：最终提交是保留原仓库历史，还是建立干净重建仓库？
 
-Decision: create the separate public repository `AlterGo-xzy/safe-code-harness-v2`. The original project remains available as technical reference only. This prevents the new repository from claiming old implementation history as evidence of the required workflow.
+决策：建立独立公开仓库 `AlterGo-xzy/safe-code-harness-v2`。旧项目仅作技术参考，避免将旧实现历史冒充为本项目的流程证据。
 
-### Iteration 2: Product Form
+### 迭代 2：产品形态
 
-Question: should the rebuild be a CLI-only Harness or retain a deployable WebUI?
+问题：重建项目改为 CLI Harness，还是保留可部署 WebUI？
 
-Decision: retain the FastAPI API and React operator WebUI. The WebUI is a real inspection and approval surface, while the project-owned Harness core remains the grading and safety focus.
+决策：保留 FastAPI API 和 React 操作者 WebUI。WebUI 是检查与审批界面，项目自实现的 Harness 内核仍是评分和安全重点。
 
-### Iteration 3: Reuse Policy
+### 迭代 3：复用策略
 
-Question: may existing code be reused to reduce unnecessary work?
+问题：是否允许为减少重复工作而参考旧代码？
 
-Decision: source may be consulted module by module only after the new repository has a failing test for the behavior. Each reuse is recorded in the task PR and `AGENT_LOG.md`, including what was rewritten and why. No bulk copy or untraceable migration is permitted.
+决策：允许按模块参考，但新仓库必须先有对应行为的失败测试，之后才能迁入、改写或重写逻辑。每次复用都在任务 PR 与 `AGENT_LOG.md` 中记录参考位置、人工修改和原因；禁止整体复制或无证据迁移。
 
-### Iteration 4: Core Contribution
+### 迭代 4：主要贡献
 
-Question: which Harness dimension should receive the deepest engineering treatment?
+问题：六类 Harness 机制中，哪个维度做深入实现？
 
-Decision: deterministic governance. Rules, sandboxes, policy gates, file-diff approval, command approval, event logs, and fail-closed behavior will be implemented as code and tested without a live model.
+决策：选择确定性治理。规则、沙箱、策略闸门、文件 diff 审批、命令审批、事件日志和失败关闭行为均用代码实现，并可在没有真实模型时被测试。
 
-### Iteration 5: Delivery Boundary
+### 迭代 5：分发与凭据边界
 
-Question: how should the project be distributable and how are keys handled?
+问题：如何进行可获得的分发，以及如何保存可选 key？
 
-Decision: Docker/OCI distributed through public GHCR plus a public WebUI deployment. The default mode needs no key. Optional Planner credentials use Windows Credential Manager on Windows; no plaintext non-Windows fallback is allowed.
+决策：通过公开 GHCR 镜像分发并部署公开 WebUI。默认无需 key；可选 Planner 在 Windows 使用 Credential Manager，不提供非 Windows 明文回退。
 
-## Accepted Constraints
+## 采纳与拒绝
 
-- Follow the official Superpowers sequence: brainstorming, writing-plans, worktrees, subagent-driven development, TDD, code review, and branch finishing.
-- Do not write Harness implementation code before a different-type cold-start agent validates `SPEC.md` and `PLAN.md` without prior conversation context.
-- Keep `REFLECTION.md` student-authored; it is intentionally absent until the student writes it.
-- Record only actions that actually occur. Do not backdate workflow evidence or claim external CI, registry, or deployment state without verification.
+采纳的 AI 建议：把治理作为主要贡献；使用可部署 WebUI 展示事件与审批；把旧项目限定为只读参考；每次复用都要求先红后绿。
 
-## Cold-Start Protocol (Prepared, Not Yet Executed)
+由学生确认并要求的约束：不改写旧历史、不用文档伪造流程、只以通用要求和 A 赛道要求作为验收基准、所有项目材料使用中文。
 
-The cold-start agent must be a different agent type in a fresh session with no imported memory or main-agent transcript. It receives only `SPEC.md` and `PLAN.md`, selects one or two explicitly named tasks, and pauses to ask when requirements are ambiguous rather than guessing.
+拒绝的方向：整体迁移旧代码，因为它无法提供“规约、计划、冷启动在实现之前”的真实证据；将同类型 subagent 称作不同类型冷启动 agent，因为这会违反要求。
 
-This document will record the exact agent type, prompt, observed questions, output, document defects found, and before/after revisions after execution.
+## 冷启动协议（已准备，尚未执行）
+
+冷启动 agent 必须与主开发 agent 类型不同，运行在全新 session，不能导入 memory 或主会话对话。它只获得 `SPEC.md` 与 `PLAN.md`，从计划中选择一至两个明确任务；遇到歧义必须暂停询问，不得凭猜测继续。
+
+执行后，本文件将如实记录 agent 类型、完整 prompt、问题、输出、发现的规约缺陷、修订前后关键 diff 与差距分析。

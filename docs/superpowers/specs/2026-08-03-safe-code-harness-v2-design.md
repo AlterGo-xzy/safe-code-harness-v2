@@ -1,11 +1,11 @@
-# SafeCodeHarness v2 Design
+# SafeCodeHarness v2 设计确认记录
 
-This design is the approved outcome of brainstorming for a clean, workflow-auditable rebuild of SafeCodeHarness.
+这是通过 `brainstorming` 形成并经用户逐段确认的设计结果。
 
-The product is a deployable coding-agent Harness with a React operator console and a Python/FastAPI backend. Its model interface proposes structured actions only; deterministic project code owns parsing, tools, policy, sandboxing, feedback, approval, memory, and stop conditions.
+产品是具有 React 操作者控制台和 Python/FastAPI 后端的可部署 Coding Agent Harness。模型只提出结构化动作；解析、工具、策略、沙箱、反馈、审批、记忆和停机都由项目自己的确定性代码负责。
 
-The primary contribution is governance. Every potentially external action is inspected by local rules and guardrails before dispatch. Dangerous commands and unsafe paths are blocked; configured writes and commands pause for human approval with visible diffs or normalized command previews.
+主要贡献是治理。任何可能影响工作区或外部环境的动作都要先经过本地规则与护栏。危险命令和不安全路径被阻断；已配置的写入与命令会暂停，供用户查看 diff 或规范化命令后批准。
 
-The rebuild treats the existing project as a read-only reference. Each reused behavior begins in this repository with a failing test and is reimplemented or adapted in an isolated task worktree. The corresponding PR documents the reference area and human changes.
+旧项目是只读参考。每个复用行为必须先在新仓库建立失败测试，再迁入、改写或重写；对应 PR 记录参考范围与人工修改。
 
-The build sequence is non-negotiable: specification, detailed plan, different-type cold-start validation, then one task at a time through worktree, fresh subagent, TDD, two-stage review, and PR. CI, public GHCR distribution, and public deployment are verified rather than asserted.
+实现顺序不可跳过：规约、详细计划、不同类型 agent 的冷启动验证，然后逐任务执行 worktree、新鲜 subagent、TDD、两阶段审查与 PR。CI、GHCR 分发与线上部署必须验证后才可声明完成。
