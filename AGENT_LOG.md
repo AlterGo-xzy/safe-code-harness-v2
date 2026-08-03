@@ -114,5 +114,6 @@
 - 实现 subagent：`/root/t02_implementer`（新鲜 session），提交 `ba3116a feat: add deterministic action protocol and mock llm`。用户明确授权直接复用旧项目；仅迁入 `D:\\2026_summer_project\\backend\\src\\safe_code_harness\\core\\action.py`、`llm\\base.py`、`llm\\mock.py` 的相关概念，人工最小适配为计划接口 `parse_action`、`LLMClient.next_action` 与字符串序列 `MockLLM(responses)`；未迁入任何工具、网络、凭据或旧版内建序列。
 - TDD 与验证：RED 的 focused parser 测试预期报 `ModuleNotFoundError: safe_code_harness.core`；GREEN 的 parser/Mock 测试为 `6 passed in 0.02s`。协调会话新建本 worktree 忽略的 `.venv` 后，从其根目录运行 `scripts/test.ps1` 和 `python -m pytest backend/tests -q`，两者均为 `7 passed in 0.01s`；`git diff --check 9f5eab6..HEAD` 无输出，受跟踪源码 secret scan 为 clean。
 - 两阶段审查：独立 reviewer `/root/t02_reviewer` 先给出 Spec Compliance PASS，再给出 Task quality APPROVE；无 Critical/Important。Minor 要求保留独立完整测试输出，已通过协调会话的新鲜 full-suite 输出满足。
+- 分支收尾：依照用户已确认的 `finishing-a-development-branch` 选项 2，推送 `codex/t02-action-protocol` 并创建 [draft PR #2](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/2)，暂以 `codex/t01-foundation` 为目标；保留该分支/worktree 处理审查，待 PR #1 合并后改为 `main`。
 - 人工干预：协调会话只创建隔离 worktree、调用审查与回填真实证据；未改动任务功能源码。一次从旧项目当前目录绝对调用 `scripts/test.ps1` 导致相对路径误收集旧项目测试；检查脚本后确认规范调用方式是先进入目标仓库根目录，按此方式重跑后通过。
 - 学到的教训：批准复用旧代码并不等于放弃新仓库接口、离线边界或 RED/GREEN 证据；堆叠 PR 需要明确目标分支，避免把任务 1 基座变成任务 2 的重复审查范围。

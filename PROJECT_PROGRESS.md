@@ -115,6 +115,6 @@
 ## 后续执行顺序
 
 1. 任务 1 的 draft PR 已建立并完成收尾决定；在 [PR #1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1) 保留 `codex/t01-foundation` worktree 以处理审查反馈。
-2. 任务 2 已在 `codex/t02-action-protocol` / `D:\safe-code-harness-v2\.worktrees\t02-action-protocol` 完成：`ba3116a` 实现确定性动作协议与 Mock LLM，用户授权迁入旧项目三个相关源文件概念并作最小接口适配；RED、GREEN、独立双审查、完整离线测试、diff 检查和 secret scan 已完成。因任务 1 PR 尚未合并，下一步创建目标为 `codex/t01-foundation` 的 stacked draft PR；PR #1 合并后改为 `main`。
+2. 任务 2 已在 `codex/t02-action-protocol` / `D:\safe-code-harness-v2\.worktrees\t02-action-protocol` 完成：`ba3116a` 实现确定性动作协议与 Mock LLM，用户授权迁入旧项目三个相关源文件概念并作最小接口适配；RED、GREEN、独立双审查、完整离线测试、diff 检查和 secret scan 已完成。因任务 1 PR 尚未合并，已创建目标为 `codex/t01-foundation` 的 [stacked draft PR #2](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/2)；保留分支/worktree 等待审查，PR #1 合并后改为 `main`。
 3. 按 `PLAN.md` 依赖图完成任务 3-15；任何代码复用需记录旧文件路径、迁入范围与人工调整。
 4. 在每个 task、PR、CI、容器、部署、NJU Git、反思发生时即时更新本文件、`PLAN.md`、`AGENT_LOG.md` 和 `REQUIREMENTS_TRACEABILITY.md`。
