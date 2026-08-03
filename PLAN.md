@@ -67,7 +67,7 @@ git commit -m "docs: record independent cold-start validation"
 ## 任务 1：工程基座与离线测试入口
 
 **工作区与 PR：** `codex/t01-foundation` / `.worktrees/t01-foundation`，独立 PR 指向 `main`。
-**文件：** 新建 `backend/pyproject.toml`、`backend/src/safe_code_harness/__init__.py`、`backend/tests/conftest.py`、`backend/tests/unit/test_project_contract.py`、`scripts/test.ps1`、`.gitignore`。本任务**不**创建 `Makefile`；它在任务 14 与容器/CI 一并创建。任何共享 fixture 在真实出现需求的任务再加入，`conftest.py` 在本任务只负责测试导入路径。
+**文件：** 新建 `backend/pyproject.toml`、`backend/src/safe_code_harness/__init__.py`、`backend/tests/conftest.py`、`backend/tests/unit/test_project_contract.py`、`scripts/test.ps1`；扩展 `.gitignore`。`.gitignore` 已在任务 1 之前的 worktree 流程准备提交中最小创建，仅包含 `.worktrees/` 与 `.superpowers/`；任务 1 在自己的 worktree 补充 Python、Node、测试和凭据忽略项。本任务**不**创建 `Makefile`；它在任务 14 与容器/CI 一并创建。任何共享 fixture 在真实出现需求的任务再加入，`conftest.py` 在本任务只负责测试导入路径。
 
 **固定配置：** 发布名 `safe-code-harness`，导入名 `safe_code_harness`，版本 `0.1.0`，`requires-python = ">=3.12"`。`backend/pyproject.toml` 使用 setuptools 和 src layout：`package-dir = {"" = "src"}`、包发现 `where = ["src"]`，`dependencies = []`，`dev = ["pytest>=8,<9"]`，pytest `testpaths = ["tests"]`。任务 8 才可向运行时依赖添加 FastAPI/Pydantic/HTTP 依赖；任务 11 才创建 Node 依赖。
 

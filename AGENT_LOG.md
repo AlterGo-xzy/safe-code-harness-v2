@@ -67,3 +67,10 @@
 - 新增客观证据：学生提供的 PowerShell 转录显示 Claude Code `2.1.220`；未登录会话未执行任何工具。实际审阅由普通 `claude` 新启动而非 `--resume`，仅 Fetch `SPEC.md` 和 `PLAN.md` 两个 raw URL（均 200），随后显示 `read 2 files`；无本地读取、shell、编辑或提交调用。
 - 门禁结论：不同类型、输入隔离、暂停问题、原始输出和据此修订五项均已有仓库内证据。实现代码仍为零；任务 0 在本轮证据提交后才标记完成。
 - 学到的教训：欢迎语“Welcome back”不是会话复用的证据；必须以启动命令、是否 `--resume`、工具轨迹和实际读取集合判断输入隔离。
+
+## 2026-08-04 P0：任务 1 worktree 前置准备
+
+- 触发技能：`superpowers:using-git-worktrees`；工作区检测显示当前是普通 `main` 检出（`git-dir` 与 `git-common-dir` 都为 `.git`），`.worktrees/` 不存在且 `git check-ignore` 返回未忽略。
+- 实际动作：在创建任一 worktree 前，最小新增 `.gitignore` 的 `.worktrees/` 与 `.superpowers/` 两项，并调整 PLAN 任务 1：该任务在隔离 worktree 中扩展已有 `.gitignore`，而不是声称新建它。
+- 边界：此提交不创建 `backend/`、`frontend/` 或任何 Harness 源码，不执行任务 1 的测试，也不替代该任务的 TDD 过程。
+- 学到的教训：忽略 worktree 目录必须先于 `git worktree add`，否则隔离目录可能被误纳入版本控制；该基础操作也要在日志和计划中如实说明。

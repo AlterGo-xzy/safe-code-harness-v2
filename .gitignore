@@ -1,0 +1,3 @@
+# Isolated worktrees and Superpowers coordination artifacts are never project source.
+.worktrees/
+.superpowers/
