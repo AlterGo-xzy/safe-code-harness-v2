@@ -78,6 +78,16 @@
 
 拒绝的方向：整体迁移旧代码，因为它无法提供“规约、计划、冷启动在实现之前”的真实证据；将同类型 subagent 称作不同类型冷启动 agent，因为这会违反要求。
 
+## 对 brainstorming 的反思
+
+做得好的地方：分段确认迫使项目先回答“为什么是 Harness”“谁使用它”“哪一项机制做深”，从而避免把旧项目的 UI 和功能清单不加选择地搬入新仓库。围绕旧代码复用的追问也把“节省工作量”变成了可审计的先测后迁入规则。
+
+不满意的地方：单靠迭代摘要很容易看起来像过程证据，但不能让评阅者判断真实问题、用户决定和规格变更之间的关系。因此本项目额外保留了关键对话节选，并用要求追踪矩阵把每个承诺转成可观察的完成门槛。另一个局限是不同类型冷启动 agent 不能由同一种 Codex 子 agent 替代，这一外部能力必须在实现前真实解决。
+
+## Superpowers 安装与使用证据
+
+主开发环境为 Codex Desktop，已安装官方插件 `superpowers@openai-curated-remote`，版本 `6.2.0`，本地路径为 `C:\Users\Admin\.codex\plugins\cache\openai-curated-remote\superpowers\6.2.0`。规格阶段实际调用 `using-superpowers` 与 `brainstorming`；后续将按任务真实调用 `writing-plans`、`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`finishing-a-development-branch`，并即时写入 `AGENT_LOG.md`。
+
 ## 冷启动协议（已准备，尚未执行）
 
 冷启动 agent 必须与主开发 agent 类型不同，运行在全新 session，不能导入 memory 或主会话对话。它只获得 `SPEC.md` 与 `PLAN.md`，从计划中选择一至两个明确任务；遇到歧义必须暂停询问，不得凭猜测继续。

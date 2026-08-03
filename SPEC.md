@@ -56,6 +56,19 @@ React WebUI 是操作者控制台：创建/恢复运行、筛选时间线、浏�
 
 本地工作区必须显式配置。线上 zip 上传只解压至隔离工作区，拒绝非 zip、路径穿越、符号链接、超限压缩包、超量文件和敏感/生成内容，例如 `.git`、`.env`、`node_modules` 与缓存目录。
 
+### 3.7 模块边界与错误处理总表
+
+| 模块 | 输入 | 行为与输出 | 边界条件 | 错误处理 |
+| --- | --- | --- | --- | --- |
+| Context/Memory | 任务、许可工作区、已有反馈、记忆查询 | 输出有界上下文与相关记忆 | 文件数量、文件大小、记忆长度受配置限制 | 不可读文件和非法记忆键生成事件，不扩大读取范围 |
+| LLMClient/Parser | 有界上下文、单个模型响应 | 输出合法 `Action` 或解析错误 | 仅接受 JSON 对象和已声明字段 | 网络/供应商错误、非 JSON、未知类型停止当前运行并生成反馈 |
+| Rule/Governance | `Action`、RuntimePolicy、工作区根目录 | 输出允许、警告、阻断或待审批结论 | 所有路径先规范化；命令先规范化 | 无法解析路径、未知策略、疑似危险输入一律阻断 |
+| Tool Dispatcher | 已许可 `Action` | 输出 `ToolResult` 与事件 | 只能调用注册工具；文件/命令都在治理后 | 未知工具、禁用工具和工具异常返回结构化失败，不抛出未处理异常 |
+| Feedback | `ToolResult`、规则/护栏结论 | 输出下一轮反馈记录 | 不复制 key 或敏感文件内容 | 结果不完整时产生通用失败反馈，并停止不安全的继续执行 |
+| Run Service/API | 运行请求、审批请求、配置请求 | 输出运行、时间线、掩码设置状态 | 运行 id、工作区 id、待审批动作必须存在 | 无效 id、非法配置、无待审批动作返回受控 4xx 与事件 |
+| WebUI | API 响应与用户操作 | 输出运行/审批/配置界面 | 不直接读取本机文件或执行命令 | 网络失败、运行停止和审批冲突显示明确状态，不猜测重试 |
+| Upload | zip 二进制、上传限制 | 输出隔离 Workspace 元数据 | 限制大小、文件数、解压大小，拒绝链接和敏感项 | 任一校验失败时删除本次临时解压结果并返回拒绝原因 |
+
 ## 4. 领域与机制设计
 
 领域是受控 Coding 工作流。客观反馈信号是测试退出状态与失败输出、命令退出状态、解析错误、本地规则结论、护栏结论和审批结果。这些信号由项目代码产生、记录为事件并回灌给下一轮动作提供方。
@@ -107,6 +120,12 @@ React WebUI -> FastAPI API -> Run Service -> AgentLoop
 
 默认离线模式无需外部 key。可选 Planner 支持首次隐藏输入、掩码状态、更新和清除。Windows 使用 Credential Manager；非 Windows 的持久化能力在实现相应安全存储适配器前不可用。
 
+### 8.1 凭据生命周期与威胁模型
+
+首次配置可选 Planner 时，WebUI 只提供密码类型输入框；后端将 key 直接交给安全存储适配器，随后响应只能返回“是否已配置”和存储类型，绝不回显明文。用户可再次以隐藏输入更新 key，或执行清除；清除必须删除安全存储中的对应条目。离线模式和所有 Mock 测试不请求、不存储任何外部 key。
+
+受保护资产是 Planner API key。威胁包括：源码、Git 历史、提交 diff、普通配置文件或日志中的意外泄露；浏览器响应或错误信息回显；命令行参数和 shell history；本地工作区的敏感文件；以及托管容器中不存在可靠系统密钥服务时的明文回退。对策是：只允许密码输入和掩码状态；不在请求日志、事件负载、异常文本或设置 JSON 保存 key；将 Windows key 写入 Credential Manager；拒绝被规则识别的 secret 值写入工作区或记忆；不支持安全存储的平台禁用持久化 Planner key；CI 执行 secret 扫描。`.env` 只作为未来显式实现的可选导入来源，必须被 Git 忽略并在 README 说明其明文和进程环境可见风险，不能通过命令行 `export` 作为推荐配置方式。
+
 正式分发形态是 GitHub Container Registry 上的公开 OCI 镜像。`docker build` 与 `docker run` 必须在本地工作；README 必须提供公开 `docker pull` 与运行命令、目标机安全配置、支持平台与已知限制。GitHub Actions 负责构建、测试、浏览器 E2E 与镜像发布。Render 使用同一镜像部署公开 WebUI。
 
 ## 9. 技术选型与理由
@@ -117,6 +136,10 @@ React WebUI -> FastAPI API -> Run Service -> AgentLoop
 - Docker/OCI + GHCR：可重复的公开分发。
 - Windows Credential Manager：目标 Windows 开发平台的原生安全存储。
 - 前端采用 Open Design 作为设计系统参考，并在前端任务中使用其对应设计工作流；界面保持 iOS 风格但优先高密度、可扫描的操作台布局。
+
+前端实现前必须实际安装或确认可用的 Open Design skill，并在 `AGENT_LOG.md` 记录版本、调用时机和采用的 iOS 风格组件规则；若该 skill 在当前工具环境不可用，必须在日志说明原因并记录遵循 Open Design 官方设计系统的替代证据，不能假称已调用。
+
+外部依赖边界：可选 Planner 只使用供应商提供的单次 chat-completions HTTP API；Docker/OCI 依赖 Docker 引擎和 GHCR；线上 WebUI 依赖 Render 或等效容器托管平台；不引入 LangChain、AutoGen、CrewAI、LlamaIndex agent 或任何宿主 agent runner。
 
 ## 10. 验收标准
 
