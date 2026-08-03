@@ -83,3 +83,10 @@
 - 两阶段审查：新鲜 reviewer `Mencius` 先作 spec 合规、再作代码质量审查，结论均为批准，无 Critical/Important/Minor；其只读审查基线 `5dd5da3..cc81e31`。主协调会话独立执行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check` 无输出。
 - 人工干预：协调会话仅回填 PLAN/AGENT_LOG 的实际证据，没有修改任务功能文件。
 - 学到的教训：即使最小包基座也要同时验证 pytest 导入路径和独立 editable-install 导入，任一单独通过都不足以证明 src layout 可用。
+
+## 2026-08-04 T1：PR 创建外部阻断
+
+- 实际动作：分支 `codex/t01-foundation` 已成功推送至 `origin`。尝试通过 GitHub 连接器为 `AlterGo-xzy/safe-code-harness-v2` 创建 draft PR，返回 `403 Resource not accessible by integration`。
+- 交叉核对：`gh auth status` 显示本机活动账户 `AlterGo-xzy` 的 token 无效，并要求执行 `gh auth login -h github.com`；Git push 的传输凭据不能替代该 token。
+- 当前状态：TDD、代码审查和独立测试均完成，但课程要求的“每个 worktree 一个 PR”尚未满足。等待学生完成 GitHub CLI 重新认证或通过网页创建 PR；在真实 PR URL/编号回填前，不进入任务 2。
+- 学到的教训：分支已 push 不等于 PR 已建立；Git 传输认证、GitHub CLI token 和连接器权限需分别验证。
