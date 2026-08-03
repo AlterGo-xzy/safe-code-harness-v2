@@ -11,8 +11,8 @@
 - 冷启动门禁：已完成。Claude Code `2.1.220` 在非 `--resume` 新会话中只 Fetch `SPEC.md` 和 `PLAN.md`，提出四项规约缺口并停止；证据在 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md`，修订提交 `ecbc418`、隔离核验 `107bda3`、门禁回填 `3195ae8`。
 - 任务 1 分支/worktree：`codex/t01-foundation` / `D:\safe-code-harness-v2\.worktrees\t01-foundation`。
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
-- 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。协调会话在 `94b49ee` 上再次运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`；两阶段 reviewer 无 Critical/Important/Minor。
-- 当前唯一硬阻断：任务 1 的 PR 尚未创建。GitHub connector 返回 403；最近一次 `gh auth status` 仍显示 `AlterGo-xzy` token 无效。必须先在用户终端成功运行 `gh auth login -h github.com -w`，并由主会话重新运行 `gh auth status` 成功后，创建 draft PR、回填 PR 编号，再开始任务 2。
+- 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
+- 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
 - 当前源码范围：只有任务 1 的包基座与测试入口；尚未开始 AgentLoop、MockLLM、治理、工具、反馈、记忆、API、凭据、上传、前端、CI、容器或部署。
 
 ## 不可突破的执行纪律
@@ -114,7 +114,7 @@
 
 ## 后续执行顺序
 
-1. 修复 `gh auth`，创建并记录任务 1 draft PR，执行该分支的 `finishing-a-development-branch` 决策。
-2. 仅在任务 1 的 PR 状态如实回填后，开始任务 2：动作协议、运行模型和 Mock LLM。先新 worktree，再 fresh subagent、RED/GREEN、双评审、PR。
+1. 任务 1 的 draft PR 已建立并完成收尾决定；在 [PR #1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1) 保留 `codex/t01-foundation` worktree 以处理审查反馈。
+2. 开始任务 2：动作协议、运行模型和 Mock LLM。先新 worktree，再 fresh subagent、RED/GREEN、双评审、PR。
 3. 按 `PLAN.md` 依赖图完成任务 3-15；任何代码复用按本文件第 6 条执行。
 4. 在每个 task、PR、CI、容器、部署、NJU Git、反思发生时即时更新本文件、`PLAN.md`、`AGENT_LOG.md` 和 `REQUIREMENTS_TRACEABILITY.md`。

@@ -153,7 +153,7 @@ git add backend scripts/test.ps1 .gitignore
 git commit -m "chore: establish offline test foundation"
 ```
 
-**完成记录：** 实现 subagent `Arendt` 在 `codex/t01-foundation` worktree 完成，提交 `cc81e31`。RED：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_project_contract.py -q` 得到预期 `ModuleNotFoundError: safe_code_harness`；GREEN：focused pytest、editable install、独立 `python -c` 导入、`scripts/test.ps1` 和当前全部 backend 测试均通过（`1 passed`）。独立 reviewer `Mencius` 的 spec 合规与代码质量审查均批准，Critical/Important/Minor 均为无；主协调会话再次运行 `scripts/test.ps1`，得到 `1 passed`，并验证 `git diff --check 5dd5da3..cc81e31` 无输出。过程记录提交为 `30dc566`。PR 当前受外部 GitHub 认证阻断：连接器创建请求返回 `403 Resource not accessible by integration`，本机 `gh auth status` 显示 token 无效；在 PR 创建前不得进入任务 2。
+**完成记录：** 实现 subagent `Arendt` 在 `codex/t01-foundation` worktree 完成，提交 `cc81e31`。RED：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_project_contract.py -q` 得到预期 `ModuleNotFoundError: safe_code_harness`；GREEN：focused pytest、editable install、独立 `python -c` 导入、`scripts/test.ps1` 和当前全部 backend 测试均通过（`1 passed`）。独立 reviewer `Mencius` 的 spec 合规与代码质量审查均批准，Critical/Important/Minor 均为无；主协调会话在创建 PR 前再次运行 `scripts/test.ps1`，得到 `1 passed in 0.01s`，并验证 `git diff --check origin/main...HEAD` 无输出。过程记录提交为 `30dc566`。draft PR 已创建：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)。按 `finishing-a-development-branch`，用户选择“推送并创建 PR”，因此保留 `codex/t01-foundation` 分支和 worktree 等待审查；可进入任务 2。
 
 ## 任务 13：确定性机制演示与浏览器端到端验证
 

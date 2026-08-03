@@ -97,3 +97,12 @@
 - 用户决策：允许复用此前完成的代码以减少重复工作，并要求完成当前 task 后维护可供新对话直接读取的进度与目标文件，目标必须覆盖两份正式要求的每一项。
 - 实际动作：新增 `PROJECT_PROGRESS.md`，记录真实分支/commit/PR 阻断、严格的旧代码迁入边界、通用要求和 A 赛道要求逐项目标，以及下一步顺序。
 - 学到的教训：handoff 文档必须把“已验证”“外部阻断”“后续目标”分开写；用户口头状态与命令实际输出冲突时以可复跑输出为准。
+
+## 2026-08-04 T1：GitHub CLI 认证成功与分支收尾
+
+- 触发技能：`superpowers:verification-before-completion`、`superpowers:finishing-a-development-branch`。
+- 关键 context：用户完成 GitHub CLI 登录后，主协调会话重新运行 `gh auth status`，得到账户 `AlterGo-xzy` 已登录，token scopes 包含 `repo` 与 `workflow`。用户此前明确选择收尾选项 2“推送并创建 PR”。
+- 实际动作：创建前执行 `scripts/test.ps1`，结果为 `1 passed in 0.01s`；执行 `git diff --check origin/main...HEAD` 无输出；使用 `gh pr create --draft --base main --head codex/t01-foundation` 创建 [PR #1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)。
+- 分支决定：依照选项 2 保留 `codex/t01-foundation` 与 `.worktrees/t01-foundation`，用于处理 PR 审查反馈；不合并、不删除。此前 connector 403 与失效 token 的日志保留为历史事实，不再构成阻断。
+- 人工干预：用户完成并授权 GitHub CLI 登录；主协调只回填真实 PR 与新鲜验证记录，未修改任务 1 功能代码。
+- 学到的教训：GitHub connector、Git 传输和 `gh` 是独立认证面；PR URL、测试输出和分支收尾决定都应在同一流程节点即时写入过程文档。
