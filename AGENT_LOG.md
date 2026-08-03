@@ -126,5 +126,6 @@
 - 实现 subagent：`/root/t03_implementer`，初始提交 `843e50e feat: add policy rules and path sandbox`，修复提交 `49efb0c fix: harden governance path and secret checks`。用户授权复用旧代码；仅迁入 `D:\\2026_summer_project\\backend\\src\\safe_code_harness\\guardrails\\path_sandbox.py` 与 `rules\\evaluator.py` 的相关逻辑。人工适配把旧版独立 `check()` 合并进新 `resolve()`，杜绝返回不安全路径；未迁入命令、审批、工具、循环和 API。
 - TDD：初始 RED 为缺少 `safe_code_harness.governance`；初始 GREEN 为 focused `11 passed`、backend `18 passed`。审查修复先得到 8 个预期失败，再为 focused `19 passed`、backend `26 passed`；协调会话新鲜运行完整 backend 及从仓库根目录运行 `scripts/test.ps1`，均为 `26 passed`，使用本地 `--basetemp`/`TEMP` 避开环境的默认临时目录权限限制。
 - 两阶段审查：`/root/t03_reviewer` 先判定 spec 不通过并报告 `.env.*` Critical、`sk-`/`sk-proj-` 与运行时 level Important；`/root/t03_implementer` 原地修复。`/root/t03_rereviewer` scoped 复审逐项判定全部 ADDRESSED，无新 Critical/Important/Minor。精确凭据形态扫描 clean；宽泛词扫描只命中安全检测函数名，不作为泄露。
+- 分支收尾：依照用户已确认的 `finishing-a-development-branch` 选项 2，推送 `codex/t03-governance` 并创建 [draft PR #3](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/3)，暂以 `codex/t02-action-protocol` 为目标；保留该分支/worktree 处理审查，上游 PR 合并后依次改为 `main`。
 - 人工干预：协调会话只创建 worktree、维护账本、调度审查、运行独立验证及回填真实证据；未编辑任务功能源码。
 - 学到的教训：治理边界不能只测试精确字符串；`.env.*`、大小写、链接解析、真实供应商 token 形态及运行时类型约束都必须成为可重复的失败测试。
