@@ -90,3 +90,10 @@
 - 交叉核对：`gh auth status` 显示本机活动账户 `AlterGo-xzy` 的 token 无效，并要求执行 `gh auth login -h github.com`；Git push 的传输凭据不能替代该 token。
 - 当前状态：TDD、代码审查和独立测试均完成，但课程要求的“每个 worktree 一个 PR”尚未满足。等待学生完成 GitHub CLI 重新认证或通过网页创建 PR；在真实 PR URL/编号回填前，不进入任务 2。
 - 学到的教训：分支已 push 不等于 PR 已建立；Git 传输认证、GitHub CLI token 和连接器权限需分别验证。
+
+## 2026-08-04 T1：认证复核与新对话 handoff
+
+- 用户声明已完成登录后，协调会话在当前分支重新运行 `scripts/test.ps1`，结果为 `1 passed in 0.01s`；随后 `gh auth status` 仍返回 `AlterGo-xzy` token invalid。该声明未被写成认证通过。
+- 用户决策：允许复用此前完成的代码以减少重复工作，并要求完成当前 task 后维护可供新对话直接读取的进度与目标文件，目标必须覆盖两份正式要求的每一项。
+- 实际动作：新增 `PROJECT_PROGRESS.md`，记录真实分支/commit/PR 阻断、严格的旧代码迁入边界、通用要求和 A 赛道要求逐项目标，以及下一步顺序。
+- 学到的教训：handoff 文档必须把“已验证”“外部阻断”“后续目标”分开写；用户口头状态与命令实际输出冲突时以可复跑输出为准。
