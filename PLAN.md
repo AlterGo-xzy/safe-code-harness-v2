@@ -35,7 +35,7 @@
 
 **目标：** 在任何实现前用不同类型、全新 session 的 agent 仅凭 SPEC+PLAN 验证清晰度。
 
-- [ ] **步骤 1：发送密封 prompt**
+- [x] **步骤 1：发送密封 prompt**
 
 ```text
 你是 SafeCodeHarness v2 的冷启动开发者。只阅读 SPEC.md 和 PLAN.md。
@@ -43,26 +43,26 @@
 若接口、边界、测试命令或依赖不明确，立即停止并提出问题。不得读取旧仓库或主会话历史。
 ```
 
-- [ ] **步骤 2：记录原始输出**
+- [x] **步骤 2：记录原始输出**
 
 记录 agent 类型、全新 session 证明、完整 prompt、仅有 SPEC+PLAN 的输入约束、问题和输出。
 
-- [ ] **步骤 3：按问题修订文档**
+- [x] **步骤 3：按问题修订文档**
 
 将每个问题判定为规约缺失或误读；在 `SPEC.md`/`PLAN.md` 写出确定答案，在 `SPEC_PROCESS.md` 保留修订前后关键 diff。
 
-- [ ] **步骤 4：验证门禁**
+- [x] **步骤 4：验证门禁**
 
 人工检查过程文档含不同类型、输入隔离、暂停问题、输出、修订；缺任一项即停止。
 
-- [ ] **步骤 5：提交**
+- [x] **步骤 5：提交**
 
 ```powershell
 git add SPEC.md PLAN.md SPEC_PROCESS.md AGENT_LOG.md REQUIREMENTS_TRACEABILITY.md
 git commit -m "docs: record independent cold-start validation"
 ```
 
-**完成记录：** 真实 agent 类型、输出、修订、hash、PR。
+**完成记录：** Claude Code `2.1.220`（主开发为 Codex Desktop）在非 `--resume` 新启动会话中，只 Fetch commit `fc9b754` 的 `SPEC.md` 与 `PLAN.md`；原始转录与工具轨迹为 `docs/evidence/cold-start-claude-code-task1.md`。它对任务 1 提出四项规约缺口并暂停；修订提交为 `ecbc418`，隔离核验提交为 `107bda3`。任务 0 是规约门禁，不创建 worktree 或 PR；后续实现任务才逐一使用独立 worktree/PR。
 
 ## 任务 1：工程基座与离线测试入口
 
