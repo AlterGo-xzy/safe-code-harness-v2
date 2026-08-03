@@ -13,7 +13,7 @@
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
 - 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
-- 当前源码范围：只有任务 1 的包基座与测试入口；尚未开始 AgentLoop、MockLLM、治理、工具、反馈、记忆、API、凭据、上传、前端、CI、容器或部署。
+- 当前源码范围：任务 1 的包基座与测试入口，以及任务 2 的确定性动作协议、运行模型与离线 Mock LLM 已完成并经双审查；尚未开始 AgentLoop、治理、工具、反馈、记忆、API、凭据、上传、前端、CI、容器或部署。
 
 ## 不可突破的执行纪律
 
@@ -115,6 +115,6 @@
 ## 后续执行顺序
 
 1. 任务 1 的 draft PR 已建立并完成收尾决定；在 [PR #1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1) 保留 `codex/t01-foundation` worktree 以处理审查反馈。
-2. 开始任务 2：动作协议、运行模型和 Mock LLM。先新 worktree，再 fresh subagent、RED/GREEN、双评审、PR。
-3. 按 `PLAN.md` 依赖图完成任务 3-15；任何代码复用按本文件第 6 条执行。
+2. 任务 2 已在 `codex/t02-action-protocol` / `D:\safe-code-harness-v2\.worktrees\t02-action-protocol` 完成：`ba3116a` 实现确定性动作协议与 Mock LLM，用户授权迁入旧项目三个相关源文件概念并作最小接口适配；RED、GREEN、独立双审查、完整离线测试、diff 检查和 secret scan 已完成。后续只读审计已将误插到任务 13 的完成记录移回任务 2。因任务 1 PR 尚未合并，已创建目标为 `codex/t01-foundation` 的 [stacked draft PR #2](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/2)；保留分支/worktree 等待审查，PR #1 合并后改为 `main`。
+3. 按 `PLAN.md` 依赖图完成任务 3-15；任何代码复用需记录旧文件路径、迁入范围与人工调整。
 4. 在每个 task、PR、CI、容器、部署、NJU Git、反思发生时即时更新本文件、`PLAN.md`、`AGENT_LOG.md` 和 `REQUIREMENTS_TRACEABILITY.md`。
