@@ -118,3 +118,13 @@
 - 人工干预：协调会话只创建隔离 worktree、调用审查与回填真实证据；未改动任务功能源码。一次从旧项目当前目录绝对调用 `scripts/test.ps1` 导致相对路径误收集旧项目测试；检查脚本后确认规范调用方式是先进入目标仓库根目录，按此方式重跑后通过。
 - 过程记录修正：后续只读审计发现任务 2 完成记录被误插入任务 13 的同名占位符；已将该记录移回任务 2，并恢复任务 13 的未完成占位符。未修改任何任务功能代码，也未启动任务 3。
 - 学到的教训：批准复用旧代码并不等于放弃新仓库接口、离线边界或 RED/GREEN 证据；堆叠 PR 需要明确目标分支，避免把任务 1 基座变成任务 2 的重复审查范围。
+
+## 2026-08-04 T3：策略、规则与失败关闭路径沙箱
+
+- worktree/分支：`D:\\safe-code-harness-v2\\.worktrees\\t03-governance` / `codex/t03-governance`，以任务 2 分支为 stacked 基线，后续 PR 先指向 `codex/t02-action-protocol`。
+- 触发技能：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`verification-before-completion`；初审发现安全问题后按 fix round 与 scoped re-review 处理。
+- 实现 subagent：`/root/t03_implementer`，初始提交 `843e50e feat: add policy rules and path sandbox`，修复提交 `49efb0c fix: harden governance path and secret checks`。用户授权复用旧代码；仅迁入 `D:\\2026_summer_project\\backend\\src\\safe_code_harness\\guardrails\\path_sandbox.py` 与 `rules\\evaluator.py` 的相关逻辑。人工适配把旧版独立 `check()` 合并进新 `resolve()`，杜绝返回不安全路径；未迁入命令、审批、工具、循环和 API。
+- TDD：初始 RED 为缺少 `safe_code_harness.governance`；初始 GREEN 为 focused `11 passed`、backend `18 passed`。审查修复先得到 8 个预期失败，再为 focused `19 passed`、backend `26 passed`；协调会话新鲜运行完整 backend 及从仓库根目录运行 `scripts/test.ps1`，均为 `26 passed`，使用本地 `--basetemp`/`TEMP` 避开环境的默认临时目录权限限制。
+- 两阶段审查：`/root/t03_reviewer` 先判定 spec 不通过并报告 `.env.*` Critical、`sk-`/`sk-proj-` 与运行时 level Important；`/root/t03_implementer` 原地修复。`/root/t03_rereviewer` scoped 复审逐项判定全部 ADDRESSED，无新 Critical/Important/Minor。精确凭据形态扫描 clean；宽泛词扫描只命中安全检测函数名，不作为泄露。
+- 人工干预：协调会话只创建 worktree、维护账本、调度审查、运行独立验证及回填真实证据；未编辑任务功能源码。
+- 学到的教训：治理边界不能只测试精确字符串；`.env.*`、大小写、链接解析、真实供应商 token 形态及运行时类型约束都必须成为可重复的失败测试。
