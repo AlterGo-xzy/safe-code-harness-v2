@@ -35,3 +35,11 @@
 - 人工干预：无实现层人工修改。用户此前确认以中文编写，并授权严格推进流程；计划仍需在提交后接受其确认，并先完成不同类型 agent 的冷启动验证。
 - 已知边界：尚未使用不同类型 agent，尚未执行任何任务的失败测试，尚未创建 `backend/` 或 `frontend/` 源码，尚无 task worktree、PR、CI、镜像或部署证据。
 - 学到的教训：计划中的“完成记录”只能在任务真实结束时回填；把任务结构写得很细不等于完成了冷启动、TDD、subagent 或评审流程。
+
+## 2026-08-03 D1：冷启动 agent 环境准备
+
+- 触发技能：`superpowers:using-superpowers`；为满足任务 0 的“不同类型”约束而检查本机 agent 客户端。
+- 实际证据：`Get-Command claude,gemini,aider,codex` 只发现当前主开发使用的 `codex.exe`；经用户授权安装 `@google/gemini-cli`，并由 `gemini.cmd --version` 确认版本 `0.53.1`。
+- 异常与处理：PowerShell 执行策略阻止 `gemini.ps1`，错误明确指向该包装脚本；改用同安装包的 `gemini.cmd`。其首次清理尝试因受限执行环境不能创建 `C:\\Users\\Admin\\.gemini` 而报告 EPERM；这不被记作认证或冷启动成功。
+- 当前状态：不同类型 agent 已安装但尚未由用户完成 Google 登录；尚未发送密封 prompt，尚未接收其输出，任务 0 仍未完成，生产代码门槛仍然关闭。
+- 学到的教训：安装命令成功不是独立 agent 验证成功；认证、全新会话、输入隔离、暂停问题、原始输出与规约修订必须分别留下证据。
