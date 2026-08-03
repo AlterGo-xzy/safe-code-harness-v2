@@ -73,7 +73,7 @@ git commit -m "docs: record independent cold-start validation"
 
 **测试路径与一键入口：** `backend/tests/conftest.py` 在 pytest 进程把仓库的 `backend/src` 插入 `sys.path`，使红色阶段精确报 `ModuleNotFoundError`，且不依赖工作目录或全局 `PYTHONPATH`。`scripts/test.ps1` 是 Windows 的等价一键测试入口；任务 1 时它只运行已有的 `backend/tests/unit`，后续任务再扩展。
 
-- [ ] **步骤 0：仅建立测试环境，不建立生产包**
+- [x] **步骤 0：仅建立测试环境，不建立生产包**
 
 创建 `.venv`，并安装测试工具：
 
@@ -84,7 +84,7 @@ python -m venv .venv
 
 创建 `backend/tests/conftest.py`，其唯一职责是把 `Path(__file__).parents[1] / "src"` 放入 `sys.path`；此文件不导入或定义任何 Harness 机制。这个脚手架不是生产实现，允许早于失败测试存在。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 ```python
 def test_package_exposes_version() -> None:
@@ -92,13 +92,13 @@ def test_package_exposes_version() -> None:
     assert __version__ == "0.1.0"
 ```
 
-- [ ] **步骤 2：确认红色结果**
+- [x] **步骤 2：确认红色结果**
 
 运行：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_project_contract.py -q`
 
 期望：`ModuleNotFoundError: safe_code_harness`。
 
-- [ ] **步骤 3：最小实现**
+- [x] **步骤 3：最小实现**
 
 ```python
 # backend/src/safe_code_harness/__init__.py
@@ -132,7 +132,7 @@ testpaths = ["tests"]
 addopts = ["-ra"]
 ```
 
-- [ ] **步骤 4：确认绿色结果并重构**
+- [x] **步骤 4：确认绿色结果并重构**
 
 运行：
 
@@ -144,7 +144,7 @@ addopts = ["-ra"]
 
 期望：pytest 输出 `1 passed`，独立导入命令无输出且退出码为 0。创建 `scripts/test.ps1` 以调用 `.venv\\Scripts\\python.exe -m pytest backend/tests/unit`；`.gitignore` 至少忽略 `.venv/`、`__pycache__/`、`*.py[cod]`、`.pytest_cache/`、`.pytest-tmp/`、`*.egg-info/`、`build/`、`dist/`、`.env`、`.env.*`、`frontend/node_modules/`、`frontend/dist/`、`playwright-report/` 与 `test-results/`，并保留 `.env.example`。不加入业务机制。
 
-- [ ] **步骤 5：两阶段审查与提交**
+- [x] **步骤 5：两阶段审查与提交**
 
 先确认本任务只建立基座；再审查 editable install、测试隔离、PowerShell 入口和 `.gitignore`。提交：
 
@@ -153,7 +153,7 @@ git add backend scripts/test.ps1 .gitignore
 git commit -m "chore: establish offline test foundation"
 ```
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** 实现 subagent `Arendt` 在 `codex/t01-foundation` worktree 完成，提交 `cc81e31`。RED：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_project_contract.py -q` 得到预期 `ModuleNotFoundError: safe_code_harness`；GREEN：focused pytest、editable install、独立 `python -c` 导入、`scripts/test.ps1` 和当前全部 backend 测试均通过（`1 passed`）。独立 reviewer `Mencius` 的 spec 合规与代码质量审查均批准，Critical/Important/Minor 均为无；主协调会话再次运行 `scripts/test.ps1`，得到 `1 passed`，并验证 `git diff --check 5dd5da3..cc81e31` 无输出。任务过程记录提交为本次提交，PR 在推送后创建。
 
 ## 任务 13：确定性机制演示与浏览器端到端验证
 

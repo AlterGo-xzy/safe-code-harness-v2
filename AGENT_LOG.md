@@ -74,3 +74,12 @@
 - 实际动作：在创建任一 worktree 前，最小新增 `.gitignore` 的 `.worktrees/` 与 `.superpowers/` 两项，并调整 PLAN 任务 1：该任务在隔离 worktree 中扩展已有 `.gitignore`，而不是声称新建它。
 - 边界：此提交不创建 `backend/`、`frontend/` 或任何 Harness 源码，不执行任务 1 的测试，也不替代该任务的 TDD 过程。
 - 学到的教训：忽略 worktree 目录必须先于 `git worktree add`，否则隔离目录可能被误纳入版本控制；该基础操作也要在日志和计划中如实说明。
+
+## 2026-08-04 T1：工程基座与离线测试入口
+
+- worktree/分支：`D:\\safe-code-harness-v2\\.worktrees\\t01-foundation` / `codex/t01-foundation`，基线 `5dd5da3`。
+- 实现 subagent：`Arendt`（新鲜 session）；读取任务简报并仅在该 worktree 工作。实际提交 `cc81e31 chore: establish offline test foundation`，创建后端包元数据、src layout、测试导入脚手架、版本契约测试、Windows `scripts/test.ps1`，并扩展忽略规则；没有使用旧仓库源码或高层 agent framework。
+- TDD 证据：生产包不存在时，focused pytest 实际得到 `ModuleNotFoundError: safe_code_harness`；加入最小 `__version__` 后 focused pytest、editable install、独立导入和 `scripts/test.ps1` 均通过，当前完整 backend 测试为 `1 passed`。
+- 两阶段审查：新鲜 reviewer `Mencius` 先作 spec 合规、再作代码质量审查，结论均为批准，无 Critical/Important/Minor；其只读审查基线 `5dd5da3..cc81e31`。主协调会话独立执行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check` 无输出。
+- 人工干预：协调会话仅回填 PLAN/AGENT_LOG 的实际证据，没有修改任务功能文件。
+- 学到的教训：即使最小包基座也要同时验证 pytest 导入路径和独立 editable-install 导入，任一单独通过都不足以证明 src layout 可用。
