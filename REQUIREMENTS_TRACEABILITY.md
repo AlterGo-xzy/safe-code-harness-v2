@@ -50,7 +50,7 @@
 | --- | --- | --- |
 | A-1/A-2 | 交付 Coding Agent Harness：决策封装、工具、上下文/记忆、治理、反馈、配置 | 已设计，尚未执行 | 六模块源码、集成测试与运行时间线。 |
 | A-3 | SPEC 说明动作、客观反馈、危险动作、记忆 | 已完成并验证 | `SPEC.md` 3、4。 |
-| A-4-A | 自实现主循环、可注入 Mock LLM；不得使用高层 agent 编排框架 | 已设计，尚未执行 | `AgentLoop`、`LLMClient`、Mock 单测、依赖清单审查。 |
+| A-4-A | 自实现主循环、可注入 Mock LLM；不得使用高层 agent 编排框架 | 部分完成（任务 2） | `ba3116a` 提供自实现 `Action`、`parse_action`、单次 `LLMClient.next_action` 与离线 `MockLLM`；完整 `AgentLoop` 留待任务 7。 |
 | A-4-B | 反馈与危险动作必须是确定性代码，而非提示词 | 已设计，尚未执行 | Feedback evaluator、rule/guardrail 单测和机制演示。 |
 | A-4-C | 移除真实 LLM 后所有核心机制仍可单测 | 已设计，尚未执行 | 离线单元/集成测试禁止网络和真实 key。 |
 | A-4-D | 六维最低实现，并选择一个深入维度 | 已设计，尚未执行 | 六模块实现；治理的规则、沙箱和 HITL 状态机作为主贡献。 |
