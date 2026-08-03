@@ -43,3 +43,11 @@
 - 异常与处理：PowerShell 执行策略阻止 `gemini.ps1`，错误明确指向该包装脚本；改用同安装包的 `gemini.cmd`。其首次清理尝试因受限执行环境不能创建 `C:\\Users\\Admin\\.gemini` 而报告 EPERM；这不被记作认证或冷启动成功。
 - 当前状态：不同类型 agent 已安装但尚未由用户完成 Google 登录；尚未发送密封 prompt，尚未接收其输出，任务 0 仍未完成，生产代码门槛仍然关闭。
 - 学到的教训：安装命令成功不是独立 agent 验证成功；认证、全新会话、输入隔离、暂停问题、原始输出与规约修订必须分别留下证据。
+
+## 2026-08-04 D1：调整冷启动 agent 选择
+
+- 用户决策：删除 Gemini CLI，改用用户安装的 Claude 作为不同类型的冷启动 agent。
+- 实际动作：执行 `npm.cmd uninstall --global @google/gemini-cli`，输出为 `removed 5 packages`；随后 `Get-Command gemini.cmd` 确认为 `not found`。
+- 环境核对：当前 PowerShell 未发现 `claude` 或 `claude.cmd`，Windows 开始菜单也没有返回 Claude/Anthropic 应用项。因此尚不能把本机已检测到的任何 Claude 客户端作为已验证的冷启动环境。
+- 当前状态：改用 Claude 的决定已记录，但在用户指出其 Claude 的实际入口并完成独立新会话前，任务 0 仍未开始；没有实现代码、worktree 或子代理任务被创建。
+- 学到的教训：更换 agent 类型也必须记录实际可执行入口，不能以口头安装声明替代可复核的类型和隔离证据。
