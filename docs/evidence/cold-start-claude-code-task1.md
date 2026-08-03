@@ -9,6 +9,19 @@ Agent 类型：Claude Code（与主开发使用的 Codex Desktop 类型不同）
 - `https://raw.githubusercontent.com/AlterGo-xzy/safe-code-harness-v2/fc9b754/SPEC.md`
 - `https://raw.githubusercontent.com/AlterGo-xzy/safe-code-harness-v2/fc9b754/PLAN.md`
 
+## 会话与输入隔离证据
+
+学生提供的 PowerShell 转录显示 `claude --version` 输出为 `2.1.220 (Claude Code)`。第一次启动因 `Not logged in` 在执行任何工具前终止；该会话没有产生审阅结果。
+
+登录/配置后，学生以普通 `claude` 命令重新启动 Claude Code，而非 `claude --resume <session-id>`。实际审阅会话显示模型为 `deepseek-v4-flash`，工作目录为 `D:\\safe-code-harness-v2`。工具轨迹仅有下列两次调用：
+
+```text
+Fetch(https://raw.githubusercontent.com/AlterGo-xzy/safe-code-harness-v2/fc9b754/SPEC.md) -> 200 OK
+Fetch(https://raw.githubusercontent.com/AlterGo-xzy/safe-code-harness-v2/fc9b754/PLAN.md) -> 200 OK
+```
+
+随后轨迹报告 `read 2 files`，没有 `Read`、目录枚举、shell、编辑或提交工具调用。因而该会话的实际文档输入和工具行为与密封 prompt 一致；没有采用主开发会话历史或仓库其他文件作为审阅依据。
+
 以下内容由学生从 Claude Code 原样粘贴到主会话；仅补充了本页标题和元数据，未改写其分析。
 
 ---

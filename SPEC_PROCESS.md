@@ -92,9 +92,9 @@
 
 ### 执行记录与输入隔离
 
-2026-08-04，学生使用与主开发 Codex Desktop 不同类型的 Claude Code 运行冷启动审阅。密封 prompt 只给出了本仓库 commit `fc9b754` 中 `SPEC.md` 和 `PLAN.md` 的两个 raw URL，并明确禁止读取其他仓库文件、主会话历史或实现代码；完整 prompt 与 Claude 的原始输出见 [`docs/evidence/cold-start-claude-code-task1.md`](docs/evidence/cold-start-claude-code-task1.md)。
+2026-08-04，学生使用与主开发 Codex Desktop 不同类型的 Claude Code `2.1.220` 运行冷启动审阅。密封 prompt 只给出了本仓库 commit `fc9b754` 中 `SPEC.md` 和 `PLAN.md` 的两个 raw URL，并明确禁止读取其他仓库文件、主会话历史或实现代码；完整 prompt、PowerShell 启动记录、Fetch 工具轨迹与 Claude 的原始输出见 [`docs/evidence/cold-start-claude-code-task1.md`](docs/evidence/cold-start-claude-code-task1.md)。
 
-该 agent 选择任务 1，说明了失败测试和预期红色结果，然后在发现四项不确定性后停止提问。它没有提交或建议任何实现代码。原始转录本身证明了“只凭 SPEC+PLAN 暂停提问”的行为；学生仍需在主会话确认该 Claude Code 进程确为全新 session，确认前不得将本节标为完成。
+第一次未登录会话在调用任何工具前终止。实际审阅由重新执行 `claude`（没有 `--resume`）启动；其工具轨迹只显示两次对上述 raw URL 的 `Fetch`，随后显示 `read 2 files`，没有本地读取、shell、编辑或提交调用。该 agent 选择任务 1，说明了失败测试和预期红色结果，然后在发现四项不确定性后停止提问。它没有提交或建议任何实现代码。这构成“不同类型、全新启动、仅凭 SPEC+PLAN、遇歧义暂停”的冷启动验证证据。
 
 ### Claude 暂停的位置与判断
 
@@ -115,4 +115,4 @@
 
 ### 差距与结论
 
-Claude 的产出没有误解领域目标；它暴露的是工程基线没有被写成可独立执行的约定。修订后，任务 1 已具备明确文件、顺序、命令、红色期望、绿色期望和 Windows 入口。冷启动的最后一项客观证据是学生确认 Claude Code 为不含旧会话/记忆的全新 session；在该确认及文档提交前，实现门槛保持关闭。
+Claude 的产出没有误解领域目标；它暴露的是工程基线没有被写成可独立执行的约定。修订后，任务 1 已具备明确文件、顺序、命令、红色期望、绿色期望和 Windows 入口。转录提供了 Claude 版本、非 resume 启动、只 Fetch 两份文档和暂停提问的客观证据；本轮修订已在实现前提交。任务 0 的冷启动门槛通过，后续任务仍必须在独立 worktree、fresh subagent、TDD 和两阶段审查下执行。

@@ -60,3 +60,10 @@
 - 人工处理：判定四项均为 SPEC/PLAN 的真实缺口；修订 SPEC 9.1、PLAN 任务 1 和任务 8，固定包名、版本、最小依赖、测试路径、PowerShell 入口、editable-install 验证以及依赖的延后引入。
 - 当前状态：Claude 已按“遇到歧义停止”要求产出可用反馈，尚待学生确认该 Claude Code 会话为全新 session；确认与本轮文档提交前，任务 0 未标完成，生产代码门槛继续关闭。
 - 学到的教训：把文件名和目标列入计划不足以让陌生 agent 独立执行；测试环境、导入策略、包边界和平台入口都必须写成可验证的约定。
+
+## 2026-08-04 T0：冷启动隔离证据核验
+
+- 触发技能：`superpowers:using-superpowers`、`executing-plans`、`verification-before-completion`。
+- 新增客观证据：学生提供的 PowerShell 转录显示 Claude Code `2.1.220`；未登录会话未执行任何工具。实际审阅由普通 `claude` 新启动而非 `--resume`，仅 Fetch `SPEC.md` 和 `PLAN.md` 两个 raw URL（均 200），随后显示 `read 2 files`；无本地读取、shell、编辑或提交调用。
+- 门禁结论：不同类型、输入隔离、暂停问题、原始输出和据此修订五项均已有仓库内证据。实现代码仍为零；任务 0 在本轮证据提交后才标记完成。
+- 学到的教训：欢迎语“Welcome back”不是会话复用的证据；必须以启动命令、是否 `--resume`、工具轨迹和实际读取集合判断输入隔离。
