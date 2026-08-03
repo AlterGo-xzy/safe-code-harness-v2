@@ -1,10 +1,19 @@
 import pytest
 
 from safe_code_harness.core.models import Action
-from safe_code_harness.governance.rules import RuleEvaluator
+from safe_code_harness.governance.rules import RuleDecision, RuleEvaluator
 
 
-@pytest.mark.parametrize("path", [".env", ".git/config", "secrets/token.txt"])
+@pytest.mark.parametrize(
+    "path",
+    [
+        ".env",
+        ".env.local",
+        "nested/.env.production",
+        ".GIT/config",
+        "nested/SECRETS/token.txt",
+    ],
+)
 def test_rules_block_secret_bearing_file_actions(path: str) -> None:
     decision = RuleEvaluator().evaluate(Action("read_file", {"path": path}, None))
 
@@ -14,6 +23,15 @@ def test_rules_block_secret_bearing_file_actions(path: str) -> None:
 def test_rules_block_secret_like_write_content() -> None:
     decision = RuleEvaluator().evaluate(
         Action("write_file", {"path": "src/config.py", "content": "API_KEY=top-secret"}, None)
+    )
+
+    assert decision.level == "block"
+
+
+@pytest.mark.parametrize("token", ["sk-abcdefghijklmnop", "sk-proj-abcdefghijklmnop"])
+def test_rules_block_standard_openai_style_secret_values(token: str) -> None:
+    decision = RuleEvaluator().evaluate(
+        Action("write_file", {"path": "src/config.py", "content": f"'{token}'"}, None)
     )
 
     assert decision.level == "block"
@@ -31,3 +49,8 @@ def test_rules_allow_an_unrestricted_action() -> None:
     decision = RuleEvaluator().evaluate(Action("run_tests", {"path": "backend/tests"}, None))
 
     assert decision.level == "allow"
+
+
+def test_rule_decision_rejects_an_unknown_level() -> None:
+    with pytest.raises(ValueError, match="level must be one of"):
+        RuleDecision("unknown")

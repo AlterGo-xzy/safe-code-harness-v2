@@ -9,7 +9,7 @@ from safe_code_harness.governance.policy import RuntimePolicy
 DecisionLevel = Literal["allow", "warn", "block"]
 SECRET_VALUE_PATTERNS = (
     re.compile(r"\b[A-Z0-9_]*(?:API_KEY|TOKEN|SECRET|PASSWORD)\s*=", re.IGNORECASE),
-    re.compile(r"\b(?:sk|ghp|github_pat)_[A-Za-z0-9_-]{12,}\b"),
+    re.compile(r"\b(?:sk_|sk-|sk-proj-|ghp_|github_pat_)[A-Za-z0-9_-]{12,}\b"),
     re.compile(r"-----BEGIN (?:RSA |OPENSSH |EC )?PRIVATE KEY-----"),
 )
 
@@ -18,6 +18,10 @@ SECRET_VALUE_PATTERNS = (
 class RuleDecision:
     level: DecisionLevel
     reasons: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.level not in {"allow", "warn", "block"}:
+            raise ValueError("level must be one of: allow, warn, block")
 
 
 class RuleEvaluator:
@@ -39,8 +43,7 @@ class RuleEvaluator:
         if action.type not in {"read_file", "write_file"}:
             return False
         path_parts = str(action.args.get("path", "")).replace("\\", "/").casefold().split("/")
-        blocked_parts = {part.casefold() for part in self.policy.blocked_path_parts}
-        return any(part in blocked_parts for part in path_parts)
+        return any(self.policy.blocks_path_part(part) for part in path_parts)
 
     def _contains_secret_value(self, action: Action) -> bool:
         if action.type != "write_file":

@@ -15,7 +15,6 @@ class PathSandbox:
             raise PermissionError("workspace escape")
 
         relative_candidate = candidate.relative_to(self.root)
-        blocked_parts = {part.casefold() for part in self.policy.blocked_path_parts}
-        if any(part.casefold() in blocked_parts for part in relative_candidate.parts):
+        if any(self.policy.blocks_path_part(part) for part in relative_candidate.parts):
             raise PermissionError("blocked sensitive path")
         return candidate
