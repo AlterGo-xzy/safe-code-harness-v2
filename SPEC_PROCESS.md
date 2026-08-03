@@ -4,7 +4,7 @@
 
 本仓库是全新重建。旧 `safe-code-harness` 仓库只能作为只读技术参考，不能作为新仓库的实现历史。`SPEC.md`、`PLAN.md` 与独立冷启动验证完成前，禁止提交任何生产 Harness 源代码。
 
-## Brainstorming 记录
+## 头脑风暴记录
 
 ### 迭代 1：仓库与产品边界
 
@@ -88,8 +88,31 @@
 
 主开发环境为 Codex Desktop，已安装官方插件 `superpowers@openai-curated-remote`，版本 `6.2.0`，本地路径为 `C:\Users\Admin\.codex\plugins\cache\openai-curated-remote\superpowers\6.2.0`。规格阶段实际调用 `using-superpowers` 与 `brainstorming`；后续将按任务真实调用 `writing-plans`、`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`finishing-a-development-branch`，并即时写入 `AGENT_LOG.md`。
 
-## 冷启动协议（已准备，尚未执行）
+## 冷启动验证：Claude Code 对任务 1 的审阅
 
-冷启动 agent 必须与主开发 agent 类型不同，运行在全新 session，不能导入 memory 或主会话对话。它只获得 `SPEC.md` 与 `PLAN.md`，从计划中选择一至两个明确任务；遇到歧义必须暂停询问，不得凭猜测继续。
+### 执行记录与输入隔离
 
-执行后，本文件将如实记录 agent 类型、完整 prompt、问题、输出、发现的规约缺陷、修订前后关键 diff 与差距分析。
+2026-08-04，学生使用与主开发 Codex Desktop 不同类型的 Claude Code 运行冷启动审阅。密封 prompt 只给出了本仓库 commit `fc9b754` 中 `SPEC.md` 和 `PLAN.md` 的两个 raw URL，并明确禁止读取其他仓库文件、主会话历史或实现代码；完整 prompt 与 Claude 的原始输出见 [`docs/evidence/cold-start-claude-code-task1.md`](docs/evidence/cold-start-claude-code-task1.md)。
+
+该 agent 选择任务 1，说明了失败测试和预期红色结果，然后在发现四项不确定性后停止提问。它没有提交或建议任何实现代码。原始转录本身证明了“只凭 SPEC+PLAN 暂停提问”的行为；学生仍需在主会话确认该 Claude Code 进程确为全新 session，确认前不得将本节标为完成。
+
+### Claude 暂停的位置与判断
+
+| 问题 | 判断 | 处理决定 |
+| --- | --- | --- |
+| `pyproject.toml` 的包名、Python 版本、依赖、src layout 与 pytest 配置缺失 | 规约缺失，不是 Claude 误读 | 在 SPEC 9.1 与 PLAN 任务 1 固定发布名、导入名、Python 版本、setuptools 配置、依赖引入时机和 pytest 配置。 |
+| 根目录 pytest 命令不能自然找到 `backend/src` | 规约缺失；原 PLAN 的“红色结果”无法稳定复现 | 选择测试进程内 `conftest.py` 显式添加 src 路径；绿色后用独立 `python -c` 验证 editable install，避免 conftest 掩盖打包错误。 |
+| `conftest.py` 职责未定义 | 规约缺失 | 任务 1 仅允许其负责路径注入，不预建无用途 fixture 或业务代码。 |
+| Windows 下 `Makefile` 与一键测试范围未定义 | 规约缺失 | 以 `scripts/test.ps1` 作为任务 1 的规范入口，仅跑已存在的 backend unit 测试；`Makefile` 延后至任务 14 的 CI/容器阶段。 |
+
+### 关键修订前后 diff
+
+| 修订前 | 修订后 |
+| --- | --- |
+| 任务 1 只列文件名，使用模糊的 `python -m pytest ...`，没有定义打包、导入或 Windows 测试约定。 | SPEC 9.1 固定 `safe-code-harness` / `safe_code_harness`、`>=3.12`、src layout、最小依赖和 PowerShell 入口。 |
+| `conftest.py`、`Makefile` 均被列为创建项，但没有职责和运行范围。 | `conftest.py` 只做 src 路径注入；`scripts/test.ps1` 为一键入口；`Makefile` 明确延后到任务 14。 |
+| 红色阶段与 editable package 安装的关系未定义。 | 红色阶段用测试路径注入得到确定的 `ModuleNotFoundError`；绿色阶段再执行 editable install 和无 conftest 的独立导入验证。 |
+
+### 差距与结论
+
+Claude 的产出没有误解领域目标；它暴露的是工程基线没有被写成可独立执行的约定。修订后，任务 1 已具备明确文件、顺序、命令、红色期望、绿色期望和 Windows 入口。冷启动的最后一项客观证据是学生确认 Claude Code 为不含旧会话/记忆的全新 session；在该确认及文档提交前，实现门槛保持关闭。

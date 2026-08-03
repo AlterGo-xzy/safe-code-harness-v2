@@ -24,7 +24,7 @@
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
 | G-4.3 | `PLAN.md`：细任务、文件、要点、失败测试、依赖/并行 | 已设计，尚未执行 | 用户确认 SPEC 后由 `writing-plans` 生成并提交。 |
 | G-4.4 | `SPEC_PROCESS.md`：关键问题、至少三轮节选、采纳/拒绝、反思 | 已完成并验证 | `SPEC_PROCESS.md` 的五次迭代、四轮节选、采纳/拒绝与 brainstorming 反思。 |
-| G-4.5 | 不同类型陌生 agent 的冷启动，且只给 SPEC+PLAN | 外部阻断 | 必须在 PLAN 后用不同 agent 类型的全新 session 执行；未验证前禁止实现。 |
+| G-4.5 | 不同类型陌生 agent 的冷启动，且只给 SPEC+PLAN | 已设计，尚未执行 | Claude Code 已对任务 1 仅凭两份 raw 文档提出四项暂停问题；见 `docs/evidence/cold-start-claude-code-task1.md` 与 `SPEC_PROCESS.md`。仍待学生确认其为全新 session，并提交本轮修订；此前禁止实现。 |
 | G-4.6-1 | 每个独立模块一个 worktree/PR | 已设计，尚未执行 | PLAN 为每个模块标注 worktree 和独立 PR；不在 `main` 直接实现。 |
 | G-4.6-2 | 每 task 一个新鲜 subagent | 已设计，尚未执行 | 每个任务 `AGENT_LOG.md` 记录新 agent id、prompt、输出和 commit。 |
 | G-4.6-3 | 红-绿-重构 | 已设计，尚未执行 | 每个 PR 的测试记录与审查。 |

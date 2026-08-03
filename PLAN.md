@@ -66,9 +66,23 @@ git commit -m "docs: record independent cold-start validation"
 
 ## 任务 1：工程基座与离线测试入口
 
-**文件：** 新建 `backend/pyproject.toml`、`backend/src/safe_code_harness/__init__.py`、`backend/tests/conftest.py`、`Makefile`、`.gitignore`；测试 `backend/tests/unit/test_project_contract.py`。
+**工作区与 PR：** `codex/t01-foundation` / `.worktrees/t01-foundation`，独立 PR 指向 `main`。
+**文件：** 新建 `backend/pyproject.toml`、`backend/src/safe_code_harness/__init__.py`、`backend/tests/conftest.py`、`backend/tests/unit/test_project_contract.py`、`scripts/test.ps1`、`.gitignore`。本任务**不**创建 `Makefile`；它在任务 14 与容器/CI 一并创建。任何共享 fixture 在真实出现需求的任务再加入，`conftest.py` 在本任务只负责测试导入路径。
 
-**接口：** 包导出 `__version__`；pytest 从 `backend/tests` 发现测试；`make test` 只调用真实存在的 unit/integration/frontend 命令。
+**固定配置：** 发布名 `safe-code-harness`，导入名 `safe_code_harness`，版本 `0.1.0`，`requires-python = ">=3.12"`。`backend/pyproject.toml` 使用 setuptools 和 src layout：`package-dir = {"" = "src"}`、包发现 `where = ["src"]`，`dependencies = []`，`dev = ["pytest>=8,<9"]`，pytest `testpaths = ["tests"]`。任务 8 才可向运行时依赖添加 FastAPI/Pydantic/HTTP 依赖；任务 11 才创建 Node 依赖。
+
+**测试路径与一键入口：** `backend/tests/conftest.py` 在 pytest 进程把仓库的 `backend/src` 插入 `sys.path`，使红色阶段精确报 `ModuleNotFoundError`，且不依赖工作目录或全局 `PYTHONPATH`。`scripts/test.ps1` 是 Windows 的等价一键测试入口；任务 1 时它只运行已有的 `backend/tests/unit`，后续任务再扩展。
+
+- [ ] **步骤 0：仅建立测试环境，不建立生产包**
+
+创建 `.venv`，并安装测试工具：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install "pytest>=8,<9"
+```
+
+创建 `backend/tests/conftest.py`，其唯一职责是把 `Path(__file__).parents[1] / "src"` 放入 `sys.path`；此文件不导入或定义任何 Harness 机制。这个脚手架不是生产实现，允许早于失败测试存在。
 
 - [ ] **步骤 1：写失败测试**
 
@@ -80,7 +94,7 @@ def test_package_exposes_version() -> None:
 
 - [ ] **步骤 2：确认红色结果**
 
-运行：`python -m pytest backend/tests/unit/test_project_contract.py -q`
+运行：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_project_contract.py -q`
 
 期望：`ModuleNotFoundError: safe_code_harness`。
 
@@ -91,18 +105,51 @@ def test_package_exposes_version() -> None:
 __version__ = "0.1.0"
 ```
 
+随后创建 `backend/pyproject.toml`，内容必须包含：
+
+```toml
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "safe-code-harness"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-ra"]
+```
+
 - [ ] **步骤 4：确认绿色结果并重构**
 
-运行：`python -m pytest backend/tests/unit/test_project_contract.py -q`
+运行：
 
-期望：`1 passed`。只整理 pytest 配置和忽略规则，不加入业务机制。
+```powershell
+.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_project_contract.py -q
+.\.venv\Scripts\python.exe -m pip install -e "backend[dev]"
+.\.venv\Scripts\python.exe -c "from safe_code_harness import __version__; assert __version__ == '0.1.0'"
+```
+
+期望：pytest 输出 `1 passed`，独立导入命令无输出且退出码为 0。创建 `scripts/test.ps1` 以调用 `.venv\\Scripts\\python.exe -m pytest backend/tests/unit`；`.gitignore` 至少忽略 `.venv/`、`__pycache__/`、`*.py[cod]`、`.pytest_cache/`、`.pytest-tmp/`、`*.egg-info/`、`build/`、`dist/`、`.env`、`.env.*`、`frontend/node_modules/`、`frontend/dist/`、`playwright-report/` 与 `test-results/`，并保留 `.env.example`。不加入业务机制。
 
 - [ ] **步骤 5：两阶段审查与提交**
 
-先确认本任务只建立基座；再审查依赖、测试隔离和 `.gitignore`。提交：
+先确认本任务只建立基座；再审查 editable install、测试隔离、PowerShell 入口和 `.gitignore`。提交：
 
 ```powershell
-git add backend Makefile .gitignore
+git add backend scripts/test.ps1 .gitignore
 git commit -m "chore: establish offline test foundation"
 ```
 
@@ -258,7 +305,7 @@ def test_failed_tests_change_the_next_mock_action() -> None:
 ## 任务 8：FastAPI 运行与审批 API
 
 **工作区与 PR：** `codex/t08-api-runs` / `.worktrees/t08-api-runs`，独立 PR。
-**文件：** 新建 `backend/src/safe_code_harness/api/main.py`、`run_service.py`、`routes_runs.py`；测试 `backend/tests/integration/test_runs_api.py`。
+**文件：** 新建 `backend/src/safe_code_harness/api/main.py`、`run_service.py`、`routes_runs.py`；修改 `backend/pyproject.toml` 以加入首次实际需要的 FastAPI/Pydantic/HTTP 依赖；测试 `backend/tests/integration/test_runs_api.py`。
 **接口：** `POST /api/runs` 创建运行；`GET /api/runs/{run_id}` 查询运行和事件；`POST /api/runs/{run_id}/approvals/{approval_id}/approve`、`.../reject` 推进运行。HTTP 响应禁止返回凭据原文。
 
 - [ ] **步骤 1：写失败测试**

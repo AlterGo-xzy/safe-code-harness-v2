@@ -51,3 +51,12 @@
 - 环境核对：当前 PowerShell 未发现 `claude` 或 `claude.cmd`，Windows 开始菜单也没有返回 Claude/Anthropic 应用项。因此尚不能把本机已检测到的任何 Claude 客户端作为已验证的冷启动环境。
 - 当前状态：改用 Claude 的决定已记录，但在用户指出其 Claude 的实际入口并完成独立新会话前，任务 0 仍未开始；没有实现代码、worktree 或子代理任务被创建。
 - 学到的教训：更换 agent 类型也必须记录实际可执行入口，不能以口头安装声明替代可复核的类型和隔离证据。
+
+## 2026-08-04 T0：Claude Code 冷启动规约审阅
+
+- 触发技能：主开发 agent 使用 `superpowers:using-superpowers`、`executing-plans` 和 `receiving-code-review`；外部审阅 agent 为 Claude Code，未获得主会话历史。
+- 密封 context：只提供 commit `fc9b754` 的 `SPEC.md` 与 `PLAN.md` raw URL；要求选择任务 1 或 2，说明失败测试和红色结果，遇到不明确之处即停止，禁止读其他文件或实现代码。
+- Claude 输出：选择任务 1，正确列出版本导入测试及 `ModuleNotFoundError`，并暂停提出四个问题：pyproject 精确内容、src layout 导入路径、conftest 职责、Windows 一键测试与忽略规则。完整原文保存在 `docs/evidence/cold-start-claude-code-task1.md`。
+- 人工处理：判定四项均为 SPEC/PLAN 的真实缺口；修订 SPEC 9.1、PLAN 任务 1 和任务 8，固定包名、版本、最小依赖、测试路径、PowerShell 入口、editable-install 验证以及依赖的延后引入。
+- 当前状态：Claude 已按“遇到歧义停止”要求产出可用反馈，尚待学生确认该 Claude Code 会话为全新 session；确认与本轮文档提交前，任务 0 未标完成，生产代码门槛继续关闭。
+- 学到的教训：把文件名和目标列入计划不足以让陌生 agent 独立执行；测试环境、导入策略、包边界和平台入口都必须写成可验证的约定。

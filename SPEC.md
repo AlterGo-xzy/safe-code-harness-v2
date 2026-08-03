@@ -137,6 +137,14 @@ React WebUI -> FastAPI API -> Run Service -> AgentLoop
 - Windows Credential Manager：目标 Windows 开发平台的原生安全存储。
 - 前端采用 Open Design 作为设计系统参考，并在前端任务中使用其对应设计工作流；界面保持 iOS 风格但优先高密度、可扫描的操作台布局。
 
+### 9.1 后端包与测试基线
+
+后端的发布包名固定为 `safe-code-harness`，Python 导入包固定为 `safe_code_harness`，初始版本为 `0.1.0`，并要求 Python `>=3.12`。项目采用 `backend/src` layout 和 setuptools；任务 1 的唯一运行时依赖为空，开发额外依赖仅为 `pytest>=8,<9`。FastAPI、Pydantic、HTTP 客户端及其他运行时依赖只能在其首次实际需要的计划任务中明确加入，不能在基座阶段预装。
+
+Windows 的规范测试入口是仓库根目录的 `scripts/test.ps1`；它调用 `.venv\\Scripts\\python.exe` 并且只执行当时真实存在的测试目录。任务 1 只执行 `backend/tests/unit`；后续任务再把集成、前端和 E2E 命令纳入该入口。`Makefile` 不是 Windows 基线的隐含前提，会在容器/CI 任务中与跨平台入口一起提供。
+
+测试导入路径只由 `backend/tests/conftest.py` 在测试进程中显式加入 `backend/src`，不依赖调用目录或全局 `PYTHONPATH`。独立的 `python -c` 安装验证不加载该文件，因此可以验证 editable install 与 src-layout 打包配置本身。
+
 前端实现前必须实际安装或确认可用的 Open Design skill，并在 `AGENT_LOG.md` 记录版本、调用时机和采用的 iOS 风格组件规则；若该 skill 在当前工具环境不可用，必须在日志说明原因并记录遵循 Open Design 官方设计系统的替代证据，不能假称已调用。
 
 外部依赖边界：可选 Planner 只使用供应商提供的单次 chat-completions HTTP API；Docker/OCI 依赖 Docker 引擎和 GHCR；线上 WebUI 依赖 Render 或等效容器托管平台；不引入 LangChain、AutoGen、CrewAI、LlamaIndex agent 或任何宿主 agent runner。
