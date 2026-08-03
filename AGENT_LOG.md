@@ -116,4 +116,5 @@
 - 两阶段审查：独立 reviewer `/root/t02_reviewer` 先给出 Spec Compliance PASS，再给出 Task quality APPROVE；无 Critical/Important。Minor 要求保留独立完整测试输出，已通过协调会话的新鲜 full-suite 输出满足。
 - 分支收尾：依照用户已确认的 `finishing-a-development-branch` 选项 2，推送 `codex/t02-action-protocol` 并创建 [draft PR #2](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/2)，暂以 `codex/t01-foundation` 为目标；保留该分支/worktree 处理审查，待 PR #1 合并后改为 `main`。
 - 人工干预：协调会话只创建隔离 worktree、调用审查与回填真实证据；未改动任务功能源码。一次从旧项目当前目录绝对调用 `scripts/test.ps1` 导致相对路径误收集旧项目测试；检查脚本后确认规范调用方式是先进入目标仓库根目录，按此方式重跑后通过。
+- 过程记录修正：后续只读审计发现任务 2 完成记录被误插入任务 13 的同名占位符；已将该记录移回任务 2，并恢复任务 13 的未完成占位符。未修改任何任务功能代码，也未启动任务 3。
 - 学到的教训：批准复用旧代码并不等于放弃新仓库接口、离线边界或 RED/GREEN 证据；堆叠 PR 需要明确目标分支，避免把任务 1 基座变成任务 2 的重复审查范围。
