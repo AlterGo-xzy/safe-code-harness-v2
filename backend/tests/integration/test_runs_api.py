@@ -24,6 +24,51 @@ def _start_run(client, scenario: str) -> str:
     return response.json()["id"]
 
 
+def test_run_list_is_empty_before_any_runs_are_created(client) -> None:
+    """Removing the empty-list route must make this test fail."""
+    response = client.get("/api/runs")
+
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+def test_run_list_returns_creation_ordered_safe_summaries(client) -> None:
+    """Returning events, paths, or non-creation order must make this test fail."""
+    first_run_id = _start_run(client, "pending_write")
+    second_run_id = _start_run(client, "secret_write")
+
+    response = client.get("/api/runs")
+
+    assert response.status_code == 200
+    summaries = response.json()
+    assert [summary["id"] for summary in summaries] == [first_run_id, second_run_id]
+    assert [summary["scenario"] for summary in summaries] == ["pending_write", "secret_write"]
+    assert [summary["status"] for summary in summaries] == ["waiting_approval", "blocked"]
+    assert all(set(summary) == {"id", "scenario", "status", "updated_at"} for summary in summaries)
+    assert all(isinstance(summary["updated_at"], str) and summary["updated_at"] for summary in summaries)
+    rendered = repr(summaries).lower()
+    assert "notes.txt" not in rendered
+    assert "api_key" not in rendered
+    assert "secret-value" not in rendered
+
+
+def test_run_detail_preserves_existing_fields_and_includes_safe_metadata(client) -> None:
+    """Omitting retained scenario or timestamps from a run must make this test fail."""
+    run_id = _start_run(client, "pending_write")
+
+    detail = client.get(f"/api/runs/{run_id}")
+
+    assert detail.status_code == 200
+    body = detail.json()
+    assert body["id"] == run_id
+    assert body["scenario"] == "pending_write"
+    assert isinstance(body["created_at"], str) and body["created_at"]
+    assert isinstance(body["updated_at"], str) and body["updated_at"]
+    assert body["status"] == "waiting_approval"
+    assert body["approval_id"]
+    assert isinstance(body["events"], list)
+
+
 def test_pending_write_only_runs_after_explicit_approval(client) -> None:
     """Removing the AgentLoop resume after approval must make this test fail."""
     run_id = _start_run(client, "pending_write")
