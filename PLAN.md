@@ -274,7 +274,7 @@ def test_failed_test_result_produces_actionable_feedback() -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：补充超过上限、跨 run 隔离、secret-like 键剔除、空结果测试；运行 `python -m pytest backend/tests/unit/test_feedback.py backend/tests/unit/test_memory.py -q`，预期全绿。
 - [ ] **步骤 5：两阶段审查与提交**：先审查反馈不会把模型文本变成政策，再审查内存上限和脱敏；提交 `git commit -m "feat: add deterministic feedback and bounded memory"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** Task 8 implementer `/root/t08_implementer` 提交 `974d73b`，依赖修复 `7afa279`。RED 为缺少 API 模块；仅在 RED 后局部适配旧 API，所有审批继续均经 `AgentLoop.resume`。独立审查发现 `httpx2` 错误依赖（Important）；干净 venv 安装验证后改为直接 `httpx`，scoped re-review PASS。新鲜 full backend `96 passed`、一键 unit `88 passed`、diff clean；上游 Starlette 1 条弃用警告已记录；PR 收尾另行记录。
 
 ## 任务 7：自实现 Agent 主循环
 

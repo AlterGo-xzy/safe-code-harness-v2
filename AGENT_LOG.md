@@ -179,3 +179,8 @@
 - worktree/分支：`codex/t07-agent-loop`，基线 `124b7f6`；implementer `/root/t07_implementer` 提交 `2ceb6b1`，两轮安全修复 `e018822`、`328baaf`。
 - RED 后仅参考旧项目 `core\agent_loop.py` 和直接相关测试的循环/事件概念；新实现使用本仓库 Action、Rules、ApprovalStore、ToolDispatcher、Feedback 和 Memory，未迁入高层 agent framework、API、planner 或凭据。
 - 初审发现审批触发/恢复和工具失败可观察性缺口；第一次修复后 scoped re-review 又发现恢复配置漂移可绕过被拒审批。每轮均先有失败回归，最终 scoped re-review PASS。新鲜 unit 为 `88 passed`，根目录完整 backend/tests（含 integration）为 `89 passed in 0.12s`；未跟踪报告保留在 `task-7-report.md`。
+
+## 2026-08-08 T8：FastAPI 运行与审批 API
+
+- `/root/t08_implementer` 提交 `974d73b`、`7afa279`；API 只经 ApprovalStore 和 AgentLoop.resume 恢复，拒绝无工具分发，事件脱敏可序列化。
+- 审查的 httpx2 依赖缺口经干净安装验证修复，scoped re-review PASS；full backend `96 passed`、一键 unit `88 passed`；上游 Starlette 弃用警告已如实记录。
