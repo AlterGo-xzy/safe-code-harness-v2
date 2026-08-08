@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Literal
 
 from safe_code_harness.core.action import parse_action
@@ -16,7 +16,7 @@ EventKind = Literal[
 @dataclass(frozen=True)
 class RunConfig:
     max_steps: int
-    require_approval: bool = False
+    approval_actions: frozenset[str] = frozenset()
     run_id: str = "run-1"
     memory_limit: int = 10
 
@@ -33,6 +33,8 @@ class RunEvent:
     step: int
     summary: str = ""
     action_type: str | None = None
+    ok: bool | None = None
+    failure: str | None = None
 
 
 @dataclass(frozen=True)
@@ -42,6 +44,9 @@ class RunState:
     status: str
     stop_reason: str
     steps: int
+    approval_id: str | None = None
+    pending_action: Action | None = None
+    resume_cursor: int | None = None
 
     @property
     def tool_events(self) -> list[RunEvent]:
@@ -60,12 +65,35 @@ class AgentLoop:
         self._memory = memory
 
     def run(self, task: str, config: RunConfig) -> RunState:
-        events: list[RunEvent] = []
-        feedback_items: list[object] = []
-        steps = 0
+        return self._continue(task, config, [], [], 0)
 
+    def resume(self, state: RunState, config: RunConfig, approval: Any) -> RunState:
+        """Continue a paused run after the caller supplies its approval decision."""
+
+        if state.status != "waiting_approval" or state.pending_action is None or state.approval_id is None:
+            raise ValueError("run is not waiting for approval")
+        if getattr(approval, "id", None) != state.approval_id:
+            raise ValueError("approval does not match the pending action")
+
+        events = list(state.events)
+        feedback_items = [event.summary for event in events if event.kind == "feedback"]
+        steps = state.resume_cursor or state.steps
+        return self._process_action(
+            state.task, config, events, feedback_items, steps, state.pending_action, approval
+        ) or self._continue(state.task, config, events, feedback_items, steps)
+
+    def _continue(
+        self,
+        task: str,
+        config: RunConfig,
+        events: list[RunEvent],
+        feedback_items: list[object],
+        steps: int,
+    ) -> RunState:
         while steps < config.max_steps:
-            context = build_context(task, feedback_items[-config.memory_limit :], self._memory.relevant(config.memory_limit))
+            context = build_context(
+                task, feedback_items[-config.memory_limit :], self._memory.relevant(config.memory_limit)
+            )
             events.append(RunEvent("context", steps, summary=context))
             try:
                 raw_action = self._llm.next_action(context)
@@ -83,36 +111,56 @@ class AgentLoop:
             if action.type == "finish":
                 return self._stop(events, task, steps, "finished")
 
-            decision = self._rules.evaluate(action)
-            events.append(
-                RunEvent("rule_decision", steps, summary=", ".join(decision.reasons), action_type=action.type)
-            )
-            if decision.level == "block":
-                self._record_feedback(
-                    events,
-                    feedback_items,
-                    config,
-                    steps,
-                    action,
-                    f"blocked by rule: {', '.join(decision.reasons)}",
-                )
-                return self._stop(events, task, steps, "rule_blocked")
-
-            if decision.level == "warn" and config.require_approval:
-                approval = self._create_approval(action)
-                events.append(RunEvent("approval", steps, summary=approval.status, action_type=action.type))
-                if approval.status != "approved":
-                    reason = "approval_rejected" if approval.status == "rejected" else "waiting_approval"
-                    self._record_feedback(events, feedback_items, config, steps, action, reason.replace("_", " "))
-                    return self._stop(events, task, steps, reason)
-
-            result = self._dispatch(action)
-            events.append(RunEvent("tool_result", steps, summary=result.summary, action_type=action.type))
-            self._record_feedback(events, feedback_items, config, steps, action, result)
-            if steps >= config.max_steps:
-                return self._stop(events, task, steps, "max_steps")
+            terminal = self._process_action(task, config, events, feedback_items, steps, action)
+            if terminal is not None:
+                return terminal
 
         return self._stop(events, task, steps, "max_steps")
+
+    def _process_action(
+        self,
+        task: str,
+        config: RunConfig,
+        events: list[RunEvent],
+        feedback_items: list[object],
+        steps: int,
+        action: Action,
+        resolved_approval: Any | None = None,
+    ) -> RunState | None:
+        decision = self._rules.evaluate(action)
+        events.append(RunEvent("rule_decision", steps, summary=", ".join(decision.reasons), action_type=action.type))
+        if decision.level == "block":
+            self._record_feedback(
+                events, feedback_items, config, steps, action, f"blocked by rule: {', '.join(decision.reasons)}"
+            )
+            return self._stop(events, task, steps, "rule_blocked")
+
+        if action.type in config.approval_actions:
+            approval = resolved_approval or self._create_approval(action)
+            status = getattr(approval, "status", "rejected")
+            events.append(RunEvent("approval", steps, summary=status, action_type=action.type))
+            if status != "approved":
+                if status == "pending":
+                    return self._stop(
+                        events,
+                        task,
+                        steps,
+                        "waiting_approval",
+                        approval_id=getattr(approval, "id", None),
+                        pending_action=action,
+                        resume_cursor=steps,
+                    )
+                self._record_feedback(events, feedback_items, config, steps, action, "approval rejected")
+                return self._stop(events, task, steps, "approval_rejected")
+
+        result, failure = self._dispatch(action)
+        events.append(
+            RunEvent("tool_result", steps, summary=result.summary, action_type=action.type, ok=result.ok, failure=failure)
+        )
+        self._record_feedback(events, feedback_items, config, steps, action, result)
+        if steps >= config.max_steps:
+            return self._stop(events, task, steps, "max_steps")
+        return None
 
     def _create_approval(self, action: Action) -> Any:
         create = getattr(self._approvals, "create", None)
@@ -120,11 +168,12 @@ class AgentLoop:
             return _Approval("rejected")
         return create(f"{action.type} requires approval")
 
-    def _dispatch(self, action: Action) -> ToolResult:
+    def _dispatch(self, action: Action) -> tuple[ToolResult, str | None]:
         try:
-            return self._tools.dispatch(action)
+            result = self._tools.dispatch(action)
+            return result, "tool_failure" if not result.ok else None
         except Exception as exc:
-            return ToolResult(ok=False, summary=f"tool error: {type(exc).__name__}")
+            return ToolResult(ok=False, summary=f"tool error: {type(exc).__name__}"), "tool_exception"
 
     def _record_feedback(
         self,
@@ -149,7 +198,14 @@ class AgentLoop:
 
     @staticmethod
     def _stop(
-        events: list[RunEvent], task: str, steps: int, reason: str, summary: str = ""
+        events: list[RunEvent],
+        task: str,
+        steps: int,
+        reason: str,
+        summary: str = "",
+        approval_id: str | None = None,
+        pending_action: Action | None = None,
+        resume_cursor: int | None = None,
     ) -> RunState:
         events.append(RunEvent("stopped", steps, summary=summary or reason))
         status = {
@@ -160,7 +216,16 @@ class AgentLoop:
             "invalid_action": "failed",
             "llm_error": "failed",
         }.get(reason, "stopped")
-        return RunState(task=task, events=tuple(events), status=status, stop_reason=reason, steps=steps)
+        return RunState(
+            task=task,
+            events=tuple(events),
+            status=status,
+            stop_reason=reason,
+            steps=steps,
+            approval_id=approval_id,
+            pending_action=pending_action,
+            resume_cursor=resume_cursor,
+        )
 
 
 @dataclass(frozen=True)
