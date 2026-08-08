@@ -1,5 +1,4 @@
-import re
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Callable, Literal
 
@@ -13,12 +12,34 @@ from safe_code_harness.memory.store import MemoryStore
 from safe_code_harness.tools.dispatcher import ToolResult
 
 
-_SECRET_ASSIGNMENT = re.compile(
-    r"\b(?:[A-Za-z_][A-Za-z0-9_]*(?:API_KEY|TOKEN|SECRET|PASSWORD)|api[-_]?key|token|secret|password)"
-    r"\s*[:=]\s*\S+",
-    re.IGNORECASE,
-)
-_SECRET_VALUE = re.compile(r"\b(?:sk-proj-|sk-|ghp_|github_pat_)[A-Za-z0-9_-]+\b")
+_TIMELINE_DISPLAY_STATUS = {
+    "rule_blocked": "规则已阻止操作",
+    "rule_checked": "规则审查已完成",
+    "approval_pending": "等待人工审批",
+    "approval_approved": "审批已通过",
+    "approval_rejected": "审批已拒绝",
+    "tool_succeeded": "工具执行成功",
+    "tool_failed": "工具执行失败",
+    "run_finished": "任务已结束",
+    "unknown_governed_event": "未知受治理事件",
+}
+
+_TIMELINE_SUMMARY_CODES = {
+    key: key
+    for key in _TIMELINE_DISPLAY_STATUS
+}
+
+_TIMELINE_LEVELS = {
+    "rule_blocked": "blocked",
+    "rule_checked": "info",
+    "approval_pending": "warning",
+    "approval_approved": "info",
+    "approval_rejected": "blocked",
+    "tool_succeeded": "info",
+    "tool_failed": "error",
+    "run_finished": "info",
+    "unknown_governed_event": "warning",
+}
 
 
 class RunNotFoundError(ValueError):
@@ -123,7 +144,10 @@ class RunService:
             "updated_at": self._timestamp_value(managed.updated_at),
             "stop_reason": state.stop_reason,
             "approval_id": state.approval_id,
-            "events": [self._event_payload(event) for event in state.events],
+            "events": [
+                self._timeline_payload(event, state.stop_reason, managed.created_at)
+                for event in state.events
+            ],
         }
 
     def decide(
@@ -171,12 +195,40 @@ class RunService:
     def _timestamp_value(timestamp: datetime) -> str:
         return timestamp.isoformat()
 
-    @staticmethod
-    def _event_payload(event: object) -> dict[str, object]:
-        payload = asdict(event)
+    @classmethod
+    def _timeline_payload(
+        cls, event: object, stop_reason: str, created_at: datetime
+    ) -> dict[str, str]:
+        mapping_key, event_type = cls._timeline_mapping(event, stop_reason)
         return {
-            key: _SECRET_VALUE.sub("[REDACTED]", _SECRET_ASSIGNMENT.sub("[REDACTED]", value))
-            if isinstance(value, str)
-            else value
-            for key, value in payload.items()
+            "type": event_type,
+            "created_at": cls._timestamp_value(created_at),
+            "level": _TIMELINE_LEVELS[mapping_key],
+            "display_status": _TIMELINE_DISPLAY_STATUS[mapping_key],
+            "summary_code": _TIMELINE_SUMMARY_CODES[mapping_key],
         }
+
+    @staticmethod
+    def _timeline_mapping(event: object, stop_reason: str) -> tuple[str, str]:
+        kind = getattr(event, "kind", None)
+        if kind == "rule_decision":
+            return (
+                ("rule_blocked", "rule_decision")
+                if stop_reason == "rule_blocked"
+                else ("rule_checked", "rule_decision")
+            )
+        if kind == "approval":
+            approval_key = {
+                "waiting_approval": "approval_pending",
+                "approval_rejected": "approval_rejected",
+            }.get(stop_reason, "approval_approved")
+            return approval_key, "approval"
+        if kind == "tool_result":
+            return (
+                ("tool_succeeded", "tool_result")
+                if getattr(event, "ok", None) is True
+                else ("tool_failed", "tool_result")
+            )
+        if kind == "stopped" and stop_reason == "finished":
+            return "run_finished", "finish"
+        return "unknown_governed_event", "unknown"
