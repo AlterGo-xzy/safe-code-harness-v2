@@ -1,4 +1,4 @@
-import sys
+import traceback
 
 import pytest
 
@@ -67,3 +67,33 @@ def test_adapter_failure_fails_closed_and_does_not_reveal_the_secret() -> None:
         store.set("fixture-secret-2026")
 
     assert "fixture-secret-2026" not in str(raised.value)
+
+
+@pytest.mark.parametrize("operation", ["set", "get", "clear"])
+def test_adapter_failure_cannot_leak_a_secret_through_the_exception_traceback(operation: str) -> None:
+    """Chaining the adapter exception would make the fixture secret visible here."""
+    from safe_code_harness.config.secret_store import SecretStore, SecretStoreUnavailableError
+
+    secret = "fixture-secret-2026"
+
+    class SecretLeakingCredentialManager:
+        def write(self, target: str, value: str) -> None:
+            raise OSError(f"credential failure: {secret}")
+
+        def read(self, target: str) -> str | None:
+            raise OSError(f"credential failure: {secret}")
+
+        def delete(self, target: str) -> None:
+            raise OSError(f"credential failure: {secret}")
+
+    store = SecretStore(adapter=SecretLeakingCredentialManager(), platform_name="Windows")
+
+    with pytest.raises(SecretStoreUnavailableError) as raised:
+        if operation == "set":
+            store.set(secret)
+        elif operation == "get":
+            store.get()
+        else:
+            store.clear()
+
+    assert secret not in "".join(traceback.format_exception(raised.value))

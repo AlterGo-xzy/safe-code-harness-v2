@@ -133,16 +133,16 @@ class _FailClosedCredentialManager:
         try:
             self._adapter.write(target, secret)
         except Exception as exc:
-            raise SecretStoreUnavailableError("Windows Credential Manager operation failed") from exc
+            raise SecretStoreUnavailableError("Windows Credential Manager operation failed") from None
 
     def read(self, target: str) -> str | None:
         try:
             return self._adapter.read(target)
         except Exception as exc:
-            raise SecretStoreUnavailableError("Windows Credential Manager operation failed") from exc
+            raise SecretStoreUnavailableError("Windows Credential Manager operation failed") from None
 
     def delete(self, target: str) -> None:
         try:
             self._adapter.delete(target)
         except Exception as exc:
-            raise SecretStoreUnavailableError("Windows Credential Manager operation failed") from exc
+            raise SecretStoreUnavailableError("Windows Credential Manager operation failed") from None

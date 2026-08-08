@@ -64,7 +64,7 @@ def get_planner(request: Request) -> dict[str, str | bool | None]:
     try:
         return _response(_configuration(request).snapshot())
     except SecretStoreUnavailableError as exc:
-        raise _unavailable() from exc
+        raise _unavailable() from None
 
 
 @router.put("")
@@ -72,7 +72,7 @@ def update_planner(payload: UpdatePlannerRequest, request: Request) -> dict[str,
     try:
         return _response(_configuration(request).update(payload.base_url, payload.model, payload.api_key))
     except SecretStoreUnavailableError as exc:
-        raise _unavailable() from exc
+        raise _unavailable() from None
 
 
 @router.delete("")
@@ -80,4 +80,4 @@ def clear_planner(request: Request) -> dict[str, str | bool | None]:
     try:
         return _response(_configuration(request).clear())
     except SecretStoreUnavailableError as exc:
-        raise _unavailable() from exc
+        raise _unavailable() from None
