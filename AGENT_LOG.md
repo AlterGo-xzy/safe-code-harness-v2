@@ -203,3 +203,4 @@
 - 行为 RED：focused 3 files/9 tests 中 3 个按预期失败，分别证明卡片 accessible name 缺场景以外的状态/更新时间、UTC 值未标注时区、`detail.id !== selectedRunId` 仍会渲染。另加真实乱序 promise 回归，证明晚到旧请求不能覆盖当前选择。GREEN：卡片名称现在包含场景/状态/UTC 更新时间，两个时间格式化器显式附加 `UTC`，App 只在详情 id 匹配当前选择时渲染；focused 3 files/9 tests 全绿。
 - 文档修正：设计、详细计划与根计划只承诺列表四字段和时间线五字段安全 DTO，删除创建运行、最新事件摘要、工具输出/规则原文承诺。Open Design 只保留“当时记录称安装并校验、当前无安装包/资产 URL/精确摘要而不可复现”的历史陈述，绝不猜测摘要。任务 11 没有窄屏浏览器测试，320px 证据继续作为任务 13 未完成项。
 - 新鲜验证：clean install 后 `npm.cmd test` 为 4 files/15 tests passed；`npm.cmd run build` 成功（Vite 5.4.21，327ms）；credential-like 扫描只报告 `credential_candidate_count=0`；staged diff check 无输出。网络仅用于获准的 npm 依赖安装/解析，没有应用 API、真实 LLM、真实凭据或其他联网操作。
+- 独立 scoped re-review 对 `47986c1..779b4e0` 给出 Critical 0、Important 0、Minor 1：详细计划示例仍含旧事件文字及笼统安装证据措辞。随后以文档最小修正将断言改为固定 `summaryCode`，并明确安装记录不可复现；未改变运行时行为或安全边界。

@@ -115,7 +115,7 @@ it("renders a blocked rule decision in the Chinese event timeline", () => {
 it("selects a run card and shows only its returned event data", async () => {
   render(<App />);
   await userEvent.click(await screen.findByRole("button", { name: /运行 pending_write/ }));
-  expect(await screen.findByText("已阻止危险命令")).toBeInTheDocument();
+  expect(await screen.findByText("dangerous_command_blocked")).toBeInTheDocument();
 });
 ```
 
@@ -169,7 +169,7 @@ git commit -m "feat: add governed run workbench"
 - Modify: `PROJECT_PROGRESS.md`, `PLAN.md`, `AGENT_LOG.md`, `REQUIREMENTS_TRACEABILITY.md`
 
 **Interfaces:**
-- Consumes: task 11 commits, actual RED/GREEN output, two-stage review findings, Open Design installation evidence.
+- Consumes: task 11 commits, actual RED/GREEN output, two-stage review findings, and the non-reproducible historical Open Design installation record.
 - Produces: accurate process handoff and PR description evidence.
 
 - [ ] **Step 1: Run spec-compliance review**
