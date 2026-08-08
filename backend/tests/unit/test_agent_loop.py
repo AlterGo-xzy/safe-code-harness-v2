@@ -4,7 +4,7 @@ import pytest
 
 from safe_code_harness.core.agent_loop import AgentLoop, RunConfig
 from safe_code_harness.core.models import Action
-from safe_code_harness.governance.approval import Approval, ApprovalStore
+from safe_code_harness.governance.approval import ApprovalStore
 from safe_code_harness.governance.rules import RuleEvaluator
 from safe_code_harness.llm.mock import MockLLM
 from safe_code_harness.tools.dispatcher import ToolResult
@@ -121,6 +121,7 @@ def test_explicit_approval_policy_pauses_command_and_write_before_dispatch(
     assert run.status == "waiting_approval"
     assert run.approval_id is not None
     assert run.pending_action == Action(action_type, args, None)
+    assert run.approval_actions == frozenset({action_type})
     assert run.resume_cursor == 1
     assert tools.actions == []
     assert [event.kind for event in run.events] == [
@@ -142,9 +143,9 @@ def test_resume_executes_pending_action_only_after_the_matching_approval() -> No
     )
     config = RunConfig(max_steps=2, approval_actions=frozenset({"run_command"}))
     waiting = loop.run("repair", config)
-    approved = approvals.approve(waiting.approval_id or "")
+    approvals.approve(waiting.approval_id or "")
 
-    resumed = loop.resume(waiting, config, approved)
+    resumed = loop.resume(waiting, RunConfig(max_steps=2))
 
     assert resumed.stop_reason == "finished"
     assert resumed.status == "completed"
@@ -172,10 +173,29 @@ def test_rejected_pending_approval_never_dispatches_the_action() -> None:
     )
     config = RunConfig(max_steps=2, approval_actions=frozenset({"write_file"}))
     waiting = loop.run("repair", config)
-    rejected = approvals.reject(waiting.approval_id or "")
+    approvals.reject(waiting.approval_id or "")
 
-    resumed = loop.resume(waiting, config, rejected)
+    resumed = loop.resume(waiting, RunConfig(max_steps=2))
 
+    assert resumed.stop_reason == "approval_rejected"
+    assert resumed.status == "blocked"
+    assert tools.actions == []
+
+
+def test_rejected_approval_cannot_be_bypassed_by_a_weaker_resume_config() -> None:
+    tools = ScriptedTools([])
+    approvals = ApprovalStore()
+    loop = _loop(
+        MockLLM(['{"type":"run_command","args":{"command":"python -V"}}']), tools, approvals
+    )
+    waiting = loop.run(
+        "repair", RunConfig(max_steps=2, approval_actions=frozenset({"run_command"}))
+    )
+    approvals.reject(waiting.approval_id or "")
+
+    resumed = loop.resume(waiting, RunConfig(max_steps=2, approval_actions=frozenset()))
+
+    assert waiting.approval_actions == frozenset({"run_command"})
     assert resumed.stop_reason == "approval_rejected"
     assert resumed.status == "blocked"
     assert tools.actions == []

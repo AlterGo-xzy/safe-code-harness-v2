@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any, Literal
 
 from safe_code_harness.core.action import parse_action
@@ -47,6 +47,7 @@ class RunState:
     approval_id: str | None = None
     pending_action: Action | None = None
     resume_cursor: int | None = None
+    approval_actions: frozenset[str] = frozenset()
 
     @property
     def tool_events(self) -> list[RunEvent]:
@@ -67,20 +68,25 @@ class AgentLoop:
     def run(self, task: str, config: RunConfig) -> RunState:
         return self._continue(task, config, [], [], 0)
 
-    def resume(self, state: RunState, config: RunConfig, approval: Any) -> RunState:
+    def resume(self, state: RunState, config: RunConfig) -> RunState:
         """Continue a paused run after the caller supplies its approval decision."""
 
         if state.status != "waiting_approval" or state.pending_action is None or state.approval_id is None:
             raise ValueError("run is not waiting for approval")
-        if getattr(approval, "id", None) != state.approval_id:
-            raise ValueError("approval does not match the pending action")
+        if state.pending_action.type not in state.approval_actions:
+            raise ValueError("pending action is not bound to an approval policy")
+        get = getattr(self._approvals, "get", None)
+        if not callable(get):
+            raise ValueError("approval state cannot be resolved")
+        approval = get(state.approval_id)
+        effective_config = replace(config, approval_actions=state.approval_actions)
 
         events = list(state.events)
         feedback_items = [event.summary for event in events if event.kind == "feedback"]
         steps = state.resume_cursor or state.steps
         return self._process_action(
-            state.task, config, events, feedback_items, steps, state.pending_action, approval
-        ) or self._continue(state.task, config, events, feedback_items, steps)
+            state.task, effective_config, events, feedback_items, steps, state.pending_action, approval
+        ) or self._continue(state.task, effective_config, events, feedback_items, steps)
 
     def _continue(
         self,
@@ -149,6 +155,7 @@ class AgentLoop:
                         approval_id=getattr(approval, "id", None),
                         pending_action=action,
                         resume_cursor=steps,
+                        approval_actions=config.approval_actions,
                     )
                 self._record_feedback(events, feedback_items, config, steps, action, "approval rejected")
                 return self._stop(events, task, steps, "approval_rejected")
@@ -206,6 +213,7 @@ class AgentLoop:
         approval_id: str | None = None,
         pending_action: Action | None = None,
         resume_cursor: int | None = None,
+        approval_actions: frozenset[str] = frozenset(),
     ) -> RunState:
         events.append(RunEvent("stopped", steps, summary=summary or reason))
         status = {
@@ -225,6 +233,7 @@ class AgentLoop:
             approval_id=approval_id,
             pending_action=pending_action,
             resume_cursor=resume_cursor,
+            approval_actions=approval_actions,
         )
 
 
