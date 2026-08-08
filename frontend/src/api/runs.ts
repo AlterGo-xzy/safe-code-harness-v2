@@ -6,12 +6,11 @@ export type RunSummary = {
 };
 
 export type RunEvent = {
-  kind: string;
-  step: number;
-  summary: string;
-  actionType: string | null;
-  ok: boolean | null;
-  failure: string | null;
+  type: string;
+  createdAt: string;
+  level: string;
+  displayStatus: string;
+  summaryCode: string;
 };
 
 export type RunDetail = {
@@ -34,22 +33,6 @@ function readString(value: JsonRecord, key: string, message: string): string {
   return value[key];
 }
 
-function readNullableString(value: JsonRecord, key: string, message: string): string | null {
-  const field = value[key];
-  if (field !== null && typeof field !== "string") {
-    throw new Error(message);
-  }
-  return field;
-}
-
-function readNullableBoolean(value: JsonRecord, key: string, message: string): boolean | null {
-  const field = value[key];
-  if (field !== null && typeof field !== "boolean") {
-    throw new Error(message);
-  }
-  return field;
-}
-
 function toSummary(value: unknown): RunSummary {
   const message = "无法加载运行列表";
   if (!isRecord(value)) {
@@ -65,16 +48,15 @@ function toSummary(value: unknown): RunSummary {
 
 function toEvent(value: unknown): RunEvent {
   const message = "无法加载运行详情";
-  if (!isRecord(value) || typeof value.step !== "number") {
+  if (!isRecord(value)) {
     throw new Error(message);
   }
   return {
-    kind: readString(value, "kind", message),
-    step: value.step,
-    summary: readString(value, "summary", message),
-    actionType: readNullableString(value, "action_type", message),
-    ok: readNullableBoolean(value, "ok", message),
-    failure: readNullableString(value, "failure", message),
+    type: readString(value, "type", message),
+    createdAt: readString(value, "created_at", message),
+    level: readString(value, "level", message),
+    displayStatus: readString(value, "display_status", message),
+    summaryCode: readString(value, "summary_code", message),
   };
 }
 
@@ -92,21 +74,29 @@ function toDetail(value: unknown): RunDetail {
 }
 
 export async function listRuns(signal?: AbortSignal): Promise<RunSummary[]> {
-  const response = await fetch("/api/runs", { signal });
-  if (!response.ok) {
+  try {
+    const response = await fetch("/api/runs", { signal });
+    if (!response.ok) {
+      throw new Error();
+    }
+    const payload: unknown = await response.json();
+    if (!Array.isArray(payload)) {
+      throw new Error();
+    }
+    return payload.map(toSummary);
+  } catch {
     throw new Error("无法加载运行列表");
   }
-  const payload: unknown = await response.json();
-  if (!Array.isArray(payload)) {
-    throw new Error("无法加载运行列表");
-  }
-  return payload.map(toSummary);
 }
 
 export async function getRun(runId: string, signal?: AbortSignal): Promise<RunDetail> {
-  const response = await fetch(`/api/runs/${encodeURIComponent(runId)}`, { signal });
-  if (!response.ok) {
+  try {
+    const response = await fetch(`/api/runs/${encodeURIComponent(runId)}`, { signal });
+    if (!response.ok) {
+      throw new Error();
+    }
+    return toDetail(await response.json());
+  } catch {
     throw new Error("无法加载运行详情");
   }
-  return toDetail(await response.json());
 }

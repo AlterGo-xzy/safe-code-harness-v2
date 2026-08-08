@@ -23,7 +23,15 @@ it("returns only the allowed detail fields", async () => {
     id: "r-1",
     scenario: "pending_write",
     status: "waiting_approval",
-    events: [{ kind: "approval", step: 1, summary: "pending", action_type: "write_file", ok: null, failure: null }],
+    events: [{
+      type: "approval",
+      created_at: "2026-08-08T10:00:00Z",
+      level: "warning",
+      display_status: "需要审批",
+      summary_code: "approval_pending",
+      summary: "D:/private/API_KEY=do-not-leak",
+      failure: "secret=do-not-leak",
+    }],
     approval_id: "private-approval-id",
   }), { status: 200 })));
 
@@ -31,11 +39,32 @@ it("returns only the allowed detail fields", async () => {
     id: "r-1",
     scenario: "pending_write",
     status: "waiting_approval",
-    events: [{ kind: "approval", step: 1, summary: "pending", actionType: "write_file", ok: null, failure: null }],
+    events: [{
+      type: "approval",
+      createdAt: "2026-08-08T10:00:00Z",
+      level: "warning",
+      displayStatus: "需要审批",
+      summaryCode: "approval_pending",
+    }],
   });
 });
 
 it("rejects malformed list data", async () => {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "r-1" }), { status: 200 })));
   await expect(listRuns()).rejects.toThrow("无法加载运行列表");
+});
+
+it("replaces a list fetch exception with the fixed Chinese error", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("D:/private/API_KEY=do-not-leak")));
+
+  await expect(listRuns()).rejects.toThrow(/^无法加载运行列表$/);
+});
+
+it("replaces a detail JSON exception with the fixed Chinese error", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+    ok: true,
+    json: vi.fn().mockRejectedValue(new Error("D:/private/secret.txt")),
+  }));
+
+  await expect(getRun("r-1")).rejects.toThrow(/^无法加载运行详情$/);
 });
