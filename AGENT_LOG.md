@@ -263,5 +263,12 @@
 
 - 反馈验证：首次审查的三项发现均可由当前代码复现，且不改变 Task 2 范围。approval demo 的根因是它没有读取 snapshots；进一步诊断确认现有安全 DTO 在 completed snapshot 中会把两条 approval event 都映射为 `approval_approved`，因此修复使用真正执行前的最后一个批准事件，而不改动 Task 8 的安全投影。PowerShell 根因是外部命令的 `$LASTEXITCODE` 不会在无检查时令脚本失败；cleanup 根因是 `ignore_errors=True`。
 - TDD：先对缺少 `_project_approval_transcript` 得到 import RED；其后事件顺序回归以不匹配固定错误 RED，确认重复 approval 投影需要精确定位。另有 PowerShell 临时 `SystemExit(7)` child 的 RED（entrypoint returncode 为 0），以及缺少 `_remove_demo_workspace` 的 import RED。修复后 approval 子集 `4 passed`、PowerShell 子集 `1 passed`、cleanup 子集 `1 passed`，完整 `test_demos.py` 为 `10 passed in 0.47s`；正常 `.\scripts\run_demos.ps1` 连续输出三份稳定 JSON。完整 backend 为 `156 passed, 1 warning`（既有 TestClient 弃用），`git diff --check` 无输出，凭据候选计数为 0。
+
 - 修复：approval transcript 只从真实 pending/completed snapshots 生成，拒绝等待 snapshot 已含 `tool_succeeded`、缺少证据或最后一次批准不早于唯一执行；PowerShell 新增受测的可选 Python/script 参数但默认行为不变，每次 child 后检查 `$LASTEXITCODE` 并抛固定 path-safe 错误；清理将 `OSError` 变为固定 `RuntimeError`，不再吞掉失败。未改 UI、E2E、policy、旧项目复用、CI 或部署。
 - 提交与后续：修复提交为 `7243dfc fix: harden deterministic demo evidence`。此修复待独立复审，随后才可更新 Task 2 完成状态并开始 Task 3。完整修复报告将写入 `.superpowers/sdd/2026-08-09-demos-e2e/task-2-fix-report.md`（忽略文件）。
+
+### 2026-08-09 — Task 13 Task 2：第二次独立复审与冻结交接
+
+- 审查：fresh read-only reviewer `/root/t13_task2_fix_reviewer` 未运行测试、未修改文件，结论为 Critical 0、Important 1、Minor 2。Important：审批演示仍只将 `tool_succeeded` 认作等待/批准前执行，未拒绝 `tool_failed`；必须先写失败回归并拒绝任意工具结果。Minor：PowerShell 测试只有单一失败 child，必须证明 first child 失败时 later child 不运行；`PROJECT_PROGRESS.md` 与 `REQUIREMENTS_TRACEABILITY.md` 有 focused `6 passed`/完整回归未执行的过期陈述。
+- 人工决定：用户要求先保存现有成果并停止继续实现，故不在此复审结论后修改代码、不启动 Task 3/Playwright/策略扩展。`7243dfc`、`7bf3d04` 已保存全部已完成实现/文档；当前 worktree 的 `git status --short` 无输出。
+- 交接：新增 `HANDOFF_TO_NEXT_MODEL.md`，含分支/HEAD、可如实引用的 RED/GREEN、三个未闭环问题、环境差异、下一步 TDD 命令和不变量。后续模型必须先关闭该 Important 和两个 Minor、完整验证、再次独立审查，才可进入 Task 13 Task 3。

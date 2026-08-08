@@ -17,8 +17,8 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-12、13 Task 1-2） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 Task 2 已如实记录离线实现及其 RED/GREEN，明确两阶段审查、完整回归和浏览器工作尚未执行。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1-2） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 2 在三份 demo 模块存在前因 `ModuleNotFoundError` 失败，最小实现后 focused `6 passed` 与 Windows JSON 入口成功。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-12、13 Task 1-2） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 Task 2 已如实记录离线实现、RED/GREEN、完整 backend `156 passed, 1 warning` 和两轮独立审查。第二次审查仍有 1 Important/2 Minor 未关闭，故浏览器工作和 Task 2 完成声明均未发生。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1-2） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 2 在三份 demo 模块存在前因 `ModuleNotFoundError` 失败，最小实现后 focused `6 passed`；审查修复后 focused `10 passed` 与 Windows JSON 入口成功。对第二次审查的 `tool_failed`/PowerShell later-child 覆盖仍须先 RED 再修复。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11） | 任务 11 的历史记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，不能算作已验证证据，且绝不猜测摘要。任务只采用记录中的技能/设计系统、真实文件产出、可审计原则，未将运行时纳入产品依赖。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
@@ -55,9 +55,9 @@
 | A-4-C | 移除真实 LLM 后所有核心机制仍可单测 | 部分完成（任务 2-5） | 已实现动作、治理和工具的离线确定性单测；完整 loop、反馈/记忆与集成测试仍待后续任务。 |
 | A-4-D | 六维最低实现，并选择一个深入维度 | 部分完成（任务 3-4） | 治理主贡献已实现规则、路径沙箱、命令护栏与 HITL 审批状态机；其余五维仍待后续任务。 |
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
-| A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 部分完成（任务 13 Task 2，修复待复审） | `backend/tests/integration/test_demos.py` 以现有 `MockLLM`、真实 loop/guard/run service 验证三项离线机制；审查修复补充 waiting 未执行、批准先于执行、PowerShell child failure 与 cleanup failure 回归，focused 为 `10 passed`、完整 backend 为 `156 passed, 1 warning`。CI 复现仍待任务 14。 |
-| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 部分完成（任务 13 Task 2，修复待复审） | `26f9855` 的三份 `scripts/run_*_demo.py` 及 Windows 入口已产生稳定 JSON；`7243dfc` 让 approval transcript 从真实 snapshots 派生并证明等待时未执行且批准在执行前，同时阻止 PowerShell 与 cleanup failure 静默继续。复审仍是完成门槛。 |
-| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成（任务 13 Task 2，修复待复审） | 内核和 Mock 单测已存在；README 已索引离线机制演示。Task 13 审查、浏览器 E2E、CI/分发和最终交付仍待完成。 |
+| A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 部分完成（任务 13 Task 2，第二次复审未通过） | `backend/tests/integration/test_demos.py` 以现有 `MockLLM`、真实 loop/guard/run service 验证三项离线机制；审查修复补充 waiting 未执行、批准先于执行、PowerShell child failure 与 cleanup failure 回归，focused 为 `10 passed`、完整 backend 为 `156 passed, 1 warning`。第二次审查要求对 waiting/approval 前 `tool_failed` 先补 RED；CI 复现仍待任务 14。 |
+| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 部分完成（任务 13 Task 2，第二次复审未通过） | `26f9855` 的三份 `scripts/run_*_demo.py` 及 Windows 入口已产生稳定 JSON；`7243dfc` 让 approval transcript 从真实 snapshots 派生并证明等待时未执行且批准在执行前，同时阻止 PowerShell 与 cleanup failure 静默继续。第二次复审仍要求拦截 `tool_failed` 和加强 first-child failure/later-child nonexecution 回归，故不可标记完成。 |
+| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成（任务 13 Task 2，第二次复审未通过） | 内核和 Mock 单测已存在；README 已索引离线机制演示。Task 13 Task 2 尚须关闭复审发现，随后还需浏览器 E2E、CI/分发和最终交付。 |
 
 ## 实现前绝对门禁
 
