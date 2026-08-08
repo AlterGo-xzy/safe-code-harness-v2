@@ -527,7 +527,7 @@ it("renders a blocked rule decision in the run timeline", () => {
 
 ## 任务 12：审批、Planner 与 ZIP 上传界面（策略扩展延后）
 
-**工作区与 PR：** `codex/t12-settings-approval-ui` / `.worktrees/t12-settings-approval-ui`；尚未创建 PR 或推送。
+**工作区与 PR：** `codex/t12-settings-approval-ui` / `.worktrees/t12-settings-approval-ui`；已创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留 worktree 等待审查。
 **实际文件：** `frontend/src/api/approvals.ts`、`planner.ts`、`workspaces.ts`，`runs.ts` 的条件 `approvalId` 投影，`ApprovalPanel.tsx`、`PlannerSettings.tsx`、`WorkspaceUpload.tsx` 及其测试、`App.tsx`/测试和样式。
 **安全接口：** 只调用任务 8 的审批 POST、任务 9 的 Planner GET/PUT/DELETE、任务 10 的 ZIP POST。详情仅在 `waiting_approval` 且 wire `approval_id` 为字符串时保留 `approvalId`；Planner 仅投影四个公共字段，密码输入仅在 submit 中读取且 finally 清空；上传仅显示 `id`、`fileCount`。没有 policy route/UI、假成功、raw event、未记录写路由、key 的 JSX/state/error/URL、localStorage、服务器路径、workspace 切换或外部 Planner 调用；用户批准将策略扩展延后。
 

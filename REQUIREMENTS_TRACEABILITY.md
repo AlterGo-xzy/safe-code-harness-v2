@@ -17,7 +17,7 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-8、11、12） | `AGENT_LOG.md` 记录任务 1-8、11、12 的 worktree、fresh分段实现、TDD、两阶段审查、修复和分支状态；Task 12 最终审查的 6 个 Minor 已关闭，但尚未进入 PR/收尾选择，策略扩展仍为用户批准的延后范围。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-8、11、12） | `AGENT_LOG.md` 记录任务 1-8、11、12 的 worktree、fresh分段实现、TDD、两阶段审查、修复和分支状态；Task 12 最终审查的 6 个 Minor 已关闭，已按用户选择完成 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，策略扩展仍为用户批准的延后范围。 |
 | G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-8、11、12） | `PLAN.md` 与 `AGENT_LOG.md` 保留 Task 12 API/面板及最终修复的真实 RED/GREEN；最终 focused RED 为 1 failed/28 passed（缺 Planner 初始加载提示），最小实现后为 4 files/29 tests，完整前端新鲜验证为 10 files/48 tests。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11） | 任务 11 的历史记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，不能算作已验证证据，且绝不猜测摘要。任务只采用记录中的技能/设计系统、真实文件产出、可审计原则，未将运行时纳入产品依赖。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |

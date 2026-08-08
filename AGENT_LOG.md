@@ -222,3 +222,4 @@
 - 最小 GREEN：Planner 面板增加只覆盖初始 GET 生命周期的本地 loading state 和固定中文提示；`App` 仍只拥有当前选择详情/审批刷新，三个面板各自拥有瞬时请求状态。focused 复跑为 4 files/29 tests passed；完整前端为 10 files/48 tests passed，build 成功。
 - 六项 Minor 均关闭：补齐非字符串审批 ID；三种 Planner 方法的 HTTP/网络脱敏；将 `PROJECT_PROGRESS.md` 日期改为 2026-08-09；统一 Task 1/2 未读取、复制或咨询旧代码且三个路径仅为未来扩展入口；修正 App/面板状态归属并加入 Planner 加载反馈；补齐 Planner 与上传 pending 禁用回归。设计、详细计划和四份过程文档均按实际事实修正。
 - 边界未扩张：无 policy API/UI/backend、localStorage、raw fields、server paths 或 Planner key state/error echo。策略扩展仍按用户决定延后；任务 13 的真实 API、浏览器和 320px E2E 仍未执行。
+- 分支收尾：用户要求按要求文件操作，故采用 `finishing-a-development-branch` 选项 2；已推送 `codex/t12-settings-approval-ui` 并创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)。保留 worktree 处理审查反馈；未合并或删除分支。
