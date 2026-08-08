@@ -204,3 +204,4 @@
 - 文档修正：设计、详细计划与根计划只承诺列表四字段和时间线五字段安全 DTO，删除创建运行、最新事件摘要、工具输出/规则原文承诺。Open Design 只保留“当时记录称安装并校验、当前无安装包/资产 URL/精确摘要而不可复现”的历史陈述，绝不猜测摘要。任务 11 没有窄屏浏览器测试，320px 证据继续作为任务 13 未完成项。
 - 新鲜验证：clean install 后 `npm.cmd test` 为 4 files/15 tests passed；`npm.cmd run build` 成功（Vite 5.4.21，327ms）；credential-like 扫描只报告 `credential_candidate_count=0`；staged diff check 无输出。网络仅用于获准的 npm 依赖安装/解析，没有应用 API、真实 LLM、真实凭据或其他联网操作。
 - 独立 scoped re-review 对 `47986c1..779b4e0` 给出 Critical 0、Important 0、Minor 1：详细计划示例仍含旧事件文字及笼统安装证据措辞。随后以文档最小修正将断言改为固定 `summaryCode`，并明确安装记录不可复现；未改变运行时行为或安全边界。
+- 收尾：用户选择 `finishing-a-development-branch` 选项 2；`codex/t11-workbench-ui` 已成功推送，并创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)。保留 worktree 处理审查反馈；未合并、未删除分支。
