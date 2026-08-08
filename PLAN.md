@@ -161,7 +161,7 @@ git commit -m "chore: establish offline test foundation"
 **文件：** 新建 `scripts/run_guardrail_demo.py`、`run_feedback_demo.py`、`run_approval_demo.py`、`frontend/e2e/workbench.spec.ts`；修改 `Makefile`、`README.md`；测试 `backend/tests/integration/test_demos.py`。
 **接口与验收：** 演示输出稳定 JSON。护栏演示必须有 `blocked: true`；反馈演示必须证明第一次 `run_tests` 失败后下一动作变为 `write_file`；审批演示必须依次显示 `waiting_approval -> approved -> executed`。E2E 必须针对真实本地 API 与 UI，不用页面内容替代后端断言。
 
-- [x] **步骤 1：写失败测试**
+- [ ] **步骤 1：写失败测试**
 
 ```python
 def test_feedback_demo_proves_feedback_changes_next_action() -> None:
@@ -509,7 +509,7 @@ def test_upload_rejects_zip_slip(client, zip_with_parent_path) -> None:
 **文件：** 新建 `frontend/package.json`、`src/main.tsx`、`src/App.tsx`、`src/api/runs.ts`、`src/components/RunTimeline.tsx`、`src/styles/app.css`；测试 `frontend/src/components/RunTimeline.test.tsx`。
 **接口：** 工作台加载/创建运行，时间线显示事件类型、时间、规则结论和工具摘要；无障碍名称可用于 E2E。视觉基调采用确认后的 Open Design 系统与简洁 iOS 控件语言，但不是把文字说明堆进卡片。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 ```tsx
 it("renders a blocked rule decision in the run timeline", () => {
