@@ -233,3 +233,10 @@
 - 六项 Minor 均关闭：补齐非字符串审批 ID；三种 Planner 方法的 HTTP/网络脱敏；将 `PROJECT_PROGRESS.md` 日期改为 2026-08-09；统一 Task 1/2 未读取、复制或咨询旧代码且三个路径仅为未来扩展入口；修正 App/面板状态归属并加入 Planner 加载反馈；补齐 Planner 与上传 pending 禁用回归。设计、详细计划和四份过程文档均按实际事实修正。
 - 边界未扩张：无 policy API/UI/backend、localStorage、raw fields、server paths 或 Planner key state/error echo。策略扩展仍按用户决定延后；任务 13 的真实 API、浏览器和 320px E2E 仍未执行。
 - 分支收尾：用户要求按要求文件操作，故采用 `finishing-a-development-branch` 选项 2；已推送 `codex/t12-settings-approval-ui` 并创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)。保留 worktree 处理审查反馈；未合并或删除分支。
+
+## 2026-08-08 T10：安全 ZIP 上传与隔离工作区
+
+- 分支/worktree：`codex/t10-workspace-upload` / `D:\\safe-code-harness-v2\\.worktrees\\t10-workspace-upload`，基线 `2de48a2`。实现 `/root/t10_implementer` 先 RED，后仅参考旧 `routes_workspace.py:75-118` 的 ZipInfo/symlink 概念，未复制旧跳过敏感文件或异常回显行为。
+- 提交 `698e4dc`、`b546c89`、`d15a4fd`：全量预校验并拒绝 ZIP Slip、ADS、NUL、UNC、Windows 设备名、重复条目、symlink、敏感/缓存目录、成员与大小上限；仅当前上传创建的目录可被清理，UUID 碰撞保留旧工作区；API 固定 path-free 400。
+- 审查：首审 1 Critical/3 Important、scoped review 1 Important，均先有失败回归后修复；最终 PASS，无 C/I/M。协调验证完整 backend `127 passed`、脚本 unit `113 passed`，各有既有 TestClient 弃用 warning。下一步按收尾 skill 建立独立 draft PR。
+- 分支收尾：沿用 `finishing-a-development-branch` 选项 2，推送 `codex/t10-workspace-upload` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #10](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/10)。保留 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
