@@ -184,3 +184,9 @@
 
 - `/root/t08_implementer` 提交 `974d73b`、`7afa279`；API 只经 ApprovalStore 和 AgentLoop.resume 恢复，拒绝无工具分发，事件脱敏可序列化。
 - 审查的 httpx2 依赖缺口经干净安装验证修复，scoped re-review PASS；full backend `96 passed`、一键 unit `88 passed`；上游 Starlette 弃用警告已如实记录。
+
+## 2026-08-08 T10：安全 ZIP 上传与隔离工作区
+
+- 分支/worktree：`codex/t10-workspace-upload` / `D:\\safe-code-harness-v2\\.worktrees\\t10-workspace-upload`，基线 `2de48a2`。实现 `/root/t10_implementer` 先 RED，后仅参考旧 `routes_workspace.py:75-118` 的 ZipInfo/symlink 概念，未复制旧跳过敏感文件或异常回显行为。
+- 提交 `698e4dc`、`b546c89`、`d15a4fd`：全量预校验并拒绝 ZIP Slip、ADS、NUL、UNC、Windows 设备名、重复条目、symlink、敏感/缓存目录、成员与大小上限；仅当前上传创建的目录可被清理，UUID 碰撞保留旧工作区；API 固定 path-free 400。
+- 审查：首审 1 Critical/3 Important、scoped review 1 Important，均先有失败回归后修复；最终 PASS，无 C/I/M。协调验证完整 backend `127 passed`、脚本 unit `113 passed`，各有既有 TestClient 弃用 warning。下一步按收尾 skill 建立独立 draft PR。
