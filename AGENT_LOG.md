@@ -205,3 +205,12 @@
 - 新鲜验证：clean install 后 `npm.cmd test` 为 4 files/15 tests passed；`npm.cmd run build` 成功（Vite 5.4.21，327ms）；credential-like 扫描只报告 `credential_candidate_count=0`；staged diff check 无输出。网络仅用于获准的 npm 依赖安装/解析，没有应用 API、真实 LLM、真实凭据或其他联网操作。
 - 独立 scoped re-review 对 `47986c1..779b4e0` 给出 Critical 0、Important 0、Minor 1：详细计划示例仍含旧事件文字及笼统安装证据措辞。随后以文档最小修正将断言改为固定 `summaryCode`，并明确安装记录不可复现；未改变运行时行为或安全边界。
 - 收尾：用户选择 `finishing-a-development-branch` 选项 2；`codex/t11-workbench-ui` 已成功推送，并创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)。保留 worktree 处理审查反馈；未合并、未删除分支。
+
+## 2026-08-09 T12：治理控制面板与过程复核
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t12-settings-approval-ui` / `codex/t12-settings-approval-ui`。Task 1 提交 `1a9074b`，Task 2 提交 `0369c8f`，审查修复 `b22c56d`；本条不创建 PR 或推送。
+- TDD：Task 1 在依赖安装后先得到 4 files failed、3 tests failed、5 passed 的预期 API RED，随后为 4 files/16 tests GREEN。Task 2 先因三个面板和 App 组合缺失得到 focused RED；另以 Planner 清除错误得到 focused RED，随后为 4 files/15 tests GREEN。Task 2 review 的两个 Important 均先有失败回归：晚到审批完成与选择切换、以及迟到初始 Planner GET 覆盖 mutation；修复后 focused 3 files/16 tests、完整 10 files/37 tests GREEN。
+- 两阶段审查与复核：Task 1 的安全投影 review 记录为 clean（仅 2 个 deferred Minor）；Task 2 初审为 Critical 0、Important 2、Minor 1，fix round 后 review clean。Task 3 按先 spec/security、后质量/无障碍的顺序复核：只用任务 8-10 已有写路由，无 policy UI/route 或假成功；无 raw event、key JSX/state/error/URL、localStorage 和路径显示；labels、原生 keyboard buttons、pending disabled、固定错误/空状态、标题、审批刷新、ZIP accept、组件边界和 stale-detail guard 均符合范围。无 Critical/Important，因此不改产品代码。
+- 旧项目/人工边界：Task 1 没有读取或复制旧代码，Task 2 没有读取或复制旧源码。旧 `D:\2026_summer_project\frontend\src\components\ConfigPanel.tsx`、`WorkspaceUploadPanel.tsx`、`backend\src\safe_code_harness\api\routes_config.py` 仅在设计中作为未来参考记录；未迁入策略、localStorage、服务器路径或 workspace 切换。用户批准策略扩展延后，Task 12 未实现策略 API/UI。
+- 新鲜控制器验证：`frontend` 中 `npm.cmd ci --ignore-scripts` 成功（176 packages；npm audit 提示 3 moderate、1 high、1 critical，未改依赖）；`npm.cmd test` 为 10 files/37 tests passed；`npm.cmd run build` 成功；`git diff --check codex/t11-workbench-ui..HEAD` 无输出。高置信凭据模式扫描只报告 `credential_like_match_count=0`，不输出内容。
+- 后续：任务 13 的真实合并后 API、浏览器和 320px E2E 尚未执行；本 Task 不虚构 PR、浏览器验证或策略持久化。
