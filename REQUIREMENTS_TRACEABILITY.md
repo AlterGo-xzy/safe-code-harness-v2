@@ -17,19 +17,19 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-4） | `AGENT_LOG.md` 记录 task 1-4 的 worktree、fresh subagent、TDD、审查、修复与分支收尾；后续任务继续同一纪律。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-4） | `PLAN.md` 与 `AGENT_LOG.md` 保留任务 1-4 的真实 RED/GREEN；任务 4 的两轮安全修复亦先有失败回归。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-5） | `AGENT_LOG.md` 记录 task 1-5 的 worktree、fresh subagent、TDD、审查、修复与分支收尾；后续任务继续同一纪律。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-5） | `PLAN.md` 与 `AGENT_LOG.md` 保留任务 1-5 的真实 RED/GREEN；任务 4 的两轮安全修复亦先有失败回归。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 已设计，尚未执行 | `SPEC.md` 9 已指定；前端任务开始前确认/安装 skill，并记录实际调用或诚实替代证据。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
 | G-4.3 | `PLAN.md`：细任务、文件、要点、失败测试、依赖/并行 | 已完成并验证 | `PLAN.md` 已由 `writing-plans` 生成并在任务 1-4 记录实际 RED/GREEN、审查与提交。 |
 | G-4.4 | `SPEC_PROCESS.md`：关键问题、至少三轮节选、采纳/拒绝、反思 | 已完成并验证 | `SPEC_PROCESS.md` 的五次迭代、四轮节选、采纳/拒绝与 brainstorming 反思。 |
 | G-4.5 | 不同类型陌生 agent 的冷启动，且只给 SPEC+PLAN | 已完成并验证 | Claude Code `2.1.220` 非 `--resume` 启动，仅 Fetch `SPEC.md` 与 `PLAN.md` 两个 raw URL，发现四项规约缺口后暂停；原始转录、工具轨迹、修订前后 diff 见 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md` 与 commit `ecbc418`。 |
-| G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-4） | 任务 1-4 均在独立 worktree 完成并各有 draft PR；后续模块继续。 |
-| G-4.6-2 | 每 task 一个新鲜 subagent | 部分完成（任务 1-4） | `AGENT_LOG.md` 记录任务 1-4 的 fresh implementer、reviewer 与输出。 |
-| G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-4） | 每个任务记录 RED/GREEN；任务 4 两轮安全审查问题均新增失败回归后修复。 |
-| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-4） | 任务 1-4 有独立审查结论；任务 4 的 Critical 清零后才继续。 |
-| G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 部分完成（任务 1-4） | 任务 1-4 均按 skill 的既有选项 2保留 branch/worktree 并建立 draft PR。 |
+| G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-5） | 任务 1-5 均在独立 worktree 完成并各有 draft PR；后续模块继续。 |
+| G-4.6-2 | 每 task 一个新鲜 subagent | 部分完成（任务 1-5） | `AGENT_LOG.md` 记录任务 1-5 的 fresh implementer、reviewer 与输出。 |
+| G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-5） | 每个任务记录 RED/GREEN；任务 4 的两轮安全审查问题均新增失败回归后修复。 |
+| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-5） | 任务 1-5 有独立审查结论；任务 4 的 Critical 清零后才继续。 |
+| G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 部分完成（任务 1-5） | 任务 1-5 均按 skill 的既有选项 2 保留 branch/worktree 并建立 draft PR。 |
 | G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 部分完成（任务 1-4） | 公开仓库、任务 1-3 draft PR、任务 4 分支及精确凭据扫描；仍需后续 task 和最终历史扫描。 |
 | G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 部分完成（任务 1-4） | 任务 1-4 的 PR/日志均已标注 subagent、人工调整与旧代码复用边界。 |
 | G-4.7-3 | PLAN 持续标注完成与 commit hash | 部分完成（任务 1-4） | `PLAN.md` 已填任务 1-4 实际提交和证据；后续 task 继续。 |
