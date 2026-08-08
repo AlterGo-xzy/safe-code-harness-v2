@@ -13,7 +13,7 @@
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
 - 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
-- 当前源码范围：任务 1-7 的 Harness 核心及任务 8 的受治理运行/审批 API 已完成并经审查；尚未开始凭据、上传、前端、CI、容器或部署。
+- 当前源码范围：任务 1-7 的 Harness 核心及任务 8 的受治理运行/审批 API 已完成并经审查；任务 11 已完成只读中文运行工作台（卡片总览与选中时间线），未开始凭据、上传、审批/配置 UI、CI、容器或部署。任务 11 尚未创建 PR，按当前授权不推送或建 PR。
 
 ## 不可突破的执行纪律
 
@@ -122,3 +122,4 @@
 6. 任务 6 已在 `codex/t06-feedback-memory` / `D:\safe-code-harness-v2\.worktrees\t06-feedback-memory` 完成：`cc5b974` 与 `6b9676b` 实现并加固确定性反馈和有界脱敏记忆；两项 Important 经失败回归与 scoped re-review 修复，一键测试为 `77 passed`。已创建目标为 `codex/t05-tools` 的 [stacked draft PR #6](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/6)，保留分支/worktree 等待审查。
 7. 任务 7 已在 `codex/t07-agent-loop` / `D:\safe-code-harness-v2\.worktrees\t07-agent-loop` 完成：自实现循环的审批与恢复边界经两轮 Critical 修复和 scoped re-review；完整 backend/tests 为 `89 passed`。已创建目标为 `codex/t06-feedback-memory` 的 [stacked draft PR #7](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/7)，保留分支/worktree 等待审查。
 8. 后续从任务 8 的 FastAPI 运行与审批 API 继续；持续即时更新过程记录。
+9. 任务 11 已在 `codex/t11-workbench-ui` / `D:\safe-code-harness-v2\.worktrees\t11-workbench-ui` 完成：`893f01a` 建立 typed read-only frontend boundary，`63749f5` 以先失败回归修复两个 Important API 安全边界，`0dcdca9` 完成中文卡片总览、选中时间线和状态 UI。前端只读调用任务 8 的两个 GET 路由，严格消费列表四字段和时间线固定五字段 DTO，未读取或迁入旧前端，也未加入写 API、审批、配置、上传、凭据或 localStorage。两阶段审查最终 Critical 0、Important 0；新鲜前端测试为 12 passed、构建通过、diff check 无输出。Open Design 记录为 `nexu-io/open-design` 官方 Windows x64 Release `0.18.1`，采用技能/设计系统驱动、真实文件产出、可审计而非装饰性堆叠原则，未加入运行时依赖；原记录称 SHA-256 已核验但本地未留精确值，在禁止联网条件下不作精确哈希声明。CSS 有 `44rem` 单列断点、`min-width: 0` 与 `overflow-wrap: anywhere`；浏览器 320px 实测明确留给任务 13。仅过程文档待提交，尚未创建 PR。

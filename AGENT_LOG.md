@@ -186,3 +186,12 @@
 - 审查的 httpx2 依赖缺口经干净安装验证修复，scoped re-review PASS；full backend `96 passed`、一键 unit `88 passed`；上游 Starlette 弃用警告已如实记录。
 - 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
 - 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
+
+## 2026-08-09 T11：受治理运行工作台的复核与过程证据
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t11-workbench-ui` / `codex/t11-workbench-ui`；实现 subagent 分段为 `/root/t11_task1_implementer` 与 `/root/t11_task2_implementer`，过程复核为 `/root/t11_task3_implementer`。实现提交：`893f01a`、`63749f5`、`0dcdca9`；本条不创建 PR。
+- Open Design 实际证据：设计阶段记录从 `nexu-io/open-design` 官方 Windows x64 Release 安装 `0.18.1`，并采用“技能/设计系统驱动、真实文件产出、可审计而非装饰性堆叠”；未引入 Open Design 运行时依赖。此前记录为“SHA-256 已核验”，但未持久化精确校验值。本次仅本地、禁止联网复核，不能独立重新算出或声称该值；该可复现性缺口明确留存，不能写成精确 SHA 已存档。
+- Task 1：先有 `runs` 模块不存在的 RED；首轮 GREEN 为 4/4。随后以任务 8 服务端安全 DTO 为唯一契约：列表白名单四字段，详情时间线白名单五字段。安全审查报告两个 Important：fetch/JSON 错误会露出原文，及旧字段 `summary`/`failure` 被读取；先有 3/6 RED，再在 `63749f5` 修复为 6/6，并将错误固定为中文消息。
+- Task 2：先有 `App` 与 `RunTimeline` 不存在的 RED；绿色为 focused 6/6、全套 12/12。审查覆盖 API-only 渲染、无批准/配置/上传写路径、无 secret/localStorage、选中卡片仅以 `getRun` 返回事件、中文加载/空/错误状态；最终未发现 Critical/Important。质量复核确认原生 button 键盘焦点、`aria-pressed`、文本状态、语义列表、`44rem` 单列布局、`min-width: 0` 和 `overflow-wrap: anywhere`。没有浏览器 320px 实测，保留 Task 13 E2E，不把 CSS 静态检查写成视觉验证。
+- 新鲜控制器验证：从 `frontend` 运行 `npm.cmd test`，Vitest 为 3 files/12 tests passed；`npm.cmd run build` 成功（Vite 5.4.21，337ms）；仓库根目录 `git diff --check 2de48a2..HEAD` 无输出。变更文件凭据模式扫描只报告汇总：无非测试代码匹配，未输出任何命中内容。
+- 人工边界与教训：没有编辑功能源码、没有读取旧项目、没有联网或真实密钥；仅更新过程文档和本地 SDD 报告。完整 Release checksum 必须在将来有原始安装证据或获准联网时补入，不能由记忆或猜测替代。
