@@ -500,7 +500,7 @@ def test_upload_rejects_zip_slip(client, zip_with_parent_path) -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：增加 `.env`、符号链接位、数量/大小上限、成功注册和失败清理测试；运行同一命令，预期全绿。
 - [ ] **步骤 5：两阶段审查与提交**：先审查上传不扩大工具权限，再审查归档元数据与清理路径；提交 `git commit -m "feat: add isolated safe workspace uploads"`。
 
-**完成记录：** `/root/t10_implementer` 在基线 `2de48a2` 提交 `698e4dc`，RED 为缺少 `workspaces` 模块；RED 后仅参考旧项目 `D:\\2026_summer_project\\backend\\src\\safe_code_harness\\api\\routes_workspace.py:75-118` 的 ZipInfo/symlink 思路，重写全量预校验与安全响应。首审发现 ADS Critical、重复条目 500、生成目录遗漏和目录元数据计数绕过；均先补 RED 后以 `b546c89` 修复。scoped review 再发现 UUID 碰撞会删除既有目录；先加固定 UUID 的 RED，再以 `d15a4fd` 限定清理所有权。最终复审 PASS，无 C/I/M；协调验证 backend `127 passed, 1 warning`、`scripts/test.ps1` `113 passed`，warning 为既有 TestClient 弃用提示。PR 真实建立后补填。
+**完成记录：** `/root/t10_implementer` 在基线 `2de48a2` 提交 `698e4dc`，RED 为缺少 `workspaces` 模块；RED 后仅参考旧项目 `D:\\2026_summer_project\\backend\\src\\safe_code_harness\\api\\routes_workspace.py:75-118` 的 ZipInfo/symlink 思路，重写全量预校验与安全响应。首审发现 ADS Critical、重复条目 500、生成目录遗漏和目录元数据计数绕过；均先补 RED 后以 `b546c89` 修复。scoped review 再发现 UUID 碰撞会删除既有目录；先加固定 UUID 的 RED，再以 `d15a4fd` 限定清理所有权。最终复审 PASS，无 C/I/M；协调验证 backend `127 passed, 1 warning`、`scripts/test.ps1` `113 passed`，warning 为既有 TestClient 弃用提示。凭据形态扫描为 0、diff check clean；按既有收尾选项 2，已建立目标为 `codex/t08-api-runs` 的 [stacked draft PR #10](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/10)，保留 branch/worktree 等待审查。
 
 ## 任务 11：Open Design 风格运行工作台
 

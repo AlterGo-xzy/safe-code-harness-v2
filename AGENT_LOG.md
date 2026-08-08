@@ -190,3 +190,4 @@
 - 分支/worktree：`codex/t10-workspace-upload` / `D:\\safe-code-harness-v2\\.worktrees\\t10-workspace-upload`，基线 `2de48a2`。实现 `/root/t10_implementer` 先 RED，后仅参考旧 `routes_workspace.py:75-118` 的 ZipInfo/symlink 概念，未复制旧跳过敏感文件或异常回显行为。
 - 提交 `698e4dc`、`b546c89`、`d15a4fd`：全量预校验并拒绝 ZIP Slip、ADS、NUL、UNC、Windows 设备名、重复条目、symlink、敏感/缓存目录、成员与大小上限；仅当前上传创建的目录可被清理，UUID 碰撞保留旧工作区；API 固定 path-free 400。
 - 审查：首审 1 Critical/3 Important、scoped review 1 Important，均先有失败回归后修复；最终 PASS，无 C/I/M。协调验证完整 backend `127 passed`、脚本 unit `113 passed`，各有既有 TestClient 弃用 warning。下一步按收尾 skill 建立独立 draft PR。
+- 分支收尾：沿用 `finishing-a-development-branch` 选项 2，推送 `codex/t10-workspace-upload` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #10](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/10)。保留 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
