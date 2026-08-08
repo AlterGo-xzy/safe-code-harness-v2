@@ -10,7 +10,7 @@
 
 - 仓库：`D:\safe-code-harness-v2`；公开远程：`https://github.com/AlterGo-xzy/safe-code-harness-v2`。
 - 当前工作目录：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e`。
-- 当前分支：`codex/t13-demos-e2e`；当前 HEAD：`7bf3d04 docs: record task 13 demo review fixes`。
+- 当前分支：`codex/t13-demos-e2e`；运行时实现基线为 `7bf3d04 docs: record task 13 demo review fixes`，其后仅有本交接/进度文档提交。接手时以 `git rev-parse HEAD` 获取实际当前 HEAD。
 - 已核验：在本交接文档创建前，`git status --short` 无输出；没有需要保留的已跟踪用户改动。
 - Task 13 尚未推送、尚未创建 PR #13。不要假称已有 PR。
 - Task 1-12 的 stacked draft PR #1-#12 已存在且尚未合并；Task 13 以 Task 12 分支为基线。
