@@ -173,3 +173,9 @@
 ## 2026-08-08 T6：分支收尾与 PR
 
 - 沿用收尾选项 2；已推送 `codex/t06-feedback-memory` 并创建 [draft PR #6](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/6)。API 回读确认 `OPEN`、`isDraft=true`、base `codex/t05-tools`、head 正确；保留 worktree 等待审查。
+
+## 2026-08-08 T7：自实现受治理 AgentLoop
+
+- worktree/分支：`codex/t07-agent-loop`，基线 `124b7f6`；implementer `/root/t07_implementer` 提交 `2ceb6b1`，两轮安全修复 `e018822`、`328baaf`。
+- RED 后仅参考旧项目 `core\agent_loop.py` 和直接相关测试的循环/事件概念；新实现使用本仓库 Action、Rules、ApprovalStore、ToolDispatcher、Feedback 和 Memory，未迁入高层 agent framework、API、planner 或凭据。
+- 初审发现审批触发/恢复和工具失败可观察性缺口；第一次修复后 scoped re-review 又发现恢复配置漂移可绕过被拒审批。每轮均先有失败回归，最终 scoped re-review PASS。新鲜 unit 为 `88 passed`，根目录完整 backend/tests（含 integration）为 `89 passed in 0.12s`；未跟踪报告保留在 `task-7-report.md`。
