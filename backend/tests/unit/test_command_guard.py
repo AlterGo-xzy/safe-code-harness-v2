@@ -56,3 +56,34 @@ def test_guard_fails_closed_for_non_string_or_malformed_commands(command: object
 
     assert result.blocked is True
     assert result.reason == "blocked command"
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "env rm -rf /",
+        "env -i MODE=production rm -rf /",
+        "sudo -n rm -rf /",
+        "sudo -u root rm -rf /",
+        "command -- rm -rf /",
+    ],
+)
+def test_guard_blocks_destructive_commands_hidden_by_supported_wrappers(command: str) -> None:
+    result = CommandGuard(RuntimePolicy()).check(command)
+
+    assert result.blocked is True
+    assert result.reason == "blocked command"
+
+
+def test_guard_does_not_treat_an_env_assignment_as_the_wrapped_command() -> None:
+    result = CommandGuard(RuntimePolicy()).check("env MODE=production python -m pytest")
+
+    assert result.blocked is False
+
+
+@pytest.mark.parametrize("command", ["env -u", "sudo --user", "command --unknown rm -rf /"])
+def test_guard_fails_closed_for_ambiguous_supported_wrapper_arguments(command: str) -> None:
+    result = CommandGuard(RuntimePolicy()).check(command)
+
+    assert result.blocked is True
+    assert result.reason == "blocked command"
