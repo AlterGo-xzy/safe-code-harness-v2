@@ -46,7 +46,24 @@ it("returns only the allowed detail fields", async () => {
       displayStatus: "需要审批",
       summaryCode: "approval_pending",
     }],
+    approvalId: "private-approval-id",
   });
+});
+
+it("keeps approval ID only for a waiting-approval detail", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+    id: "run-1", scenario: "pending_write", status: "waiting_approval",
+    approval_id: "approval-1", events: [],
+  }), { status: 200 })));
+  await expect(getRun("run-1")).resolves.toMatchObject({ approvalId: "approval-1" });
+});
+
+it("never includes an approval ID for a completed detail", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+    id: "run-1", scenario: "pending_write", status: "completed",
+    approval_id: "approval-1", events: [],
+  }), { status: 200 })));
+  await expect(getRun("run-1")).resolves.toMatchObject({ approvalId: null });
 });
 
 it("rejects malformed list data", async () => {

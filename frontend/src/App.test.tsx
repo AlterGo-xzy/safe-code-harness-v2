@@ -63,6 +63,7 @@ describe("App", () => {
       id: "r-1",
       scenario: "pending_write",
       status: "waiting_approval",
+      approvalId: null,
       events: [{
         type: "approval",
         level: "warning",
@@ -74,6 +75,7 @@ describe("App", () => {
       id: "r-2",
       scenario: "review_patch",
       status: "completed",
+      approvalId: null,
       events: [{
         type: "rule_decision",
         level: "block",
@@ -98,6 +100,7 @@ describe("App", () => {
       id: "r-stale",
       scenario: "stale_scenario",
       status: "completed",
+      approvalId: null,
       events: [{
         type: "rule_decision",
         level: "block",
@@ -136,6 +139,7 @@ describe("App", () => {
         id: "r-2",
         scenario: "review_patch",
         status: "completed",
+        approvalId: null,
         events: [{
           type: "rule_decision",
           level: "info",
@@ -152,6 +156,7 @@ describe("App", () => {
         id: "r-1",
         scenario: "pending_write",
         status: "waiting_approval",
+        approvalId: null,
         events: [{
           type: "approval",
           level: "warning",
