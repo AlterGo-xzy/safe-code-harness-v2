@@ -140,3 +140,10 @@
 - 协调验证与环境排障：新鲜完整 `pytest backend/tests -q --basetemp ...` 为 `51 passed in 0.07s`。首次调用 `scripts/test.ps1` 显示 task 4 worktree 缺少 `.venv`，且脚本未传播解释器不存在的退出码；检查脚本和 `.gitignore` 后确认是隔离环境缺失而非源码缺陷。仅在忽略的 `.venv/` 建立指向任务 3 已验证环境的本地 junction，并从 task 4 根目录重跑，`scripts/test.ps1` 为 `51 passed in 0.08s`。`git diff --check b9f72cf..HEAD` 无输出；精确凭据扫描唯一命中是既有 `test_rules.py` 的假 token fixture，不是泄露。
 - 人工干预：协调会话未编辑任务 4 功能源码；只调度独立审查、维护记录、修复本地忽略测试环境并执行新鲜验证。
 - 学到的教训：命令安全策略不能依赖字符串子串；必须对参数排列、长短选项、分隔符、包装器和无法解析输入定义确定性的 fail-closed 语义，并把每一个审查绕过固化为先失败的回归测试。
+
+## 2026-08-08 T4：分支收尾与 PR
+
+- 触发技能：`verification-before-completion`、`finishing-a-development-branch`、`github:yeet`。用户已在任务 1-3 建立并持续采用收尾选项 2；本任务沿用“推送并创建 draft PR、保留 worktree”。
+- 收尾前新鲜验证：从 `codex/t04-command-approval` worktree 根目录运行 `scripts/test.ps1`，为 `51 passed in 0.07s`；`git diff --check b9f72cf..HEAD` 无输出，工作树干净。
+- 实际动作：GitHub CLI 认证为 `AlterGo-xzy`，scopes 包含 `repo` 与 `workflow`；推送 `codex/t04-command-approval` 并创建目标为 `codex/t03-governance` 的 [draft PR #4](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/4)。API 回读确认 `OPEN`、`isDraft=true`、base/head 正确。
+- 分支决定：保留 `codex/t04-command-approval` 与 `.worktrees/t04-command-approval` 用于处理审查；待 #1、#2、#3 合并后依次将 base 调整为 `main`。
