@@ -6,9 +6,9 @@
 
 | 编号 | 正式要求 | 当前状态 | 目标证据与完成门槛 |
 | --- | --- | --- | --- |
-| G-3.1-1 | key 不得硬编码、提交、写日志/history/明文配置 | 部分完成（任务 12 前端边界） | `SPEC.md` 8.1；Task 12 密钥仅在密码输入的提交中读取、finally 清空，且不进 JSX/state/error/URL/localStorage；对 `codex/t11-workbench-ui..HEAD` 的高置信凭据扫描只报告计数 0。仍需最终 Git 历史扫描。 |
-| G-3.1-2 | 至少一种安全存储；说明环境变量/`.env` 明文风险 | 已设计，尚未执行 | Windows Credential Manager 适配器和确定性 Mock 测试；README 说明 `.env` 风险与不推荐命令行 `export`。 |
-| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 12 前端单测） | Task 12 有隐藏输入、掩码后缀、初始加载、保存/清除、mutation pending 禁用和不回显单测；Planner GET/PUT/DELETE 的 non-OK 与网络异常均验证只返回固定中文错误。任务 13 仍需针对合并后真实 API 的浏览器 E2E，安全存储本身也仍须按后续任务完成。 |
+| G-3.1-1 | key 不得硬编码、提交、写日志/history/明文配置 | 部分完成（任务 9、12） | `3074085`、`51eb9c8`：Credential Manager-only、掩码 API、异常链/503 不含 fixture key；Task 12 密钥仅在密码输入提交中读取、finally 清空，且不进 JSX/state/error/URL/localStorage。最终 Git 历史扫描仍待完成。 |
+| G-3.1-2 | 至少一种安全存储；说明环境变量/`.env` 明文风险 | 部分完成（任务 9） | Windows Credential Manager 适配器、fake adapter 和非 Windows fail-closed 测试已完成；README 的环境变量/`.env` 风险说明仍待任务 14/15。 |
+| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。任务 13 仍需针对合并后真实 API 的浏览器 E2E。 |
 | G-3.1-4 | SPEC 有凭据威胁模型与对策 | 已完成并验证 | `SPEC.md` 8.1。 |
 | G-3.2-1 | 选择分发形态；容器须单条 build/run 且推送公开 registry | 已设计，尚未执行 | Dockerfile、GHCR publish workflow、公开 `docker pull` 和全新机器运行证据。 |
 | G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 已设计，尚未执行 | README 分发/安全章节和命令验证。 |
