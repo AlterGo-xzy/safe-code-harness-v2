@@ -7,8 +7,9 @@ from pathlib import Path
 
 import pytest
 
+import safe_code_harness.workspaces.registry as registry_module
 from safe_code_harness.workspaces.registry import WorkspaceRegistry
-from safe_code_harness.workspaces.upload import ArchiveRejectedError, UploadLimits
+from safe_code_harness.workspaces.upload import ArchiveRejectedError, UploadLimits, _member_path
 
 
 def zip_bytes(*members: tuple[str, bytes], symlink: bool = False) -> bytes:
@@ -43,9 +44,12 @@ def test_creates_a_unique_workspace_and_extracts_safe_files(tmp_path: Path) -> N
         ("../outside.txt", "unsafe_archive_path"),
         ("/absolute.txt", "unsafe_archive_path"),
         ("C:/windows.txt", "unsafe_archive_path"),
+        ("safe.txt:payload", "unsafe_archive_path"),
         (".env", "protected_archive_path"),
         (".git/config", "protected_archive_path"),
         ("config/api_key.txt", "protected_archive_path"),
+        ("node_modules/package.json", "protected_archive_path"),
+        (".pytest_cache/v/cache/nodeids", "protected_archive_path"),
     ],
 )
 def test_rejects_unsafe_member_names_without_creating_a_workspace(
@@ -67,6 +71,67 @@ def test_rejects_symlink_members_before_extraction(tmp_path: Path) -> None:
         registry.create_from_zip(zip_bytes(("linked", b"../outside"), symlink=True))
 
     assert raised.value.code == "unsafe_archive_member"
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_rejects_members_that_normalize_to_the_same_target(tmp_path: Path) -> None:
+    registry = WorkspaceRegistry(tmp_path)
+    archive = zip_bytes(("src//main.py", b"first"), ("src/main.py", b"second"))
+
+    with pytest.raises(ArchiveRejectedError) as raised:
+        registry.create_from_zip(archive)
+
+    assert raised.value.code == "duplicate_archive_member"
+    assert list(tmp_path.iterdir()) == []
+
+
+@pytest.mark.parametrize(
+    "member_name",
+    [
+        r"\\server\share\file.txt",
+        r"..\escape.txt",
+        r"safe\child.txt:payload",
+        "NUL",
+        "com1.txt",
+        "folder/name.",
+        "folder/name ",
+    ],
+)
+def test_rejects_platform_ambiguous_member_paths(member_name: str) -> None:
+    with pytest.raises(ArchiveRejectedError, match="unsafe_archive_path"):
+        _member_path(member_name)
+
+
+def test_rejects_nul_member_path_before_path_conversion() -> None:
+    with pytest.raises(ArchiveRejectedError, match="unsafe_archive_path"):
+        _member_path("safe\x00name.txt")
+
+
+def test_rejects_archives_with_too_many_directory_or_file_members(tmp_path: Path) -> None:
+    registry = WorkspaceRegistry(tmp_path, limits=UploadLimits(max_files=2))
+    archive = zip_bytes(("one/", b""), ("two/", b""), ("safe.txt", b"content"))
+
+    with pytest.raises(ArchiveRejectedError) as raised:
+        registry.create_from_zip(archive)
+
+    assert raised.value.code == "too_many_files"
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_translates_unexpected_extraction_error_and_cleans_new_workspace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    registry = WorkspaceRegistry(tmp_path)
+
+    def fail_extract(*_args: object, **_kwargs: object) -> int:
+        raise FileExistsError("host path must not escape")
+
+    monkeypatch.setattr(registry_module, "extract_verified_zip", fail_extract)
+
+    with pytest.raises(ArchiveRejectedError) as raised:
+        registry.create_from_zip(zip_bytes(("safe.txt", b"content")))
+
+    assert raised.value.code == "workspace_extraction_failed"
     assert list(tmp_path.iterdir()) == []
 
 

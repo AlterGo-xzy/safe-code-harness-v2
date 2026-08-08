@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
 
-from safe_code_harness.workspaces.upload import UploadLimits, extract_verified_zip
+from safe_code_harness.workspaces.upload import ArchiveRejectedError, UploadLimits, extract_verified_zip
 
 
 @dataclass(frozen=True)
@@ -25,7 +26,13 @@ class WorkspaceRegistry:
     def create_from_zip(self, upload: bytes) -> Workspace:
         workspace_id = uuid4().hex
         workspace_root = self.root / workspace_id
-        file_count = extract_verified_zip(upload, workspace_root, self.limits)
+        try:
+            file_count = extract_verified_zip(upload, workspace_root, self.limits)
+        except ArchiveRejectedError:
+            raise
+        except Exception as exc:
+            shutil.rmtree(workspace_root, ignore_errors=True)
+            raise ArchiveRejectedError("workspace_extraction_failed") from exc
         workspace = Workspace(id=workspace_id, root=workspace_root, file_count=file_count)
         self._workspaces[workspace_id] = workspace
         return workspace

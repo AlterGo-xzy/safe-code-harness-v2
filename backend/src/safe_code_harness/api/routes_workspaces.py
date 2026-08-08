@@ -14,9 +14,11 @@ _ERROR_MESSAGES = {
     "unsafe_archive_path": "archive contains an unsafe path",
     "protected_archive_path": "archive contains a protected path",
     "unsafe_archive_member": "archive contains an unsafe member",
+    "duplicate_archive_member": "archive contains duplicate members",
     "too_many_files": "archive contains too many files",
     "archive_too_large": "archive exceeds size limits",
     "empty_archive": "archive contains no files",
+    "workspace_extraction_failed": "workspace extraction could not be completed",
 }
 
 
@@ -34,5 +36,13 @@ async def upload_zip(request: Request, file: UploadFile = File(...)) -> dict[str
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"code": exc.code, "message": _ERROR_MESSAGES[exc.code]},
+        )
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "code": "workspace_extraction_failed",
+                "message": _ERROR_MESSAGES["workspace_extraction_failed"],
+            },
         )
     return {"id": workspace.id, "file_count": workspace.file_count}

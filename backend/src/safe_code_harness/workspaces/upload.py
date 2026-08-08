@@ -13,7 +13,12 @@ from safe_code_harness.governance.path_sandbox import PathSandbox
 
 _DRIVE_PATH = re.compile(r"^[A-Za-z]:")
 _SECRET_NAME = re.compile(r"(?:api[-_]?key|secret|token|password|credential)", re.IGNORECASE)
-_PROTECTED_PARTS = frozenset({".env", ".git"})
+_PROTECTED_PARTS = frozenset(
+    {".env", ".git", "node_modules", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "dist"}
+)
+_WINDOWS_DEVICE_STEMS = frozenset(
+    {"con", "prn", "aux", "nul", *(f"com{number}" for number in range(1, 10)), *(f"lpt{number}" for number in range(1, 10))}
+)
 
 
 @dataclass(frozen=True)
@@ -55,9 +60,12 @@ def extract_verified_zip(data: bytes, destination: Path, limits: UploadLimits) -
                 target = sandbox.resolve(_member_path(member.filename))
                 target.parent.mkdir(parents=True, exist_ok=True)
                 _copy_member_with_limit(archive, member, target, limits.max_uncompressed_bytes)
-        except Exception:
+        except ArchiveRejectedError:
             shutil.rmtree(destination, ignore_errors=True)
             raise
+        except Exception as exc:
+            shutil.rmtree(destination, ignore_errors=True)
+            raise ArchiveRejectedError("workspace_extraction_failed") from exc
         return len(files)
     finally:
         archive.close()
@@ -68,11 +76,12 @@ def _validate_members(
 ) -> None:
     if not files:
         raise ArchiveRejectedError("empty_archive")
-    if len(files) > limits.max_files:
+    if len(members) > limits.max_files:
         raise ArchiveRejectedError("too_many_files")
 
     compressed_size = 0
     uncompressed_size = 0
+    target_paths: set[PurePosixPath] = set()
     for member in members:
         relative = _member_path(member.filename)
         if _is_symlink(member):
@@ -80,6 +89,9 @@ def _validate_members(
         _validate_member_path(relative)
         if member.is_dir():
             continue
+        if relative in target_paths:
+            raise ArchiveRejectedError("duplicate_archive_member")
+        target_paths.add(relative)
         compressed_size += member.compress_size
         uncompressed_size += member.file_size
         if compressed_size > limits.max_compressed_bytes or uncompressed_size > limits.max_uncompressed_bytes:
@@ -91,9 +103,18 @@ def _member_path(name: str) -> PurePosixPath:
     if "\x00" in normalized or normalized.startswith("//") or _DRIVE_PATH.match(normalized):
         raise ArchiveRejectedError("unsafe_archive_path")
     path = PurePosixPath(normalized)
-    if path.is_absolute() or ".." in path.parts or not path.parts:
+    if (
+        path.is_absolute()
+        or ".." in path.parts
+        or not path.parts
+        or any(_is_windows_ambiguous(part) or ":" in part for part in path.parts)
+    ):
         raise ArchiveRejectedError("unsafe_archive_path")
     return path
+
+
+def _is_windows_ambiguous(part: str) -> bool:
+    return part.endswith((".", " ")) or part.split(".", 1)[0].lower() in _WINDOWS_DEVICE_STEMS
 
 
 def _validate_member_path(path: PurePosixPath) -> None:
