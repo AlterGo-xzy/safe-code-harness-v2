@@ -248,4 +248,5 @@
 - TDD RED：先新增 `backend/tests/integration/test_integrated_api_surface.py`，fixture 以 `FakeSecretStore` 调用 `create_app(secret_store=...)`，且断言 runs、Planner 四字段 DTO 与非法非 ZIP 上传。任何 merge 前 focused 命令 exit 1，预期错误为 `TypeError: create_app() got an unexpected keyword argument 'secret_store'`。
 - 合并与冲突：Task 9 以 `ec613df` 合入，冲突仅 `AGENT_LOG.md`、`PROJECT_PROGRESS.md`、`REQUIREMENTS_TRACEABILITY.md`，保留 T9 reviewed 记录与更新的 T11/T12 记录；Task 10 以 `1664aa2` 合入，冲突为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py`。factory 按 brief 统一三个 state 和三个 router；Task 9/10 安全源文件与测试相对各自 reviewed branch 的 scoped diff 均无输出。
 - GREEN：focused integration `1 passed, 1 warning`；完整 `backend/tests` 为 `146 passed, 1 warning`。warning 仍为既有 TestClient 弃用提示，不是本集成引入的失败。未使用真实 key、应用网络调用或旧项目源码。
+- 提交：Task 9/10 merge commits 分别为 `ec613df`、`1664aa2`；集成测试与四份过程文档提交为 `fd38e6a feat: integrate planner and workspace APIs`。
 - 剩余范围：Task 13 的三个确定性 demo、Playwright 真实浏览器流程与 320px 验证仍未执行；策略扩展仍按用户决定延后。完整命令和证据见 `.superpowers/sdd/2026-08-09-demos-e2e/task-1-report.md`。
