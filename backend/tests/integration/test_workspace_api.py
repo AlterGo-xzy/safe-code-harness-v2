@@ -3,11 +3,13 @@ from __future__ import annotations
 import io
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 
 from fastapi.testclient import TestClient
 import pytest
 
 from safe_code_harness.api.main import create_app
+import safe_code_harness.workspaces.registry as registry_module
 from safe_code_harness.workspaces.registry import WorkspaceRegistry
 
 
@@ -111,4 +113,30 @@ def test_upload_zip_maps_unexpected_registry_failure_to_safe_response(
         "code": "workspace_extraction_failed",
         "message": "workspace extraction could not be completed",
     }
+    assert str(tmp_path) not in response.text
+
+
+def test_upload_zip_uuid_collision_keeps_existing_workspace_and_returns_safe_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    existing_workspace = tmp_path / "collision"
+    existing_workspace.mkdir()
+    existing_file = existing_workspace / "keep.txt"
+    existing_file.write_text("existing workspace", encoding="utf-8")
+    monkeypatch.setattr(registry_module, "uuid4", lambda: SimpleNamespace(hex="collision"))
+    app = create_app()
+    app.state.workspace_registry = WorkspaceRegistry(tmp_path)
+    client = TestClient(app)
+
+    response = client.post(
+        "/api/workspaces/upload-zip",
+        files={"file": ("project.zip", make_zip("safe.txt", b"new upload"), "application/zip")},
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {
+        "code": "workspace_extraction_failed",
+        "message": "workspace extraction could not be completed",
+    }
+    assert existing_file.read_text(encoding="utf-8") == "existing workspace"
     assert str(tmp_path) not in response.text

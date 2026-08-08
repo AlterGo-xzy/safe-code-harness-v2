@@ -4,6 +4,7 @@ import io
 import stat
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -133,6 +134,23 @@ def test_translates_unexpected_extraction_error_and_cleans_new_workspace(
 
     assert raised.value.code == "workspace_extraction_failed"
     assert list(tmp_path.iterdir()) == []
+
+
+def test_uuid_collision_does_not_remove_existing_workspace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    existing_workspace = tmp_path / "collision"
+    existing_workspace.mkdir()
+    existing_file = existing_workspace / "keep.txt"
+    existing_file.write_text("existing workspace", encoding="utf-8")
+    monkeypatch.setattr(registry_module, "uuid4", lambda: SimpleNamespace(hex="collision"))
+    registry = WorkspaceRegistry(tmp_path)
+
+    with pytest.raises(ArchiveRejectedError) as raised:
+        registry.create_from_zip(zip_bytes(("safe.txt", b"new upload")))
+
+    assert raised.value.code == "workspace_extraction_failed"
+    assert existing_file.read_text(encoding="utf-8") == "existing workspace"
 
 
 def test_rejects_invalid_archive_without_leaking_host_paths(tmp_path: Path) -> None:

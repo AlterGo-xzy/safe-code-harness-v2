@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import shutil
 from dataclasses import dataclass
 from pathlib import Path
 from uuid import uuid4
@@ -31,7 +30,6 @@ class WorkspaceRegistry:
         except ArchiveRejectedError:
             raise
         except Exception as exc:
-            shutil.rmtree(workspace_root, ignore_errors=True)
             raise ArchiveRejectedError("workspace_extraction_failed") from exc
         workspace = Workspace(id=workspace_id, root=workspace_root, file_count=file_count)
         self._workspaces[workspace_id] = workspace
