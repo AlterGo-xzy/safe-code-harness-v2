@@ -17,9 +17,9 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-5） | `AGENT_LOG.md` 记录 task 1-5 的 worktree、fresh subagent、TDD、审查、修复与分支收尾；后续任务继续同一纪律。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-5） | `PLAN.md` 与 `AGENT_LOG.md` 保留任务 1-5 的真实 RED/GREEN；任务 4 的两轮安全修复亦先有失败回归。 |
-| G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 已设计，尚未执行 | `SPEC.md` 9 已指定；前端任务开始前确认/安装 skill，并记录实际调用或诚实替代证据。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-8、11） | `AGENT_LOG.md` 记录任务 1-8 与 11 的 worktree、fresh subagent、TDD、审查、修复和分支状态；任务 11 按用户选择完成 push 与 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)，worktree 保留以处理审查。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-8、11） | `PLAN.md` 与 `AGENT_LOG.md` 保留任务 1-8、11 的真实 RED/GREEN；任务 11 的两个 Important API 边界问题及最终审查的 accessible name、详情 id 与 UTC 问题均在先失败回归后修复。 |
+| G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11） | 任务 11 的历史记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，不能算作已验证证据，且绝不猜测摘要。任务只采用记录中的技能/设计系统、真实文件产出、可审计原则，未将运行时纳入产品依赖。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
 | G-4.3 | `PLAN.md`：细任务、文件、要点、失败测试、依赖/并行 | 已完成并验证 | `PLAN.md` 已由 `writing-plans` 生成并在任务 1-4 记录实际 RED/GREEN、审查与提交。 |

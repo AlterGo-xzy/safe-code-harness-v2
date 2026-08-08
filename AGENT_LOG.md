@@ -186,3 +186,22 @@
 - 审查的 httpx2 依赖缺口经干净安装验证修复，scoped re-review PASS；full backend `96 passed`、一键 unit `88 passed`；上游 Starlette 弃用警告已如实记录。
 - 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
 - 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
+
+## 2026-08-09 T11：受治理运行工作台的复核与过程证据
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t11-workbench-ui` / `codex/t11-workbench-ui`；实现 subagent 分段为 `/root/t11_task1_implementer` 与 `/root/t11_task2_implementer`，过程复核为 `/root/t11_task3_implementer`。实现提交：`893f01a`、`63749f5`、`0dcdca9`；本条不创建 PR。
+- Open Design 历史记录与当前证据边界：设计阶段记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，也不能作为已验证事实。本项目只采用该记录中的“技能/设计系统驱动、真实文件产出、可审计而非装饰性堆叠”原则，未引入运行时依赖；绝不猜测或补写摘要值。
+- Task 1：先有 `runs` 模块不存在的 RED；首轮 GREEN 为 4/4。随后以任务 8 服务端安全 DTO 为唯一契约：列表白名单四字段，详情时间线白名单五字段。安全审查报告两个 Important：fetch/JSON 错误会露出原文，及旧字段 `summary`/`failure` 被读取；先有 3/6 RED，再在 `63749f5` 修复为 6/6，并将错误固定为中文消息。
+- Task 2：先有 `App` 与 `RunTimeline` 不存在的 RED；绿色为 focused 6/6、全套 12/12。审查覆盖 API-only 渲染、无批准/配置/上传写路径、无 secret/localStorage、选中卡片仅以 `getRun` 返回事件、中文加载/空/错误状态；最终未发现 Critical/Important。质量复核确认原生 button 键盘焦点、`aria-pressed`、文本状态、语义列表、`44rem` 单列布局、`min-width: 0` 和 `overflow-wrap: anywhere`。没有浏览器 320px 实测，保留 Task 13 E2E，不把 CSS 静态检查写成视觉验证。
+- 新鲜控制器验证：从 `frontend` 运行 `npm.cmd test`，Vitest 为 3 files/12 tests passed；`npm.cmd run build` 成功（Vite 5.4.21，337ms）；仓库根目录 `git diff --check 2de48a2..HEAD` 无输出。变更文件凭据模式扫描只报告汇总：无非测试代码匹配，未输出任何命中内容。
+- 人工边界与教训：没有编辑功能源码、没有读取旧项目、没有联网或真实密钥；仅更新过程文档和本地 SDD 报告。完整 Release checksum 必须在将来有原始安装证据或获准联网时补入，不能由记忆或猜测替代。
+
+## 2026-08-09 T11：最终审查修复波
+
+- 执行者 `/root/t11_final_fix_implementer` 使用 `receiving-code-review`、`systematic-debugging`、`test-driven-development`、`verification-before-completion`；用户明确选择安全 DTO 优先，禁止恢复任何原始事件文本。实现与设计/详细计划修复提交为 `33b5ff0`，不创建 PR。
+- 依赖 RED：原树没有 `package-lock.json`，`npm.cmd ci --ignore-scripts` 以 `EUSAGE`/exit 1 失败；`@testing-library/react`、`@testing-library/jest-dom`、`jsdom` 只是旧 `node_modules` 的 extraneous 包。GREEN：`package.json` 精确声明 16.3.2、6.9.1、25.0.1，新增 lockfile v3；`npm.cmd install` 生成依赖树，随后 lockfile 驱动的 `npm.cmd ci --ignore-scripts --no-audit --no-fund` 成功安装 176 packages。
+- 行为 RED：focused 3 files/9 tests 中 3 个按预期失败，分别证明卡片 accessible name 缺场景以外的状态/更新时间、UTC 值未标注时区、`detail.id !== selectedRunId` 仍会渲染。另加真实乱序 promise 回归，证明晚到旧请求不能覆盖当前选择。GREEN：卡片名称现在包含场景/状态/UTC 更新时间，两个时间格式化器显式附加 `UTC`，App 只在详情 id 匹配当前选择时渲染；focused 3 files/9 tests 全绿。
+- 文档修正：设计、详细计划与根计划只承诺列表四字段和时间线五字段安全 DTO，删除创建运行、最新事件摘要、工具输出/规则原文承诺。Open Design 只保留“当时记录称安装并校验、当前无安装包/资产 URL/精确摘要而不可复现”的历史陈述，绝不猜测摘要。任务 11 没有窄屏浏览器测试，320px 证据继续作为任务 13 未完成项。
+- 新鲜验证：clean install 后 `npm.cmd test` 为 4 files/15 tests passed；`npm.cmd run build` 成功（Vite 5.4.21，327ms）；credential-like 扫描只报告 `credential_candidate_count=0`；staged diff check 无输出。网络仅用于获准的 npm 依赖安装/解析，没有应用 API、真实 LLM、真实凭据或其他联网操作。
+- 独立 scoped re-review 对 `47986c1..779b4e0` 给出 Critical 0、Important 0、Minor 1：详细计划示例仍含旧事件文字及笼统安装证据措辞。随后以文档最小修正将断言改为固定 `summaryCode`，并明确安装记录不可复现；未改变运行时行为或安全边界。
+- 收尾：用户选择 `finishing-a-development-branch` 选项 2；`codex/t11-workbench-ui` 已成功推送，并创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)。保留 worktree 处理审查反馈；未合并、未删除分支。
