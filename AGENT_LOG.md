@@ -240,3 +240,12 @@
 - 提交 `698e4dc`、`b546c89`、`d15a4fd`：全量预校验并拒绝 ZIP Slip、ADS、NUL、UNC、Windows 设备名、重复条目、symlink、敏感/缓存目录、成员与大小上限；仅当前上传创建的目录可被清理，UUID 碰撞保留旧工作区；API 固定 path-free 400。
 - 审查：首审 1 Critical/3 Important、scoped review 1 Important，均先有失败回归后修复；最终 PASS，无 C/I/M。协调验证完整 backend `127 passed`、脚本 unit `113 passed`，各有既有 TestClient 弃用 warning。下一步按收尾 skill 建立独立 draft PR。
 - 分支收尾：沿用 `finishing-a-development-branch` 选项 2，推送 `codex/t10-workspace-upload` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #10](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/10)。保留 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
+
+## 2026-08-09 T13 Task 1：真实 Task 8/9/10 API 集成
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e` / `codex/t13-demos-e2e`；fresh implementer `/root/t13_task1_implementer` 使用 `executing-plans`、`using-git-worktrees`、`test-driven-development` 与 `verification-before-completion`，严格限定为后端 API 集成，不做 frontend、E2E、demo 或 policy。
+- 环境与基线：brief 中的 `..\.venv\Scripts\python.exe` 不存在；改用本 worktree 内被 `.gitignore` 排除的 `.venv` 并 editable install `backend[dev]`，避免误加载其他 worktree 的 editable source。合并前完整 backend 为 `100 passed`，只有既有 Starlette/TestClient 对 httpx 的弃用 warning。
+- TDD RED：先新增 `backend/tests/integration/test_integrated_api_surface.py`，fixture 以 `FakeSecretStore` 调用 `create_app(secret_store=...)`，且断言 runs、Planner 四字段 DTO 与非法非 ZIP 上传。任何 merge 前 focused 命令 exit 1，预期错误为 `TypeError: create_app() got an unexpected keyword argument 'secret_store'`。
+- 合并与冲突：Task 9 以 `ec613df` 合入，冲突仅 `AGENT_LOG.md`、`PROJECT_PROGRESS.md`、`REQUIREMENTS_TRACEABILITY.md`，保留 T9 reviewed 记录与更新的 T11/T12 记录；Task 10 以 `1664aa2` 合入，冲突为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py`。factory 按 brief 统一三个 state 和三个 router；Task 9/10 安全源文件与测试相对各自 reviewed branch 的 scoped diff 均无输出。
+- GREEN：focused integration `1 passed, 1 warning`；完整 `backend/tests` 为 `146 passed, 1 warning`。warning 仍为既有 TestClient 弃用提示，不是本集成引入的失败。未使用真实 key、应用网络调用或旧项目源码。
+- 剩余范围：Task 13 的三个确定性 demo、Playwright 真实浏览器流程与 320px 验证仍未执行；策略扩展仍按用户决定延后。完整命令和证据见 `.superpowers/sdd/2026-08-09-demos-e2e/task-1-report.md`。

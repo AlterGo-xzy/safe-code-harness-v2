@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | G-3.1-1 | key 不得硬编码、提交、写日志/history/明文配置 | 部分完成（任务 9、12） | `3074085`、`51eb9c8`：Credential Manager-only、掩码 API、异常链/503 不含 fixture key；Task 12 密钥仅在密码输入提交中读取、finally 清空，且不进 JSX/state/error/URL/localStorage。最终 Git 历史扫描仍待完成。 |
 | G-3.1-2 | 至少一种安全存储；说明环境变量/`.env` 明文风险 | 部分完成（任务 9） | Windows Credential Manager 适配器、fake adapter 和非 Windows fail-closed 测试已完成；README 的环境变量/`.env` 风险说明仍待任务 14/15。 |
-| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。任务 13 仍需针对合并后真实 API 的浏览器 E2E。 |
+| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12、13 Task 1） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。Task 13 Task 1 已验证合并后真实 Planner API 返回固定四字段 DTO；真实浏览器 E2E 仍待后续 Task 13 工作。 |
 | G-3.1-4 | SPEC 有凭据威胁模型与对策 | 已完成并验证 | `SPEC.md` 8.1。 |
 | G-3.2-1 | 选择分发形态；容器须单条 build/run 且推送公开 registry | 已设计，尚未执行 | Dockerfile、GHCR publish workflow、公开 `docker pull` 和全新机器运行证据。 |
 | G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 已设计，尚未执行 | README 分发/安全章节和命令验证。 |
@@ -17,8 +17,8 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-8、11、12） | `AGENT_LOG.md` 记录任务 1-8、11、12 的 worktree、fresh分段实现、TDD、两阶段审查、修复和分支状态；Task 12 最终审查的 6 个 Minor 已关闭，已按用户选择完成 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，策略扩展仍为用户批准的延后范围。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-8、11、12） | `PLAN.md` 与 `AGENT_LOG.md` 保留 Task 12 API/面板及最终修复的真实 RED/GREEN；最终 focused RED 为 1 failed/28 passed（缺 Planner 初始加载提示），最小实现后为 4 files/29 tests，完整前端新鲜验证为 10 files/48 tests。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-12、13 Task 1） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 Task 1 记录两个 reviewed branch 的 merge commits、精确冲突、factory union、scope 与验证，未把未执行的 demo/browser 工作写成完成。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 1 在任何 merge 前因 `create_app` 缺少 `secret_store` contract 得到 RED，合入 reviewed code 后 focused `1 passed`、完整 backend `146 passed`。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11） | 任务 11 的历史记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，不能算作已验证证据，且绝不猜测摘要。任务只采用记录中的技能/设计系统、真实文件产出、可审计原则，未将运行时纳入产品依赖。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |

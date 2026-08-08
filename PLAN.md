@@ -161,6 +161,8 @@ git commit -m "chore: establish offline test foundation"
 **文件：** 新建 `scripts/run_guardrail_demo.py`、`run_feedback_demo.py`、`run_approval_demo.py`、`frontend/e2e/workbench.spec.ts`；修改 `Makefile`、`README.md`；测试 `backend/tests/integration/test_demos.py`。
 **接口与验收：** 演示输出稳定 JSON。护栏演示必须有 `blocked: true`；反馈演示必须证明第一次 `run_tests` 失败后下一动作变为 `write_file`；审批演示必须依次显示 `waiting_approval -> approved -> executed`。E2E 必须针对真实本地 API 与 UI，不用页面内容替代后端断言。
 
+**Task 1 API 集成检查点（已完成）：** fresh implementer `/root/t13_task1_implementer` 先新增 `test_integrated_api_surface.py`，在任何 merge 前得到预期 RED：`create_app()` 不接受 `secret_store`。随后按顺序以 merge commit `ec613df`、`1664aa2` 合入已审查的 Task 9/10 分支；仅统一 app factory 为三个 service state 和三个 router，Task 9/10 安全源码与测试相对来源分支无 diff。focused GREEN 为 `1 passed`，完整 backend 为 `146 passed`；均只有既有 Starlette/TestClient 弃用 warning。此检查点不包含 demo、frontend/E2E、320px 浏览器或 policy 工作，以下 Task 13 主清单仍保持未完成。
+
 - [ ] **步骤 1：写失败测试**
 
 ```python
