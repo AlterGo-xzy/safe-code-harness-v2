@@ -6,6 +6,7 @@ class RuntimePolicy:
     """Local, deterministic defaults for sensitive workspace paths."""
 
     blocked_path_parts: tuple[str, ...] = (".env", ".git", "secrets")
+    blocked_command_executables: tuple[str, ...] = ("rm",)
 
     def blocks_path_part(self, path_part: str) -> bool:
         normalized_part = path_part.casefold()
@@ -16,3 +17,10 @@ class RuntimePolicy:
             if normalized_blocked_part == ".env" and normalized_part.startswith(".env."):
                 return True
         return False
+
+    def blocks_command_executable(self, executable: str) -> bool:
+        normalized_executable = executable.casefold()
+        return any(
+            normalized_executable == blocked_executable.casefold()
+            for blocked_executable in self.blocked_command_executables
+        )

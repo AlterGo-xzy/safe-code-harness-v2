@@ -17,25 +17,25 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 已设计，尚未执行 | G-4.1 至 G-4.6 的真实时间序列与本矩阵；任何例外写入日志。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 已设计，尚未执行 | 每个任务 PR 的失败命令、最小实现、通过命令和重构记录。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-4） | `AGENT_LOG.md` 记录 task 1-4 的 worktree、fresh subagent、TDD、审查、修复与分支收尾；后续任务继续同一纪律。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-4） | `PLAN.md` 与 `AGENT_LOG.md` 保留任务 1-4 的真实 RED/GREEN；任务 4 的两轮安全修复亦先有失败回归。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 已设计，尚未执行 | `SPEC.md` 9 已指定；前端任务开始前确认/安装 skill，并记录实际调用或诚实替代证据。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
-| G-4.3 | `PLAN.md`：细任务、文件、要点、失败测试、依赖/并行 | 已设计，尚未执行 | 用户确认 SPEC 后由 `writing-plans` 生成并提交。 |
+| G-4.3 | `PLAN.md`：细任务、文件、要点、失败测试、依赖/并行 | 已完成并验证 | `PLAN.md` 已由 `writing-plans` 生成并在任务 1-4 记录实际 RED/GREEN、审查与提交。 |
 | G-4.4 | `SPEC_PROCESS.md`：关键问题、至少三轮节选、采纳/拒绝、反思 | 已完成并验证 | `SPEC_PROCESS.md` 的五次迭代、四轮节选、采纳/拒绝与 brainstorming 反思。 |
 | G-4.5 | 不同类型陌生 agent 的冷启动，且只给 SPEC+PLAN | 已完成并验证 | Claude Code `2.1.220` 非 `--resume` 启动，仅 Fetch `SPEC.md` 与 `PLAN.md` 两个 raw URL，发现四项规约缺口后暂停；原始转录、工具轨迹、修订前后 diff 见 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md` 与 commit `ecbc418`。 |
-| G-4.6-1 | 每个独立模块一个 worktree/PR | 已设计，尚未执行 | PLAN 为每个模块标注 worktree 和独立 PR；不在 `main` 直接实现。 |
-| G-4.6-2 | 每 task 一个新鲜 subagent | 已设计，尚未执行 | 每个任务 `AGENT_LOG.md` 记录新 agent id、prompt、输出和 commit。 |
-| G-4.6-3 | 红-绿-重构 | 已设计，尚未执行 | 每个 PR 的测试记录与审查。 |
-| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 已设计，尚未执行 | 两份独立审查结论；Critical 未清零不得继续。 |
-| G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 已设计，尚未执行 | 每个完成模块的 skill 调用、PR 结论和合并证据。 |
-| G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 已设计，尚未执行 | 公开仓库已创建；后续用 secret scan、分支 PR、commit 说明建立完整历史。 |
-| G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 已设计，尚未执行 | PR 模板和每个任务的 commit/PR 描述。 |
-| G-4.7-3 | PLAN 持续标注完成与 commit hash | 已设计，尚未执行 | PLAN task checklist 逐项更新。 |
-| G-4.7-4 | 维护 `AGENT_LOG.md` | 已设计，尚未执行 | 当前日志是起点；每一次 task、审查、外部验证即时追加。 |
-| G-4.8 | 一键测试、GitHub Actions push 测试、容器构建 | 已设计，尚未执行 | Makefile、CI 后端/前端/E2E/Docker jobs 和最终绿灯。 |
-| G-4.9 | AGENT_LOG 包含时间、task、skill、prompt、输出、人工干预、教训 | 已设计，尚未执行 | D0 已有；所有后续任务必须填满字段。 |
+| G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-4） | 任务 1-4 均在独立 worktree 完成并各有 draft PR；后续模块继续。 |
+| G-4.6-2 | 每 task 一个新鲜 subagent | 部分完成（任务 1-4） | `AGENT_LOG.md` 记录任务 1-4 的 fresh implementer、reviewer 与输出。 |
+| G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-4） | 每个任务记录 RED/GREEN；任务 4 两轮安全审查问题均新增失败回归后修复。 |
+| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-4） | 任务 1-4 有独立审查结论；任务 4 的 Critical 清零后才继续。 |
+| G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 部分完成（任务 1-4） | 任务 1-4 均按 skill 的既有选项 2保留 branch/worktree 并建立 draft PR。 |
+| G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 部分完成（任务 1-4） | 公开仓库、任务 1-3 draft PR、任务 4 分支及精确凭据扫描；仍需后续 task 和最终历史扫描。 |
+| G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 部分完成（任务 1-4） | 任务 1-4 的 PR/日志均已标注 subagent、人工调整与旧代码复用边界。 |
+| G-4.7-3 | PLAN 持续标注完成与 commit hash | 部分完成（任务 1-4） | `PLAN.md` 已填任务 1-4 实际提交和证据；后续 task 继续。 |
+| G-4.7-4 | 维护 `AGENT_LOG.md` | 部分完成（任务 1-4） | 日志已追加任务 1-4 的时间、agent、验证、审查、人工动作和教训。 |
+| G-4.8 | 一键测试、GitHub Actions push 测试、容器构建 | 部分完成（本地一键测试） | `scripts/test.ps1` 在任务 1-4 本地验证；CI/容器构建留待任务 14。 |
+| G-4.9 | AGENT_LOG 包含时间、task、skill、prompt、输出、人工干预、教训 | 部分完成（任务 1-4） | D0 及任务 1-4 日志包含上述字段；后续持续维护。 |
 | G-4.10 | README 分发与 key 配置，CI 对应构建 | 已设计，尚未执行 | README、Docker/GHCR workflow 和 pull/run 验证。 |
 | G-4.11 | 服务端项目提供截止前可访问 WebUI、说明部署与 CI/CD | 已设计，尚未执行 | Render 或等效部署 URL、README 架构、部署验证。 |
 | G-5-1 | 同一个 NJU Git 链接提交所有交付 | 外部阻断 | 等待用户提供 NJU Git 远程地址；推送后记录 URL/commit。 |
@@ -51,9 +51,9 @@
 | A-1/A-2 | 交付 Coding Agent Harness：决策封装、工具、上下文/记忆、治理、反馈、配置 | 已设计，尚未执行 | 六模块源码、集成测试与运行时间线。 |
 | A-3 | SPEC 说明动作、客观反馈、危险动作、记忆 | 已完成并验证 | `SPEC.md` 3、4。 |
 | A-4-A | 自实现主循环、可注入 Mock LLM；不得使用高层 agent 编排框架 | 部分完成（任务 2） | `ba3116a` 提供自实现 `Action`、`parse_action`、单次 `LLMClient.next_action` 与离线 `MockLLM`；完整 `AgentLoop` 留待任务 7。 |
-| A-4-B | 反馈与危险动作必须是确定性代码，而非提示词 | 部分完成（任务 3） | `843e50e`/`49efb0c` 提供确定性路径/secret 规则和失败关闭沙箱；反馈校验器、命令护栏及机制演示仍待后续任务。 |
+| A-4-B | 反馈与危险动作必须是确定性代码，而非提示词 | 部分完成（任务 3-4） | `843e50e`/`49efb0c` 提供路径/secret 规则和失败关闭沙箱；`4707e49`、`b053032`、`eea0e4d` 提供确定性命令解析/阻断与审批状态机；反馈校验器和机制演示仍待后续任务。 |
 | A-4-C | 移除真实 LLM 后所有核心机制仍可单测 | 已设计，尚未执行 | 离线单元/集成测试禁止网络和真实 key。 |
-| A-4-D | 六维最低实现，并选择一个深入维度 | 部分完成（任务 3） | 治理主贡献已实现规则与路径沙箱；命令护栏、HITL 状态机和其余五维仍待后续任务。 |
+| A-4-D | 六维最低实现，并选择一个深入维度 | 部分完成（任务 3-4） | 治理主贡献已实现规则、路径沙箱、命令护栏与 HITL 审批状态机；其余五维仍待后续任务。 |
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
 | A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 已设计，尚未执行 | 测试目录按机制分类，CI 离线运行。 |
 | A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已设计，尚未执行 | 可重复脚本或测试，保存预期输出/断言。 |
