@@ -14,17 +14,19 @@ export function PlannerSettings() {
   const [loadError, setLoadError] = useState(false);
   const [action, setAction] = useState<"save" | "clear" | null>(null);
   const [actionError, setActionError] = useState<"save" | "clear" | null>(null);
+  const settingsVersion = useRef(0);
 
   useEffect(() => {
     let active = true;
+    const version = settingsVersion.current;
 
     getPlanner().then((loaded) => {
-      if (!active) return;
+      if (!active || settingsVersion.current !== version) return;
       setSettings(loaded);
       setBaseUrl(loaded.baseUrl);
       setModel(loaded.model);
     }).catch(() => {
-      if (active) setLoadError(true);
+      if (active && settingsVersion.current === version) setLoadError(true);
     });
 
     return () => { active = false; };
@@ -39,8 +41,10 @@ export function PlannerSettings() {
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const apiKey = apiKeyRef.current?.value ?? "";
+    settingsVersion.current += 1;
     setAction("save");
     setActionError(null);
+    setLoadError(false);
     try {
       applySettings(await savePlanner({ baseUrl, model, apiKey }));
     } catch {
@@ -52,8 +56,10 @@ export function PlannerSettings() {
   }
 
   async function clear() {
+    settingsVersion.current += 1;
     setAction("clear");
     setActionError(null);
+    setLoadError(false);
     try {
       applySettings(await clearPlanner());
     } catch {

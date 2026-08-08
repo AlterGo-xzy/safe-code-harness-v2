@@ -19,7 +19,13 @@ afterEach(() => {
 describe("WorkspaceUpload", () => {
   it("shows only safe workspace metadata and does not write browser storage", async () => {
     const setItem = vi.spyOn(Storage.prototype, "setItem");
-    mockedUploadWorkspace.mockResolvedValue({ id: "ws-1", fileCount: 3 });
+    const responseWithUnsafeExtras = {
+      id: "ws-1",
+      fileCount: 3,
+      path: "/private/workspace",
+      event: "workspace_selected",
+    };
+    mockedUploadWorkspace.mockResolvedValue(responseWithUnsafeExtras);
     render(<WorkspaceUpload />);
     const file = new File(["zip"], "project.zip", { type: "application/zip" });
 
@@ -28,6 +34,8 @@ describe("WorkspaceUpload", () => {
 
     await waitFor(() => expect(mockedUploadWorkspace).toHaveBeenCalledWith(file));
     expect(await screen.findByText("工作区 ws-1：3 个文件")).toBeInTheDocument();
+    expect(screen.queryByText("/private/workspace")).not.toBeInTheDocument();
+    expect(screen.queryByText("workspace_selected")).not.toBeInTheDocument();
     expect(setItem).not.toHaveBeenCalled();
   });
 

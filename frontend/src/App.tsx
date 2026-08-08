@@ -14,8 +14,12 @@ export function App() {
   const [detail, setDetail] = useState<RunDetail | null>(null);
   const [detailError, setDetailError] = useState(false);
   const detailRequest = useRef(0);
+  const currentRunId = useRef<string | null>(null);
+
+  currentRunId.current = selectedRunId;
 
   function reloadRun(runId: string) {
+    if (currentRunId.current !== runId) return;
     const request = ++detailRequest.current;
     setDetail(null);
     setDetailError(false);

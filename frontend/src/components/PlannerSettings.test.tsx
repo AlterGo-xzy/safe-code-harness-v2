@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { clearPlanner, getPlanner, savePlanner } from "../api/planner";
@@ -64,5 +64,43 @@ describe("PlannerSettings", () => {
 
     expect(await screen.findByText("无法清除 Planner 配置")).toBeInTheDocument();
     expect(screen.queryByText("private-clear-error")).not.toBeInTheDocument();
+  });
+
+  it("keeps a saved Planner configuration when the initial load resolves late", async () => {
+    let resolveInitialLoad!: (settings: typeof configuredPlanner) => void;
+    const initialLoad = new Promise<typeof configuredPlanner>((resolve) => { resolveInitialLoad = resolve; });
+    const savedPlanner = {
+      configured: true,
+      maskedSuffix: "...9876",
+      baseUrl: "https://saved.example.test/v1",
+      model: "saved-model",
+    };
+    mockedGetPlanner.mockReturnValue(initialLoad);
+    mockedSavePlanner.mockResolvedValue(savedPlanner);
+    render(<PlannerSettings />);
+
+    fireEvent.change(screen.getByLabelText("Planner 地址"), { target: { value: savedPlanner.baseUrl } });
+    fireEvent.change(screen.getByLabelText("模型"), { target: { value: savedPlanner.model } });
+    fireEvent.click(screen.getByRole("button", { name: "保存 Planner 配置" }));
+    await waitFor(() => expect(mockedSavePlanner).toHaveBeenCalledOnce());
+
+    await act(async () => { resolveInitialLoad(configuredPlanner); });
+
+    expect(screen.getByDisplayValue(savedPlanner.baseUrl)).toBeInTheDocument();
+    expect(screen.getByDisplayValue(savedPlanner.model)).toBeInTheDocument();
+    expect(screen.getByText("…9876")).toBeInTheDocument();
+  });
+
+  it("clears the password after a failed save without disclosing the request error", async () => {
+    mockedGetPlanner.mockResolvedValue(configuredPlanner);
+    mockedSavePlanner.mockRejectedValue(new Error("private-save-error"));
+    render(<PlannerSettings />);
+
+    fireEvent.change(await screen.findByLabelText("API 密钥"), { target: { value: "failed-secret" } });
+    fireEvent.click(screen.getByRole("button", { name: "保存 Planner 配置" }));
+
+    expect(await screen.findByText("无法保存 Planner 配置")).toBeInTheDocument();
+    expect(screen.queryByDisplayValue("failed-secret")).not.toBeInTheDocument();
+    expect(screen.queryByText("private-save-error")).not.toBeInTheDocument();
   });
 });
