@@ -13,7 +13,7 @@
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
 - 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
-- 当前源码范围：任务 1-7 的 Harness 核心及任务 8 的受治理运行/审批 API 已完成并经审查；尚未开始凭据、上传、前端、CI、容器或部署。
+- 当前源码范围：任务 1-8 的 Harness 核心/API及任务 10 的安全 ZIP 上传和隔离工作区已完成并经审查；前端、CI、容器与部署尚未开始。任务 9 凭据模块在独立 stacked PR 中。
 
 ## 不可突破的执行纪律
 
