@@ -14,7 +14,7 @@ export function RunCardGrid({ runs, selectedRunId, onSelect }: Props) {
           key={run.id}
           type="button"
           className="run-card"
-          aria-label={`运行 ${run.scenario}`}
+          aria-label={`运行 ${run.scenario}，状态 ${run.status}，更新 ${formatTimestamp(run.updatedAt)}`}
           aria-pressed={run.id === selectedRunId}
           onClick={() => onSelect(run.id)}
         >
@@ -34,5 +34,5 @@ function formatTimestamp(value: string): string {
     return value;
   }
 
-  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")}`;
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")} ${String(date.getUTCHours()).padStart(2, "0")}:${String(date.getUTCMinutes()).padStart(2, "0")} UTC`;
 }

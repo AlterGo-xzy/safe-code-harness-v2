@@ -2,11 +2,11 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a Chinese card-overview workbench that reads task 8 run data and exposes a selected run's auditable event timeline.
+**Goal:** Build a Chinese card-overview workbench that reads task 8's four-field run summaries and exposes a selected run's five-field safe event timeline.
 
 **Architecture:** A typed `api/runs.ts` isolates all read-only HTTP calls and data normalization. `App` owns request and selection state, `RunCardGrid` renders selectable run summaries, and `RunTimeline` renders only events supplied by the selected API response. CSS implements the Open Design-informed, restrained visual hierarchy with responsive cards and a detail pane.
 
-**Tech Stack:** React 18, TypeScript, Vite, Vitest, Testing Library, CSS.
+**Tech Stack:** React 18, TypeScript, Vite, Vitest, Testing Library, jsdom, CSS, npm lockfile.
 
 ## Global Constraints
 
@@ -14,15 +14,15 @@
 - Use Chinese for visible UI text and accessible names.
 - Before reading or adapting any legacy frontend source, add and run the corresponding failing test in this repository; document exact legacy paths and adaptations.
 - The UI calls only task 8 read endpoints in this task. It must not create/approve/reject runs, store Planner keys, create fake events, or infer a backend state.
-- Use Open Design 0.18.1 installation evidence and its skills/design-system/real-artifact principles; do not add Open Design runtime as an application dependency.
+- Treat the Open Design 0.18.1 installation/checksum note only as an unreproducible historical record because no artifact, asset URL, or exact digest remains; never invent a digest. Use the recorded skills/design-system/real-artifact principles without adding an Open Design runtime dependency.
 - Never commit secrets, `.env`, `node_modules`, build output, virtual environments, test caches, or SDD artifacts.
-- Require keyboard-accessible selection, text equivalents for all color-coded states, and no horizontal overflow at 320px.
+- Require keyboard-accessible selection and text equivalents for all color-coded states. Keep the CSS responsive intent, but leave actual 320px browser verification to unfinished Task 13.
 
 ---
 
 ## File Structure
 
-- `frontend/package.json`: Vite, React, Vitest and Testing Library scripts and dependencies.
+- `frontend/package.json` and `frontend/package-lock.json`: Vite, React, Vitest, Testing Library and jsdom scripts, declared dependencies and reproducible resolution.
 - `frontend/vite.config.ts`: Vitest jsdom configuration.
 - `frontend/index.html`: Vite mount document with Chinese language declaration.
 - `frontend/src/main.tsx`: React entry point.
@@ -38,7 +38,7 @@
 ### Task 1: Create the typed, read-only frontend boundary and scaffold
 
 **Files:**
-- Create: `frontend/package.json`, `frontend/vite.config.ts`, `frontend/tsconfig.json`, `frontend/index.html`, `frontend/src/main.tsx`, `frontend/src/test/setup.ts`, `frontend/src/api/runs.ts`, `frontend/src/api/runs.test.ts`
+- Create: `frontend/package.json`, `frontend/package-lock.json`, `frontend/vite.config.ts`, `frontend/tsconfig.json`, `frontend/index.html`, `frontend/src/main.tsx`, `frontend/src/test/setup.ts`, `frontend/src/api/runs.ts`, `frontend/src/api/runs.test.ts`
 
 **Interfaces:**
 - Produces: `type RunSummary`, `type RunEvent`, `type RunDetail`, `listRuns(signal?: AbortSignal): Promise<RunSummary[]>`, `getRun(runId: string, signal?: AbortSignal): Promise<RunDetail>`.
@@ -107,8 +107,8 @@ git commit -m "feat: add run workbench frontend scaffold"
 
 ```tsx
 it("renders a blocked rule decision in the Chinese event timeline", () => {
-  render(<RunTimeline events={[{ id: "e-1", type: "rule_decision", level: "block", summary: "已阻止危险命令", createdAt: "2026-08-08T10:00:00Z" }]} />);
-  expect(screen.getByText("已阻止危险命令")).toBeInTheDocument();
+  render(<RunTimeline events={[{ type: "rule_decision", level: "block", displayStatus: "已阻止", summaryCode: "dangerous_command_blocked", createdAt: "2026-08-08T10:00:00Z" }]} />);
+  expect(screen.getByText("dangerous_command_blocked")).toBeInTheDocument();
   expect(screen.getByText("已阻止")).toBeInTheDocument();
 });
 
@@ -138,7 +138,7 @@ export function RunCardGrid({ runs, selectedRunId, onSelect }: Props) {
 }
 ```
 
-`App` must call `listRuns` on mount, automatically select the first returned run, then call `getRun` only for the selected id. Render exact Chinese states `正在加载运行…`, `暂无运行记录`, and `无法加载运行列表`. `RunTimeline` must use a semantic list and show type, formatted time, summary and a text status label. Do not implement any mutation button.
+`App` must call `listRuns` on mount, automatically select the first returned run, then call `getRun` only for the selected id. Render exact Chinese states `正在加载运行…`, `暂无运行记录`, and `无法加载运行列表`. `RunTimeline` must use a semantic list and show only the safe event type, UTC time, fixed summary code and fixed text status; `level` may affect auxiliary styling. Do not implement any mutation button or original-event text path.
 
 - [ ] **Step 4: Implement responsive, text-first Open Design-informed styling**
 
@@ -148,7 +148,7 @@ export function RunCardGrid({ runs, selectedRunId, onSelect }: Props) {
 @media (max-width: 44rem) { .workbench { grid-template-columns: 1fr; } }
 ```
 
-Use neutral surfaces, consistent spacing, visible focus rings, `overflow-wrap:anywhere`, and labels in addition to status color. Verify the 320px breakpoint does not create horizontal overflow.
+Use neutral surfaces, consistent spacing, visible focus rings, `overflow-wrap:anywhere`, and labels in addition to status color. Record the CSS responsive rules, but do not claim a 320px browser result; Task 13 owns that verification.
 
 - [ ] **Step 5: Run frontend verification**
 
@@ -178,17 +178,17 @@ Inspect the diff for: API-only rendering; no approval/config/upload write path; 
 
 - [ ] **Step 2: Run code-quality and visual review**
 
-Inspect keyboard focus, `aria-pressed`, text equivalents for status, 320px media behavior, loading/error/empty transitions, and CSS overflow controls. Record each Critical/Important issue; add a failing regression before every fix.
+Inspect keyboard focus, `aria-pressed`, text equivalents for status, loading/error/empty transitions, and static CSS overflow controls. Record each Critical/Important issue; add a failing regression before every fix. Keep 320px browser evidence explicitly unfinished for Task 13.
 
 - [ ] **Step 3: Run controller verification**
 
-Run: `cd frontend; npm.cmd test; npm.cmd run build; git diff --check 2de48a2..HEAD`
+Run: `cd frontend; npm.cmd ci --ignore-scripts; npm.cmd test; npm.cmd run build; git diff --check 2de48a2..HEAD`
 
 Expected: test and build PASS; diff command has no output. Scan changed-file credential patterns without printing matches.
 
 - [ ] **Step 4: Update process evidence and commit it**
 
-Record the exact Open Design version/source/hash verification, design principles, legacy reuse boundary, RED/GREEN, review findings and final counts. Do not mark a PR number until it exists.
+Record the Open Design historical version/source claim and its unreproducible checksum boundary without inventing a digest, plus design principles, legacy reuse boundary, RED/GREEN, review findings and final counts. Do not mark a PR number until it exists.
 
 ```powershell
 git add PROJECT_PROGRESS.md PLAN.md AGENT_LOG.md REQUIREMENTS_TRACEABILITY.md

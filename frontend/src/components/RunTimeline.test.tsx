@@ -21,7 +21,7 @@ describe("RunTimeline", () => {
     expect(screen.getByText("rule_decision")).toBeInTheDocument();
     expect(screen.getByText("已阻止")).toBeInTheDocument();
     expect(screen.getByText("dangerous_command_blocked")).toBeInTheDocument();
-    expect(screen.getByText("2026-08-08 10:00")).toBeInTheDocument();
+    expect(screen.getByText("2026-08-08 10:00 UTC")).toBeInTheDocument();
   });
 
   it("renders the waiting-approval status as text", () => {
