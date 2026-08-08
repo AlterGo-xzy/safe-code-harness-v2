@@ -19,10 +19,10 @@ class FeedbackEvaluator:
 
     def from_result(self, action: Action, result: ToolResult) -> Feedback:
         del action
-        summary = result.summary or "tool failed without a summary"
         if result.ok:
-            return Feedback(kind="success", summary=summary)
+            return Feedback(kind="success", summary=result.summary or "tool succeeded without a summary")
 
+        summary = result.summary or "tool failed without a summary"
         normalized_summary = result.summary.casefold()
         if normalized_summary.startswith("blocked ") or normalized_summary.startswith("rule denied"):
             return Feedback(kind="rule_denial", summary=summary)

@@ -40,3 +40,12 @@ def test_empty_failed_result_becomes_a_generic_tool_failure() -> None:
 
     assert feedback.kind == "tool_failure"
     assert feedback.summary == "tool failed without a summary"
+
+
+def test_empty_successful_result_does_not_describe_the_action_as_a_failure() -> None:
+    feedback = FeedbackEvaluator().from_result(
+        Action("run_tests", {}, None), ToolResult(ok=True, summary="")
+    )
+
+    assert feedback.kind == "success"
+    assert feedback.summary == "tool succeeded without a summary"

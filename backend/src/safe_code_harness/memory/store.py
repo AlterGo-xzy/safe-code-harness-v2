@@ -1,10 +1,15 @@
 import re
 from dataclasses import dataclass, field
+from types import MappingProxyType
+from typing import Mapping
 
 
 _SECRET_ASSIGNMENT = re.compile(
-    r"\b(?:api[_-]?key|token|secret|password|authorization)\b\s*[:=]\s*\S+", re.IGNORECASE
+    r"\b(?:[A-Za-z_][A-Za-z0-9_]*(?:API_KEY|TOKEN|SECRET|PASSWORD)|api[-_]?key|token|secret|password)"
+    r"\s*[:=]\s*\S+",
+    re.IGNORECASE,
 )
+_AUTHORIZATION_VALUE = re.compile(r"\bauthorization\b\s*:\s*(?:bearer|basic)\s+\S+", re.IGNORECASE)
 _SECRET_VALUE = re.compile(r"\b(?:sk-proj-|sk-|ghp_|github_pat_)[A-Za-z0-9_-]+\b")
 
 
@@ -12,7 +17,10 @@ _SECRET_VALUE = re.compile(r"\b(?:sk-proj-|sk-|ghp_|github_pat_)[A-Za-z0-9_-]+\b
 class MemoryEvent:
     run_id: str
     summary: str
-    details: dict[str, object] = field(default_factory=dict)
+    details: Mapping[str, object] = field(default_factory=lambda: MappingProxyType({}))
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "details", MappingProxyType(dict(self.details)))
 
 
 class MemoryStore:
@@ -56,4 +64,5 @@ class MemoryStore:
     @staticmethod
     def _redact(summary: str) -> str:
         redacted = _SECRET_ASSIGNMENT.sub("[REDACTED]", summary)
+        redacted = _AUTHORIZATION_VALUE.sub("[REDACTED]", redacted)
         return _SECRET_VALUE.sub("[REDACTED]", redacted)
