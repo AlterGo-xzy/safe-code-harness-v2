@@ -324,7 +324,7 @@ def test_pending_write_only_runs_after_explicit_approval(client) -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：补充未知运行、重复审批、拒绝和不可序列化事件测试；运行 `python -m pytest backend/tests/integration/test_runs_api.py -q`，预期全绿。
 - [ ] **步骤 5：两阶段审查与提交**：先审查 API 没有绕过 AgentLoop，再审查状态隔离、错误码和日志脱敏；提交 `git commit -m "feat: expose governed runs through api"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** 初始实现/依赖修正提交为 `974d73b`、`7afa279`、过程记录 `2de48a2`；现为解除任务 11 的真实 API 契约阻断，经用户确认补充只读列表。fresh implementer `/root/t08_runlist_implementer` 先在 `GET /api/runs` 得到 405、详情缺 `scenario` 的 `3 failed` RED，后提交 `afd42ae feat(api): add safe run list summaries`。列表只白名单返回 `id`、`scenario`、`status`、`updated_at`，按创建时序稳定排序；详情补同样安全元数据。独立审查 PASS，无 C/I/M；协调验证完整 backend `99 passed, 1 warning`、脚本 unit `88 passed`，warning 是既有 TestClient 弃用提示。更新既有 draft PR #8，保留分支/worktree。
 
 ## 任务 2：动作协议、运行模型与 Mock LLM
 
