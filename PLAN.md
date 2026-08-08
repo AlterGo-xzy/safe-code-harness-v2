@@ -525,25 +525,18 @@ it("renders a blocked rule decision in the run timeline", () => {
 
 **完成记录：** Task 1 提交 `893f01a`、`63749f5`：初始 `runs` 模块缺失 RED，边界初始 GREEN 4/4；在任务 8 固定安全 DTO 后，审查发现两个 Important（异常原文泄露、读取原始 `summary`/`failure`），先有 3/6 RED 回归，修复后 focused/full GREEN 6/6。Task 2 提交 `0dcdca9`：`App`/`RunTimeline` 缺失 RED，focused GREEN 6/6、全套 GREEN 12/12。前端只读调用任务 8 的两个 GET 路由，严格投影列表四字段和时间线安全 DTO 五字段；未读取或迁入旧前端，未实现写 API、审批、配置、上传、凭据或 localStorage。Open Design 只有不可复现的历史记录：记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 0.18.1 并做过 SHA-256 校验，但本地没有安装包、资产 URL 或精确摘要，不能算作当前已验证证据，绝不猜测摘要；任务只采用记录中的技能/设计系统、真实文件产出和可审计原则，未加入运行时依赖。两阶段审查最终 Critical 0、Important 0；CSS 有 `44rem` 单列断点、`min-width: 0`、`overflow-wrap: anywhere`，但没有窄屏浏览器测试，320px 证据明确留给任务 13。最终审查修复提交 `33b5ff0`：依赖 RED 为缺 lockfile 导致 `npm ci` exit 1，行为 RED 为 focused 3 files/9 tests 中 3 failed；新增 lockfile v3 并精确声明 Testing Library/jsdom 依赖，卡片可访问名称加入场景/状态/UTC 更新时间，详情以 id 绑定当前选择并覆盖乱序响应，时间显式标注 UTC。GREEN 为 focused 9/9；clean `npm ci` 成功，完整前端 4 files/15 tests passed，build 通过，credential candidate 0，staged diff check 无输出。设计和 UI 只承诺安全四字段卡片/五字段时间线，绝不恢复原始事件文本。按用户选择已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)，保留分支/worktree 等待审查。
 
-## 任务 12：审批、策略、Planner 与上传界面
+## 任务 12：审批、Planner 与 ZIP 上传界面（策略扩展延后）
 
-**工作区与 PR：** `codex/t12-settings-approval-ui` / `.worktrees/t12-settings-approval-ui`，独立 PR。
-**文件：** 新建 `frontend/src/api/config.ts`、`api/workspaces.ts`、`components/ApprovalPanel.tsx`、`PlannerSettings.tsx`、`PolicyEditor.tsx`、`WorkspaceUpload.tsx`；测试对应 `*.test.tsx`。
-**接口：** 审批面板仅在 API 返回 `waiting_approval` 时允许批准/拒绝；Planner 表单永不回填密钥，仅呈现配置状态；策略编辑传递显式 allow/block/approval 配置；上传结果切换当前 workspace。
+**工作区与 PR：** `codex/t12-settings-approval-ui` / `.worktrees/t12-settings-approval-ui`；已创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留 worktree 等待审查。
+**实际文件：** `frontend/src/api/approvals.ts`、`planner.ts`、`workspaces.ts`，`runs.ts` 的条件 `approvalId` 投影，`ApprovalPanel.tsx`、`PlannerSettings.tsx`、`WorkspaceUpload.tsx` 及其测试、`App.tsx`/测试和样式。
+**安全接口：** 只调用任务 8 的审批 POST、任务 9 的 Planner GET/PUT/DELETE、任务 10 的 ZIP POST。详情仅在 `waiting_approval` 且 wire `approval_id` 为字符串时保留 `approvalId`；Planner 仅投影四个公共字段，密码输入仅在 submit 中读取且 finally 清空；上传仅显示 `id`、`fileCount`。没有 policy route/UI、假成功、raw event、未记录写路由、key 的 JSX/state/error/URL、localStorage、服务器路径、workspace 切换或外部 Planner 调用；用户批准将策略扩展延后。
 
-- [ ] **步骤 1：写失败测试**
+**完成记录：**
 
-```tsx
-it("submits approval without rendering the secret key", async () => {
-  render(<PlannerSettings configured maskedSuffix="...1234" />)
-  expect(screen.queryByDisplayValue("secret-value")).not.toBeInTheDocument()
-  expect(screen.getByText(/1234/)).toBeInTheDocument()
-})
-```
-
-- [ ] **步骤 2：确认红色结果**：运行 `npm.cmd test -- --run PlannerSettings.test.tsx`，预期组件不存在或断言失败。
-- [ ] **步骤 3：最小实现**：对 approve/reject、配置更新和 zip 上传使用任务 8-10 的 API；不使用 `localStorage` 保存 key，轮询/刷新后以服务端掩码状态恢复。
-- [ ] **步骤 4：确认绿色结果与重构**：补充拒绝审批、上传错误、配置保存失败、secret 不入 DOM/localStorage 测试；运行 `npm.cmd test` 与 `npm.cmd run build`，预期全绿。
-- [ ] **步骤 5：两阶段审查与提交**：先审查 UI 不能绕开治理与凭据边界，再审查 loading/disabled/error 状态和无障碍标签；提交 `git commit -m "feat: add approval and configuration controls"`。
-
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+- Task 1 RED：`npm.cmd test -- --run src/api/runs.test.ts src/api/approvals.test.ts src/api/planner.test.ts src/api/workspaces.test.ts` 在安装依赖后为 4 files failed、3 tests failed、5 passed（缺三个模块与 `approvalId` 投影）；GREEN 为 4 files/16 tests passed，`npm.cmd run build` 通过。提交 `1a9074b`。
+- Task 2 RED：`npm.cmd test -- --run src/components/ApprovalPanel.test.tsx src/components/PlannerSettings.test.tsx src/components/WorkspaceUpload.test.tsx src/App.test.tsx` 因组件/组合缺失 exit 1；首次 GREEN 后另有 Planner 固定错误的 focused RED，最终 focused GREEN 为 4 files/15 tests。初始全套为 10 files/34 tests，build 通过，提交 `0369c8f`。
+- 两阶段审查先覆盖 spec/security，再覆盖质量/无障碍。Task 2 review 为 Critical 0、Important 2、Minor 1；两个 Important 均先新增失败回归，再由 `b22c56d` 修复：过期审批完成不会使当前选择卡住，迟到的 Planner 初始 GET 不会覆盖保存/清除结果。修复后的 focused GREEN 为 3 files/16 tests，完整前端为 10 files/37 tests，build 通过；最终 review clean。
+- Task 3 独立复核了 API/JSX/状态边界、labels、键盘 button、pending disabled、错误/空反馈、面板标题、批准后的当前详情刷新、ZIP accept 限制、组件边界和 stale-detail guard；未发现 Critical 或 Important，故不改产品代码。控制器新鲜验证：`npm.cmd ci --ignore-scripts` 成功安装 176 packages；`npm.cmd test` 为 10 files/37 tests passed；`npm.cmd run build` 通过；`git diff --check codex/t11-workbench-ui..HEAD` 无输出；高置信凭据模式扫描只报告计数 `0`，不输出内容。
+- 最终审查为 Critical 0、Important 0、Minor 6。最终修复波先新增全部回归；focused `npm.cmd test -- --run src/api/runs.test.ts src/api/planner.test.ts src/components/PlannerSettings.test.tsx src/components/WorkspaceUpload.test.tsx` 得到预期 RED：1 failed、28 passed，唯一失败是缺少 `正在加载 Planner 配置…`，而非字符串 `approval_id`、Planner GET/PUT/DELETE 的 non-OK/网络错误净化、Planner save/clear pending 禁用和 upload pending 禁用均验证了既有安全行为。增加最小 Planner loading state 后同命令为 4 files/29 tests GREEN；完整 `npm.cmd test` 为 10 files/48 tests，`npm.cmd run build` 通过。六项 Minor 全部关闭。
+- 旧项目：Task 1/2 没有读取、复制或咨询旧项目源码。旧 `D:\2026_summer_project\frontend\src\components\ConfigPanel.tsx`、`WorkspaceUploadPanel.tsx` 和 `backend\src\safe_code_harness\api\routes_config.py` 只在设计文档中登记为未来扩展调查入口，不是任务 12 的实现指导；未迁入策略、localStorage、路径展示或自定义 workspace 事件。
+- 未完成：策略 API/UI 是用户批准的延后扩展；任务 13 仍负责合并后真实本地 API、浏览器和 320px E2E。没有 PR 编号可记录。

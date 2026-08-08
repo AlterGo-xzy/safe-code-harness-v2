@@ -205,3 +205,21 @@
 - 新鲜验证：clean install 后 `npm.cmd test` 为 4 files/15 tests passed；`npm.cmd run build` 成功（Vite 5.4.21，327ms）；credential-like 扫描只报告 `credential_candidate_count=0`；staged diff check 无输出。网络仅用于获准的 npm 依赖安装/解析，没有应用 API、真实 LLM、真实凭据或其他联网操作。
 - 独立 scoped re-review 对 `47986c1..779b4e0` 给出 Critical 0、Important 0、Minor 1：详细计划示例仍含旧事件文字及笼统安装证据措辞。随后以文档最小修正将断言改为固定 `summaryCode`，并明确安装记录不可复现；未改变运行时行为或安全边界。
 - 收尾：用户选择 `finishing-a-development-branch` 选项 2；`codex/t11-workbench-ui` 已成功推送，并创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)。保留 worktree 处理审查反馈；未合并、未删除分支。
+
+## 2026-08-09 T12：治理控制面板与过程复核
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t12-settings-approval-ui` / `codex/t12-settings-approval-ui`。Task 1 提交 `1a9074b`，Task 2 提交 `0369c8f`，审查修复 `b22c56d`；本条不创建 PR 或推送。
+- TDD：Task 1 在依赖安装后先得到 4 files failed、3 tests failed、5 passed 的预期 API RED，随后为 4 files/16 tests GREEN。Task 2 先因三个面板和 App 组合缺失得到 focused RED；另以 Planner 清除错误得到 focused RED，随后为 4 files/15 tests GREEN。Task 2 review 的两个 Important 均先有失败回归：晚到审批完成与选择切换、以及迟到初始 Planner GET 覆盖 mutation；修复后 focused 3 files/16 tests、完整 10 files/37 tests GREEN。
+- 两阶段审查与复核：Task 1 的安全投影 review 记录为 clean（仅 2 个 deferred Minor）；Task 2 初审为 Critical 0、Important 2、Minor 1，fix round 后 review clean。Task 3 按先 spec/security、后质量/无障碍的顺序复核：只用任务 8-10 已有写路由，无 policy UI/route 或假成功；无 raw event、key JSX/state/error/URL、localStorage 和路径显示；labels、原生 keyboard buttons、pending disabled、固定错误/空状态、标题、审批刷新、ZIP accept、组件边界和 stale-detail guard 均符合范围。无 Critical/Important，因此不改产品代码。
+- 旧项目/人工边界：Task 1/2 没有读取、复制或咨询旧项目源码。旧 `D:\2026_summer_project\frontend\src\components\ConfigPanel.tsx`、`WorkspaceUploadPanel.tsx`、`backend\src\safe_code_harness\api\routes_config.py` 仅登记为未来扩展调查入口，不是 Task 12 的实现指导；未迁入策略、localStorage、服务器路径或 workspace 切换。用户批准策略扩展延后，Task 12 未实现策略 API/UI。
+- 新鲜控制器验证：`frontend` 中 `npm.cmd ci --ignore-scripts` 成功（176 packages；npm audit 提示 3 moderate、1 high、1 critical，未改依赖）；`npm.cmd test` 为 10 files/37 tests passed；`npm.cmd run build` 成功；`git diff --check codex/t11-workbench-ui..HEAD` 无输出。高置信凭据模式扫描只报告 `credential_like_match_count=0`，不输出内容。
+- 后续：任务 13 的真实合并后 API、浏览器和 320px E2E 尚未执行；本 Task 不虚构 PR、浏览器验证或策略持久化。
+
+## 2026-08-09 T12：最终审查修复波
+
+- 执行者 `/root/t12_final_fix_implementer` 使用 `receiving-code-review`、`systematic-debugging`、`test-driven-development` 和 `verification-before-completion`；只处理最终审查的 Critical 0、Important 0、Minor 6，不创建 PR 或推送。
+- 根因与 RED：运行时唯一缺口是 `PlannerSettings` 未表达初始 GET pending；其余五项是边界覆盖或文档事实不一致。新增全部回归后，focused `npm.cmd test -- --run src/api/runs.test.ts src/api/planner.test.ts src/components/PlannerSettings.test.tsx src/components/WorkspaceUpload.test.tsx` 为 1 failed、28 passed，失败断言精确指出缺少 `正在加载 Planner 配置…`。非字符串 `approval_id`、Planner GET/PUT/DELETE non-OK/网络错误固定消息、Planner save/clear pending 和 ZIP upload pending 回归均直接通过，证明现有实现已保持这些行为。
+- 最小 GREEN：Planner 面板增加只覆盖初始 GET 生命周期的本地 loading state 和固定中文提示；`App` 仍只拥有当前选择详情/审批刷新，三个面板各自拥有瞬时请求状态。focused 复跑为 4 files/29 tests passed；完整前端为 10 files/48 tests passed，build 成功。
+- 六项 Minor 均关闭：补齐非字符串审批 ID；三种 Planner 方法的 HTTP/网络脱敏；将 `PROJECT_PROGRESS.md` 日期改为 2026-08-09；统一 Task 1/2 未读取、复制或咨询旧代码且三个路径仅为未来扩展入口；修正 App/面板状态归属并加入 Planner 加载反馈；补齐 Planner 与上传 pending 禁用回归。设计、详细计划和四份过程文档均按实际事实修正。
+- 边界未扩张：无 policy API/UI/backend、localStorage、raw fields、server paths 或 Planner key state/error echo。策略扩展仍按用户决定延后；任务 13 的真实 API、浏览器和 320px E2E 仍未执行。
+- 分支收尾：用户要求按要求文件操作，故采用 `finishing-a-development-branch` 选项 2；已推送 `codex/t12-settings-approval-ui` 并创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)。保留 worktree 处理审查反馈；未合并或删除分支。
