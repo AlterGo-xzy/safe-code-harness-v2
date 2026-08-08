@@ -179,3 +179,10 @@
 - worktree/分支：`codex/t07-agent-loop`，基线 `124b7f6`；implementer `/root/t07_implementer` 提交 `2ceb6b1`，两轮安全修复 `e018822`、`328baaf`。
 - RED 后仅参考旧项目 `core\agent_loop.py` 和直接相关测试的循环/事件概念；新实现使用本仓库 Action、Rules、ApprovalStore、ToolDispatcher、Feedback 和 Memory，未迁入高层 agent framework、API、planner 或凭据。
 - 初审发现审批触发/恢复和工具失败可观察性缺口；第一次修复后 scoped re-review 又发现恢复配置漂移可绕过被拒审批。每轮均先有失败回归，最终 scoped re-review PASS。新鲜 unit 为 `88 passed`，根目录完整 backend/tests（含 integration）为 `89 passed in 0.12s`；未跟踪报告保留在 `task-7-report.md`。
+
+## 2026-08-08 T8：FastAPI 运行与审批 API
+
+- `/root/t08_implementer` 提交 `974d73b`、`7afa279`；API 只经 ApprovalStore 和 AgentLoop.resume 恢复，拒绝无工具分发，事件脱敏可序列化。
+- 审查的 httpx2 依赖缺口经干净安装验证修复，scoped re-review PASS；full backend `96 passed`、一键 unit `88 passed`；上游 Starlette 弃用警告已如实记录。
+- 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
+- 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
