@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { getRun, listRuns, type RunDetail, type RunSummary } from "./api/runs";
+import { ApprovalPanel } from "./components/ApprovalPanel";
+import { PlannerSettings } from "./components/PlannerSettings";
 import { RunCardGrid } from "./components/RunCardGrid";
 import { RunTimeline } from "./components/RunTimeline";
+import { WorkspaceUpload } from "./components/WorkspaceUpload";
 
 export function App() {
   const [runs, setRuns] = useState<RunSummary[]>([]);
@@ -10,6 +13,18 @@ export function App() {
   const [listState, setListState] = useState<"loading" | "ready" | "error">("loading");
   const [detail, setDetail] = useState<RunDetail | null>(null);
   const [detailError, setDetailError] = useState(false);
+  const detailRequest = useRef(0);
+
+  function reloadRun(runId: string) {
+    const request = ++detailRequest.current;
+    setDetail(null);
+    setDetailError(false);
+    getRun(runId).then((loadedDetail) => {
+      if (detailRequest.current === request) setDetail(loadedDetail);
+    }).catch(() => {
+      if (detailRequest.current === request) setDetailError(true);
+    });
+  }
 
   useEffect(() => {
     let active = true;
@@ -28,17 +43,7 @@ export function App() {
 
   useEffect(() => {
     if (!selectedRunId) return;
-    let active = true;
-
-    setDetail(null);
-    setDetailError(false);
-    getRun(selectedRunId).then((loadedDetail) => {
-      if (active) setDetail(loadedDetail);
-    }).catch(() => {
-      if (active) setDetailError(true);
-    });
-
-    return () => { active = false; };
+    reloadRun(selectedRunId);
   }, [selectedRunId]);
 
   if (listState === "loading") {
@@ -67,7 +72,14 @@ export function App() {
         <section className="panel" aria-labelledby="timeline-heading">
           <h2 id="timeline-heading">事件时间线</h2>
           {detailError ? <p className="state-message state-message--error">无法加载运行详情</p> : detail?.id === selectedRunId ? <RunTimeline events={detail.events} /> : <p className="state-message">正在加载运行详情…</p>}
+          {detail?.id === selectedRunId && detail.status === "waiting_approval" && detail.approvalId ? (
+            <ApprovalPanel runId={detail.id} approvalId={detail.approvalId} onResolved={() => reloadRun(detail.id)} />
+          ) : null}
         </section>
+      </div>
+      <div className="control-grid">
+        <PlannerSettings />
+        <WorkspaceUpload />
       </div>
     </main>
   );

@@ -4,8 +4,10 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "./App";
+import { decideApproval } from "./api/approvals";
 import { getRun, listRuns } from "./api/runs";
 
+vi.mock("./api/approvals", () => ({ decideApproval: vi.fn() }));
 vi.mock("./api/runs", () => ({
   getRun: vi.fn(),
   listRuns: vi.fn(),
@@ -13,6 +15,7 @@ vi.mock("./api/runs", () => ({
 
 const mockedGetRun = vi.mocked(getRun);
 const mockedListRuns = vi.mocked(listRuns);
+const mockedDecideApproval = vi.mocked(decideApproval);
 
 const pendingWrite = {
   id: "r-1",
@@ -169,5 +172,53 @@ describe("App", () => {
 
     expect(screen.getByText("selected_detail")).toBeInTheDocument();
     expect(screen.queryByText("late_stale_detail")).not.toBeInTheDocument();
+  });
+
+  it("renders approval controls only for a selected waiting-approval detail with an approval ID", async () => {
+    mockedListRuns.mockResolvedValue([pendingWrite]);
+    mockedGetRun.mockResolvedValue({
+      id: "r-1",
+      scenario: "pending_write",
+      status: "completed",
+      approvalId: "approval-1",
+      events: [],
+    });
+
+    render(<App />);
+
+    await waitFor(() => expect(mockedGetRun).toHaveBeenCalledWith("r-1"));
+    expect(screen.queryByRole("button", { name: "批准" })).not.toBeInTheDocument();
+  });
+
+  it("reloads the selected run detail after a successful approval decision", async () => {
+    mockedListRuns.mockResolvedValue([pendingWrite]);
+    mockedDecideApproval.mockResolvedValue();
+    mockedGetRun
+      .mockResolvedValueOnce({
+        id: "r-1",
+        scenario: "pending_write",
+        status: "waiting_approval",
+        approvalId: "approval-1",
+        events: [],
+      })
+      .mockResolvedValueOnce({
+        id: "r-1",
+        scenario: "pending_write",
+        status: "completed",
+        approvalId: null,
+        events: [{
+          type: "approval",
+          level: "info",
+          displayStatus: "已批准",
+          summaryCode: "approval_resolved",
+          createdAt: "2026-08-08T10:01:00Z",
+        }],
+      });
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "批准" }));
+
+    await waitFor(() => expect(mockedGetRun).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText("approval_resolved")).toBeInTheDocument();
   });
 });
