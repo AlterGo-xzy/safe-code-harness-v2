@@ -157,3 +157,10 @@
 - 审查：`/root/t05_reviewer` 认为白名单、PathSandbox、guard-before-runner、argv/timeout 和无真实进程测试均符合要求，无 Critical/Important。它建议补强安全 shell 的 argv/timeout 和 requires_approval 短路回归，已如实登记为 deferred Minor，不影响当前任务合格。
 - 人工干预：协调会话只建立 worktree/本地忽略环境、调度审查、回填证据和运行新鲜验证，未改动任务功能源码。
 - 学到的教训：工具层的“没有执行”需要用注入 runner 的行为断言证明；白名单、路径解析和命令护栏必须构成不可绕过的先后顺序，而不是由调用者自觉遵守。
+
+## 2026-08-08 T5：分支收尾与 PR
+
+- 触发技能：`verification-before-completion`、`finishing-a-development-branch`、`github:yeet`；沿用既有选项 2，推送并创建 draft PR、保留 worktree。
+- 收尾前新鲜验证：`scripts/test.ps1` 为 `58 passed in 0.10s`，`git diff --check 716d246..HEAD` 无输出，工作树干净。
+- 实际动作：推送 `codex/t05-tools`，创建 [draft PR #5](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/5)，API 回读确认 `OPEN`、`isDraft=true`、base `codex/t04-command-approval`、head 正确。
+- 分支决定：保留 `codex/t05-tools` 与 `.worktrees/t05-tools` 等待审查；上游 PR 合并后依次调整 base 为 `main`。
