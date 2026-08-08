@@ -250,3 +250,11 @@
 - GREEN：focused integration `1 passed, 1 warning`；完整 `backend/tests` 为 `146 passed, 1 warning`。warning 仍为既有 TestClient 弃用提示，不是本集成引入的失败。未使用真实 key、应用网络调用或旧项目源码。
 - 提交：Task 9/10 merge commits 分别为 `ec613df`、`1664aa2`；集成测试与四份过程文档提交为 `fd38e6a feat: integrate planner and workspace APIs`。
 - 剩余范围：Task 13 的三个确定性 demo、Playwright 真实浏览器流程与 320px 验证仍未执行；策略扩展仍按用户决定延后。完整命令和证据见 `.superpowers/sdd/2026-08-09-demos-e2e/task-1-report.md`。
+
+## 2026-08-09 T13 Task 2：离线确定性机制演示（审查待执行）
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e` / `codex/t13-demos-e2e`；fresh implementer `/root/t13_task2_implementer` 按 `subagent-driven-development` brief 使用 `test-driven-development`。范围严格限于三份离线 demo、其集成测试、跨平台入口与 README 说明；未开始 Playwright、policy 扩展、CI、容器或部署，也未读取或迁入旧项目代码。
+- TDD RED：新增 `backend/tests/integration/test_demos.py` 后运行 `.\.venv\Scripts\python.exe -m pytest backend\tests\integration\test_demos.py --basetemp .pytest-tmp\task13-demos-red -q`，预期在收集期以 `ModuleNotFoundError: No module named 'scripts.run_approval_demo'` 失败。测试验证实际 CLI JSON 行为，而非源文本；同时拒绝 `C:`、`D:` 和 `secret` 输出。
+- 最小实现与边界：guardrail 直接调用现有 `CommandGuard(RuntimePolicy())`；反馈 demo 用固定响应的 `MockLLM` 子类，第二次动作前确认失败测试反馈已进入真实 `AgentLoop` context，并用临时目录内的有界工具 double 后在 `finally` 清理；approval demo 使用真实 `RunService.start/decide` 与实际投影事件，而非伪造状态序列。三份 CLI 仅输出稳定 JSON；没有网络、真实 LLM、key、项目工作区 mutation 或绝对路径输出。
+- GREEN：同测试为 `6 passed in 0.23s`；`.\scripts\run_demos.ps1` 成功连续输出阻止、反馈修复、批准后执行三份 JSON。完整 backend 回归为 `152 passed, 1 warning`，warning 是既有 Starlette/TestClient 对 httpx 的弃用提示；`git diff --check` 无输出，高置信凭据候选只报告计数 `0`。`Makefile` 为 Unix-like 环境提供 `demos` target；当前 Windows 没有 GNU make，未运行且未宣称其成功。README 仅说明离线 demos，明确不把它们写成 E2E/CI/部署证据。
+- 后续：Task 2 尚待独立 spec/security 审查与代码质量审查；之后才可记录 commit、运行完整控制器验证并进入 Task 3 的真实 API/browser/320px 工作。完整执行报告将写入 `.superpowers/sdd/2026-08-09-demos-e2e/task-2-report.md`（忽略文件）。

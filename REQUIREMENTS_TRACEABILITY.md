@@ -11,14 +11,14 @@
 | G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12、13 Task 1） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。Task 13 Task 1 已验证合并后真实 Planner API 返回固定四字段 DTO；真实浏览器 E2E 仍待后续 Task 13 工作。 |
 | G-3.1-4 | SPEC 有凭据威胁模型与对策 | 已完成并验证 | `SPEC.md` 8.1。 |
 | G-3.2-1 | 选择分发形态；容器须单条 build/run 且推送公开 registry | 已设计，尚未执行 | Dockerfile、GHCR publish workflow、公开 `docker pull` 和全新机器运行证据。 |
-| G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 已设计，尚未执行 | README 分发/安全章节和命令验证。 |
+| G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 部分完成（任务 13 Task 2） | 新增 README 的离线机制演示命令与边界已由 Windows 入口验证；分发、目标机 key 安全配置、完整限制和容器命令仍待任务 14/15。 |
 | G-3.3 | SPEC 说明技术栈、LLM 供应商与理由 | 已完成并验证 | `SPEC.md` 9；可选 Planner 明确为 OpenAI-compatible 单次动作提供方。 |
 | G-3.4-1 | 真实、非玩具项目，至少三个职责清晰模块 | 已设计，尚未执行 | Core、Governance、Tools、Feedback/Memory、API、WebUI 六类模块及可运行工作流。 |
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-12、13 Task 1） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 Task 1 记录两个 reviewed branch 的 merge commits、精确冲突、factory union、scope 与验证，未把未执行的 demo/browser 工作写成完成。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 1 在任何 merge 前因 `create_app` 缺少 `secret_store` contract 得到 RED，合入 reviewed code 后 focused `1 passed`、完整 backend `146 passed`。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-12、13 Task 1-2） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 Task 2 已如实记录离线实现及其 RED/GREEN，明确两阶段审查、完整回归和浏览器工作尚未执行。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1-2） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 2 在三份 demo 模块存在前因 `ModuleNotFoundError` 失败，最小实现后 focused `6 passed` 与 Windows JSON 入口成功。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11） | 任务 11 的历史记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，不能算作已验证证据，且绝不猜测摘要。任务只采用记录中的技能/设计系统、真实文件产出、可审计原则，未将运行时纳入产品依赖。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
@@ -55,9 +55,9 @@
 | A-4-C | 移除真实 LLM 后所有核心机制仍可单测 | 部分完成（任务 2-5） | 已实现动作、治理和工具的离线确定性单测；完整 loop、反馈/记忆与集成测试仍待后续任务。 |
 | A-4-D | 六维最低实现，并选择一个深入维度 | 部分完成（任务 3-4） | 治理主贡献已实现规则、路径沙箱、命令护栏与 HITL 审批状态机；其余五维仍待后续任务。 |
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
-| A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 已设计，尚未执行 | 测试目录按机制分类，CI 离线运行。 |
-| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已设计，尚未执行 | 可重复脚本或测试，保存预期输出/断言。 |
-| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 已设计，尚未执行 | 最终源码、测试、演示和 README 索引。 |
+| A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 部分完成（任务 13 Task 2，审查待执行） | `backend/tests/integration/test_demos.py` 以现有 `MockLLM`、真实 loop/guard/run service 验证三项离线机制；focused 为 `6 passed`、完整 backend 为 `152 passed, 1 warning`，CI 复现仍待任务 14。 |
+| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 部分完成（任务 13 Task 2，审查待执行） | 三份 `scripts/run_*_demo.py` 及 Windows 入口已产生稳定 JSON：危险命令被阻止、失败反馈先于修复动作、真实审批后才执行；测试同时禁止路径/敏感输出。完整 Task 13 审查仍是完成门槛。 |
+| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成（任务 13 Task 2，审查待执行） | 内核和 Mock 单测已存在；README 已索引离线机制演示。Task 13 审查、浏览器 E2E、CI/分发和最终交付仍待完成。 |
 
 ## 实现前绝对门禁
 
