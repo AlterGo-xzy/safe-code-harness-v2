@@ -184,3 +184,12 @@
 
 - `/root/t08_implementer` 提交 `974d73b`、`7afa279`；API 只经 ApprovalStore 和 AgentLoop.resume 恢复，拒绝无工具分发，事件脱敏可序列化。
 - 审查的 httpx2 依赖缺口经干净安装验证修复，scoped re-review PASS；full backend `96 passed`、一键 unit `88 passed`；上游 Starlette 弃用警告已如实记录。
+
+## 2026-08-08 T9：凭据存储与 OpenAI-compatible Planner
+
+- worktree/分支：`D:\\safe-code-harness-v2\\.worktrees\\t09-planner-credentials` / `codex/t09-planner-credentials`，基线 `2de48a2`。触发技能：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`systematic-debugging`、`verification-before-completion`；SDD 简报明确禁止真实 key、网络调用和明文/磁盘回退。
+- 用户决策与安全边界：用户选择暂不配置 OpenAI-compatible API key，之后再通过前端录入。协调会话仅做 presence 检查并得到 `OPENAI_API_KEY_STATUS=absent`，未读取或输出任何值；功能和测试只用 `fixture-secret-2026` 与 fake adapter/transport。
+- 实现 subagent：`/root/t09_implementer` 提交 `3074085 feat: add secure optional planner configuration`。新增 Windows Credential Manager-only `SecretStore`、掩码 `GET/PUT/DELETE /api/config/planner` 和可注入 HTTP transport 的单次 Planner LLM。非 Windows 和适配器失败均 fail-closed，配置响应只含 `configured`、`masked_suffix`、`base_url`、`model`；未使用旧项目代码。
+- TDD：模块缺失时 focused RED 是 `4 failed, 4 errors`；初始 GREEN focused `8 passed`、全量 `104 passed`。`/root/t09_reviewer` 的威胁模型审查发现 Important：`raise ... from exc` 会让潜在含 key 的底层错误存在于 traceback。implementer 先用会抛含 fixture key 的 fake adapter 得到修复 RED `4 failed, 10 passed`，随后在 SecretStore 和配置路由的六处异常转换使用 `from None`，提交 `51eb9c8 fix: prevent credential exception-chain leaks`；另补无 key 不调 fake transport和空白 key 422。修复 GREEN focused `14 passed`、full backend `110 passed`。
+- 两阶段审查：首轮拒绝并报告上述 Important；scoped re-review 核对 set/get/clear 与 GET/PUT/DELETE 的 traceback/503 均不含 fixture key，且无 key 时传输调用为零，结论 PASS、无 C/I/M。协调会话独立运行完整 backend `110 passed, 1 warning`，运行 `scripts/test.ps1` unit `96 passed`；唯一 warning 为既有 Starlette/TestClient 对 httpx 的弃用提示。
+- 人工干预与教训：协调会话未编辑功能源码，只调度审查、运行独立验证并回填证据。接口“不回显”不足以保证安全；异常 cause、traceback 和错误日志也必须被视为凭据数据流并有失败回归。任务完成后仍须按 `finishing-a-development-branch` 创建单独 draft PR 并在此日志补真实链接。

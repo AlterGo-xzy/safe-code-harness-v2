@@ -478,7 +478,7 @@ def test_config_response_never_contains_planner_key(client) -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：补充 fake Windows API 调用、非 Windows fail-closed、清除后不可读取、空 URL/模型校验测试；运行同一命令，预期全绿。
 - [ ] **步骤 5：两阶段审查与提交**：先对照 SPEC 威胁模型逐项审查流向，再审查异常消息、日志和响应；提交 `git commit -m "feat: add secure optional planner configuration"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** 新鲜 implementer `/root/t09_implementer` 在基线 `2de48a2` 完成 `3074085 feat: add secure optional planner configuration`，未使用旧项目代码。用户明确选择暂不配置真实 OpenAI-compatible key；全部验证使用 fixture key、fake Credential Manager / fake transport，未读写真实凭据且未访问网络。初始 RED 运行 `python -m pytest backend/tests/unit/test_secret_store.py backend/tests/unit/test_openai_compatible.py backend/tests/integration/test_config_api.py -q --basetemp .pytest-tmp\\task9-red`，结果 `4 failed, 4 errors`（缺少模块）；最小实现后 focused GREEN 为 `8 passed`。首轮独立安全审查发现异常链会在 traceback 中保留可能含 key 的适配器异常（Important）；修复先加入含 fixture key 的回归，RED 为 `4 failed, 10 passed`，再以六处 `raise ... from None` 隔离底层异常，提交 `51eb9c8 fix: prevent credential exception-chain leaks`。补充无 key 时 fake transport 零调用和空白 key 校验；focused GREEN `14 passed`，scoped re-review PASS，无 C/I/M。协调会话新鲜完整 backend 为 `110 passed, 1 warning`，根目录 `scripts/test.ps1` 为 `96 passed`；warning 是既有 Starlette/TestClient 对 `httpx` 的弃用警告。提交前 `git diff --check 2de48a2..HEAD` 与精确凭据形态扫描均须在 PR 收尾时再运行并记录；PR 编号只在真实创建后补填。
 
 ## 任务 10：安全项目压缩包上传与工作区注册
 
