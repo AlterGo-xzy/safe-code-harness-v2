@@ -507,23 +507,23 @@ def test_upload_rejects_zip_slip(client, zip_with_parent_path) -> None:
 **工作区与 PR：** `codex/t11-workbench-ui` / `.worktrees/t11-workbench-ui`，独立 PR。
 **前置门槛：** 在任务开始时实际确认或安装选定的 Open Design skill，记录版本、来源和实际使用的设计原则到 `AGENT_LOG.md`；若做不到，停止，不以“iOS 风格”替代此要求。
 **文件：** 新建 `frontend/package.json`、`src/main.tsx`、`src/App.tsx`、`src/api/runs.ts`、`src/components/RunTimeline.tsx`、`src/styles/app.css`；测试 `frontend/src/components/RunTimeline.test.tsx`。
-**接口：** 工作台加载/创建运行，时间线显示事件类型、时间、规则结论和工具摘要；无障碍名称可用于 E2E。视觉基调采用确认后的 Open Design 系统与简洁 iOS 控件语言，但不是把文字说明堆进卡片。
+**接口：** 工作台只读加载列表四字段安全 DTO（`id`、`scenario`、`status`、`updated_at`）与时间线五字段安全 DTO（`type`、`created_at`、`level`、`display_status`、`summary_code`）；不创建运行，也不接收或展示原始事件文本、工具输出或任意摘要。卡片无障碍名称包含场景、状态和 UTC 更新时间，可供后续 E2E 使用。视觉基调采用记录中的 Open Design 原则与简洁 iOS 控件语言，但不是把文字说明堆进卡片。
 
 - [x] **步骤 1：写失败测试**
 
 ```tsx
 it("renders a blocked rule decision in the run timeline", () => {
-  render(<RunTimeline events={[{ type: "rule_decision", level: "block", summary: "blocked command" }]} />)
-  expect(screen.getByText("blocked command")).toBeInTheDocument()
+  render(<RunTimeline events={[{ type: "rule_decision", level: "block", displayStatus: "已阻止", summaryCode: "dangerous_command_blocked", createdAt: "2026-08-08T10:00:00Z" }]} />)
+  expect(screen.getByText("dangerous_command_blocked")).toBeInTheDocument()
 })
 ```
 
 - [x] **步骤 2：确认红色结果**：运行 `npm.cmd test -- --run RunTimeline.test.tsx`，预期测试/组件不存在。
 - [x] **步骤 3：最小实现**：建立 Vite/Vitest，调用任务 8 的只读 API；实现稳定尺寸的运行列表与事件时间线，不伪造后端状态。
 - [x] **步骤 4：确认绿色结果与重构**：添加空、加载、API 错误、等待审批状态；运行 `npm.cmd test` 与 `npm.cmd run build`，预期全绿。
-- [x] **步骤 5：两阶段审查与提交**：先审查所有状态来自 API 且信息足够审计，再审查键盘焦点、窄屏布局、色彩对比和文本溢出；提交 `git commit -m "feat: add governed run workbench"`。
+- [x] **步骤 5：两阶段审查与提交**：先审查所有状态来自安全 DTO，再审查键盘焦点、色彩对比、文本溢出与静态响应式规则；没有执行窄屏浏览器测试，该项保持为任务 13 未完成工作；提交 `git commit -m "feat: add governed run workbench"`。
 
-**完成记录：** Task 1 提交 `893f01a`、`63749f5`：初始 `runs` 模块缺失 RED，边界初始 GREEN 4/4；在任务 8 固定安全 DTO 后，审查发现两个 Important（异常原文泄露、读取原始 `summary`/`failure`），先有 3/6 RED 回归，修复后 focused/full GREEN 6/6。Task 2 提交 `0dcdca9`：`App`/`RunTimeline` 缺失 RED，focused GREEN 6/6、全套 GREEN 12/12。前端只读调用任务 8 的两个 GET 路由，严格投影列表四字段和时间线安全 DTO 五字段；未读取或迁入旧前端，未实现写 API、审批、配置、上传、凭据或 localStorage。Open Design 证据记录为 `nexu-io/open-design` 官方 Windows x64 Release `0.18.1`，采用技能/设计系统驱动、真实文件产出、可审计而非装饰性堆叠原则，且未加入运行时依赖；原记录声称 SHA-256 已核验，但本地未保留精确值，禁止联网条件下不得伪造，留为待补证据。两阶段审查最终 Critical 0、Important 0；卡片为键盘可用原生按钮、使用 `aria-pressed` 和可见焦点，状态有中文文本。CSS 有 `44rem` 单列断点、`min-width: 0`、`overflow-wrap: anywhere`；320px 浏览器实测未进行，明确留给任务 13。2026-08-09 新鲜验证：`npm.cmd test` 3 files/12 tests passed，`npm.cmd run build` 通过（337ms），`git diff --check 2de48a2..HEAD` 无输出，凭据模式扫描无非测试代码匹配（未输出命中内容）。本任务仅提交过程记录；尚未创建 PR，未填写 PR 编号。
+**完成记录：** Task 1 提交 `893f01a`、`63749f5`：初始 `runs` 模块缺失 RED，边界初始 GREEN 4/4；在任务 8 固定安全 DTO 后，审查发现两个 Important（异常原文泄露、读取原始 `summary`/`failure`），先有 3/6 RED 回归，修复后 focused/full GREEN 6/6。Task 2 提交 `0dcdca9`：`App`/`RunTimeline` 缺失 RED，focused GREEN 6/6、全套 GREEN 12/12。前端只读调用任务 8 的两个 GET 路由，严格投影列表四字段和时间线安全 DTO 五字段；未读取或迁入旧前端，未实现写 API、审批、配置、上传、凭据或 localStorage。Open Design 只有不可复现的历史记录：记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 0.18.1 并做过 SHA-256 校验，但本地没有安装包、资产 URL 或精确摘要，不能算作当前已验证证据，绝不猜测摘要；任务只采用记录中的技能/设计系统、真实文件产出和可审计原则，未加入运行时依赖。两阶段审查最终 Critical 0、Important 0；CSS 有 `44rem` 单列断点、`min-width: 0`、`overflow-wrap: anywhere`，但没有窄屏浏览器测试，320px 证据明确留给任务 13。最终审查修复提交 `33b5ff0`：依赖 RED 为缺 lockfile 导致 `npm ci` exit 1，行为 RED 为 focused 3 files/9 tests 中 3 failed；新增 lockfile v3 并精确声明 Testing Library/jsdom 依赖，卡片可访问名称加入场景/状态/UTC 更新时间，详情以 id 绑定当前选择并覆盖乱序响应，时间显式标注 UTC。GREEN 为 focused 9/9；clean `npm ci` 成功，完整前端 4 files/15 tests passed，build 通过，credential candidate 0，staged diff check 无输出。设计和 UI 只承诺安全四字段卡片/五字段时间线，绝不恢复原始事件文本。本任务尚未创建 PR，未填写 PR 编号。
 
 ## 任务 12：审批、策略、Planner 与上传界面
 
