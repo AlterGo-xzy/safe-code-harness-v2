@@ -45,4 +45,16 @@ describe("WorkspaceUpload", () => {
     expect(screen.getByRole("button", { name: "上传工作区" })).toBeDisabled();
     expect(screen.getByLabelText("项目 ZIP")).toHaveAttribute("accept", ".zip,application/zip");
   });
+
+  it("disables the file and upload controls while upload is pending", () => {
+    mockedUploadWorkspace.mockReturnValue(new Promise(() => {}));
+    render(<WorkspaceUpload />);
+    const file = new File(["zip"], "project.zip", { type: "application/zip" });
+
+    fireEvent.change(screen.getByLabelText("项目 ZIP"), { target: { files: [file] } });
+    fireEvent.click(screen.getByRole("button", { name: "上传工作区" }));
+
+    expect(screen.getByLabelText("项目 ZIP")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "上传工作区" })).toBeDisabled();
+  });
 });

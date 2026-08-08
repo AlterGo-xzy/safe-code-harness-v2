@@ -28,6 +28,17 @@ afterEach(() => {
 });
 
 describe("PlannerSettings", () => {
+  it("shows a fixed loading message while the initial Planner request is pending", async () => {
+    let resolveInitialLoad!: (settings: typeof configuredPlanner) => void;
+    mockedGetPlanner.mockReturnValue(new Promise((resolve) => { resolveInitialLoad = resolve; }));
+    render(<PlannerSettings />);
+
+    expect(screen.getByText("正在加载 Planner 配置…")).toBeInTheDocument();
+
+    await act(async () => { resolveInitialLoad(configuredPlanner); });
+    expect(screen.queryByText("正在加载 Planner 配置…")).not.toBeInTheDocument();
+  });
+
   it("does not render or retain a Planner key after save", async () => {
     mockedGetPlanner.mockResolvedValue(configuredPlanner);
     mockedSavePlanner.mockResolvedValue(configuredPlanner);
@@ -102,5 +113,22 @@ describe("PlannerSettings", () => {
     expect(await screen.findByText("无法保存 Planner 配置")).toBeInTheDocument();
     expect(screen.queryByDisplayValue("failed-secret")).not.toBeInTheDocument();
     expect(screen.queryByText("private-save-error")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    { button: "保存 Planner 配置", pending: mockedSavePlanner },
+    { button: "清除 Planner 配置", pending: mockedClearPlanner },
+  ])("disables every Planner control while $button is pending", async ({ button, pending }) => {
+    mockedGetPlanner.mockResolvedValue(configuredPlanner);
+    pending.mockReturnValue(new Promise(() => {}));
+    render(<PlannerSettings />);
+
+    fireEvent.click(await screen.findByRole("button", { name: button }));
+
+    expect(screen.getByLabelText("Planner 地址")).toBeDisabled();
+    expect(screen.getByLabelText("模型")).toBeDisabled();
+    expect(screen.getByLabelText("API 密钥")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "保存 Planner 配置" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "清除 Planner 配置" })).toBeDisabled();
   });
 });

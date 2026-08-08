@@ -58,6 +58,15 @@ it("keeps approval ID only for a waiting-approval detail", async () => {
   await expect(getRun("run-1")).resolves.toMatchObject({ approvalId: "approval-1" });
 });
 
+it("drops a non-string approval ID from a waiting-approval detail", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+    id: "run-1", scenario: "pending_write", status: "waiting_approval",
+    approval_id: 1234, events: [],
+  }), { status: 200 })));
+
+  await expect(getRun("run-1")).resolves.toMatchObject({ approvalId: null });
+});
+
 it("never includes an approval ID for a completed detail", async () => {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
     id: "run-1", scenario: "pending_write", status: "completed",

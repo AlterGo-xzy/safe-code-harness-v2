@@ -16,8 +16,8 @@
 - Planner keys are password-input request data only: never render, retain after request completion, log, put in a URL, persist to browser storage, or interpolate into an error.
 - Upload UI displays only returned `id` and `file_count`; never show a server filesystem path, write `localStorage`, dispatch workspace-selection events, or imply a current-run workspace switch.
 - Do not implement policy read/edit, run creation, raw events, tool output, file display, external Planner calls, or browser persistence in this task. Policy API/UI stays a last extension.
-- Legacy reuse requires an equivalent failing test first. Reference only `D:\2026_summer_project\frontend\src\components\ConfigPanel.tsx` for controlled-form patterns and `D:\2026_summer_project\frontend\src\components\WorkspaceUploadPanel.tsx` for file-selection/status structure; exclude its policy mutation scope, paths, `localStorage`, custom event, and full source copy.
-- Never commit keys, `.env`, `node_modules`, build output, test caches, virtual environments, or SDD reports. Record actual RED/GREEN, review, legacy scope, commits, and PR in process documents.
+- Tasks 1 and 2 do not read, copy, or consult legacy source. `D:\2026_summer_project\frontend\src\components\ConfigPanel.tsx`, `WorkspaceUploadPanel.tsx`, and `D:\2026_summer_project\backend\src\safe_code_harness\api\routes_config.py` are prospective future-extension references only, not Task 12 implementation guidance. Any future investigation still requires an equivalent failing test first and must exclude policy mutation, paths, `localStorage`, custom events, and full source copy.
+- Never commit keys, `.env`, `node_modules`, build output, test caches, virtual environments, or SDD reports. Record actual RED/GREEN, review, legacy non-use, commits, and PR in process documents.
 
 ---
 
@@ -130,7 +130,7 @@ git commit -m "feat: add governed controls API clients"
 
 **Interfaces:**
 - `ApprovalPanel({ runId, approvalId, onResolved })` renders decision buttons only for supplied IDs and calls `onResolved` after a successful request.
-- `PlannerSettings()` loads `getPlanner`; it reads `apiKey` from an uncontrolled password-input ref only at submit time, sends `{ baseUrl, model, apiKey }` to `savePlanner`, and clears the input in `finally` without retaining the key in React state.
+- `PlannerSettings()` loads `getPlanner` and shows the fixed `正在加载 Planner 配置…` message while that initial request is pending; it reads `apiKey` from an uncontrolled password-input ref only at submit time, sends `{ baseUrl, model, apiKey }` to `savePlanner`, and clears the input in `finally` without retaining the key in React state.
 - `WorkspaceUpload()` accepts a selected ZIP, calls `uploadWorkspace`, and renders only its safe result.
 
 - [ ] **Step 1: Write failing component tests**
@@ -225,7 +225,7 @@ Expected: clean dependency install, all tests and build PASS, diff check has no 
 
 - [ ] **Step 4: Update evidence and commit**
 
-Record exact RED/GREEN commands/counts, reviewers, safe contracts, legacy paths and excluded behavior, Task 12’s deliberately deferred policy extension, and unresolved Task 13 E2E. Do not enter a PR number until it exists.
+Record exact RED/GREEN commands/counts, reviewers, safe contracts, legacy non-use and prospective-reference boundary, Task 12’s deliberately deferred policy extension, and unresolved Task 13 E2E. Do not enter a PR number until it exists.
 
 ```powershell
 git add PROJECT_PROGRESS.md PLAN.md AGENT_LOG.md REQUIREMENTS_TRACEABILITY.md

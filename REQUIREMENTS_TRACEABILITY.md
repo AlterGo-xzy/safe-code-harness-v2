@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | G-3.1-1 | key 不得硬编码、提交、写日志/history/明文配置 | 部分完成（任务 12 前端边界） | `SPEC.md` 8.1；Task 12 密钥仅在密码输入的提交中读取、finally 清空，且不进 JSX/state/error/URL/localStorage；对 `codex/t11-workbench-ui..HEAD` 的高置信凭据扫描只报告计数 0。仍需最终 Git 历史扫描。 |
 | G-3.1-2 | 至少一种安全存储；说明环境变量/`.env` 明文风险 | 已设计，尚未执行 | Windows Credential Manager 适配器和确定性 Mock 测试；README 说明 `.env` 风险与不推荐命令行 `export`。 |
-| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 12 前端单测） | Task 12 有隐藏输入、掩码后缀、保存/清除和不回显单测；任务 13 仍需针对合并后真实 API 的浏览器 E2E，安全存储本身也仍须按后续任务完成。 |
+| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 12 前端单测） | Task 12 有隐藏输入、掩码后缀、初始加载、保存/清除、mutation pending 禁用和不回显单测；Planner GET/PUT/DELETE 的 non-OK 与网络异常均验证只返回固定中文错误。任务 13 仍需针对合并后真实 API 的浏览器 E2E，安全存储本身也仍须按后续任务完成。 |
 | G-3.1-4 | SPEC 有凭据威胁模型与对策 | 已完成并验证 | `SPEC.md` 8.1。 |
 | G-3.2-1 | 选择分发形态；容器须单条 build/run 且推送公开 registry | 已设计，尚未执行 | Dockerfile、GHCR publish workflow、公开 `docker pull` 和全新机器运行证据。 |
 | G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 已设计，尚未执行 | README 分发/安全章节和命令验证。 |
@@ -17,8 +17,8 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-8、11、12） | `AGENT_LOG.md` 记录任务 1-8、11、12 的 worktree、fresh分段实现、TDD、两阶段审查、修复和分支状态；Task 12 尚未进入 PR/收尾选择，策略扩展为用户批准的延后范围。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-8、11、12） | `PLAN.md` 与 `AGENT_LOG.md` 保留 Task 12 API/面板的真实 RED/GREEN；Task 2 的两项 Important 均先以失败回归复现再由 `b22c56d` 修复，完整前端新鲜验证为 37 tests passed。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-8、11、12） | `AGENT_LOG.md` 记录任务 1-8、11、12 的 worktree、fresh分段实现、TDD、两阶段审查、修复和分支状态；Task 12 最终审查的 6 个 Minor 已关闭，但尚未进入 PR/收尾选择，策略扩展仍为用户批准的延后范围。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-8、11、12） | `PLAN.md` 与 `AGENT_LOG.md` 保留 Task 12 API/面板及最终修复的真实 RED/GREEN；最终 focused RED 为 1 failed/28 passed（缺 Planner 初始加载提示），最小实现后为 4 files/29 tests，完整前端新鲜验证为 10 files/48 tests。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11） | 任务 11 的历史记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，不能算作已验证证据，且绝不猜测摘要。任务只采用记录中的技能/设计系统、真实文件产出、可审计原则，未将运行时纳入产品依赖。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
@@ -28,7 +28,7 @@
 | G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-5） | 任务 1-5 均在独立 worktree 完成并各有 draft PR；后续模块继续。 |
 | G-4.6-2 | 每 task 一个新鲜 subagent | 部分完成（任务 1-5） | `AGENT_LOG.md` 记录任务 1-5 的 fresh implementer、reviewer 与输出。 |
 | G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-5） | 每个任务记录 RED/GREEN；任务 4 的两轮安全审查问题均新增失败回归后修复。 |
-| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-5、12） | Task 12 先审 spec/security 边界，再审质量/无障碍；Task 2 的 Critical 0、Important 2、Minor 1 在 fix round 后 clean，Task 3 复核无 Critical/Important。 |
+| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-5、12） | Task 12 先审 spec/security 边界，再审质量/无障碍；Task 2 的 Critical 0、Important 2、Minor 1 在 fix round 后 clean。后续最终审查为 Critical 0、Important 0、Minor 6，六项已用覆盖、Planner loading 和文档一致性最小修正全部关闭。 |
 | G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 部分完成（任务 1-5） | 任务 1-5 均按 skill 的既有选项 2 保留 branch/worktree 并建立 draft PR。 |
 | G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 部分完成（任务 1-4） | 公开仓库、任务 1-3 draft PR、任务 4 分支及精确凭据扫描；仍需后续 task 和最终历史扫描。 |
 | G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 部分完成（任务 1-4） | 任务 1-4 的 PR/日志均已标注 subagent、人工调整与旧代码复用边界。 |
