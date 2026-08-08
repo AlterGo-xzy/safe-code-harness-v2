@@ -56,6 +56,13 @@ class _FeedbackDemoTools:
         return ToolResult(ok=False, summary="unknown demo tool")
 
 
+def _remove_demo_workspace(workspace: Path) -> None:
+    try:
+        shutil.rmtree(workspace)
+    except OSError as error:
+        raise RuntimeError("demo workspace cleanup failed") from error
+
+
 def run_feedback_demo() -> list[dict[str, object]]:
     """Show that failed-test feedback is present before the fixed mock chooses a repair."""
     workspace = Path(tempfile.mkdtemp(prefix="safe-code-harness-demo-"))
@@ -77,7 +84,7 @@ def run_feedback_demo() -> list[dict[str, object]]:
             if event.action_type is not None and event.ok is not None
         ]
     finally:
-        shutil.rmtree(workspace, ignore_errors=True)
+        _remove_demo_workspace(workspace)
 
 
 def main() -> None:

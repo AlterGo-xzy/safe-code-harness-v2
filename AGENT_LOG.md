@@ -255,6 +255,13 @@
 
 - worktree/分支：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e` / `codex/t13-demos-e2e`；fresh implementer `/root/t13_task2_implementer` 按 `subagent-driven-development` brief 使用 `test-driven-development`。范围严格限于三份离线 demo、其集成测试、跨平台入口与 README 说明；未开始 Playwright、policy 扩展、CI、容器或部署，也未读取或迁入旧项目代码。
 - TDD RED：新增 `backend/tests/integration/test_demos.py` 后运行 `.\.venv\Scripts\python.exe -m pytest backend\tests\integration\test_demos.py --basetemp .pytest-tmp\task13-demos-red -q`，预期在收集期以 `ModuleNotFoundError: No module named 'scripts.run_approval_demo'` 失败。测试验证实际 CLI JSON 行为，而非源文本；同时拒绝 `C:`、`D:` 和 `secret` 输出。
-- 最小实现与边界：guardrail 直接调用现有 `CommandGuard(RuntimePolicy())`；反馈 demo 用固定响应的 `MockLLM` 子类，第二次动作前确认失败测试反馈已进入真实 `AgentLoop` context，并用临时目录内的有界工具 double 后在 `finally` 清理；approval demo 使用真实 `RunService.start/decide` 与实际投影事件，而非伪造状态序列。三份 CLI 仅输出稳定 JSON；没有网络、真实 LLM、key、项目工作区 mutation 或绝对路径输出。
+- 最小实现与边界：guardrail 直接调用现有 `CommandGuard(RuntimePolicy())`；反馈 demo 用固定响应的 `MockLLM` 子类，第二次动作前确认失败测试反馈已进入真实 `AgentLoop` context，并用临时目录内的有界工具 double 后在 `finally` 清理。首次版本的 approval demo 虽调用真实 `RunService.start/decide`，但返回值是固定字面量，不能构成“实际投影”证据；该不准确表述已在修复记录中更正。三份 CLI 仅输出稳定 JSON；没有网络、真实 LLM、key、项目工作区 mutation 或绝对路径输出。
 - GREEN：同测试为 `6 passed in 0.23s`；`.\scripts\run_demos.ps1` 成功连续输出阻止、反馈修复、批准后执行三份 JSON。完整 backend 回归为 `152 passed, 1 warning`，warning 是既有 Starlette/TestClient 对 httpx 的弃用提示；`git diff --check` 无输出，高置信凭据候选只报告计数 `0`。`Makefile` 为 Unix-like 环境提供 `demos` target；当前 Windows 没有 GNU make，未运行且未宣称其成功。README 仅说明离线 demos，明确不把它们写成 E2E/CI/部署证据。
 - 提交与后续：源代码及首次证据提交为 `26f9855 test: add deterministic mechanism demos`。Task 2 尚待独立 spec/security 审查与代码质量审查；之后才可进入 Task 3 的真实 API/browser/320px 工作。完整执行报告将写入 `.superpowers/sdd/2026-08-09-demos-e2e/task-2-report.md`（忽略文件）。
+
+## 2026-08-09 T13 Task 2：首次审查修复（复审待执行）
+
+- 反馈验证：首次审查的三项发现均可由当前代码复现，且不改变 Task 2 范围。approval demo 的根因是它没有读取 snapshots；进一步诊断确认现有安全 DTO 在 completed snapshot 中会把两条 approval event 都映射为 `approval_approved`，因此修复使用真正执行前的最后一个批准事件，而不改动 Task 8 的安全投影。PowerShell 根因是外部命令的 `$LASTEXITCODE` 不会在无检查时令脚本失败；cleanup 根因是 `ignore_errors=True`。
+- TDD：先对缺少 `_project_approval_transcript` 得到 import RED；其后事件顺序回归以不匹配固定错误 RED，确认重复 approval 投影需要精确定位。另有 PowerShell 临时 `SystemExit(7)` child 的 RED（entrypoint returncode 为 0），以及缺少 `_remove_demo_workspace` 的 import RED。修复后 approval 子集 `4 passed`、PowerShell 子集 `1 passed`、cleanup 子集 `1 passed`，完整 `test_demos.py` 为 `10 passed in 0.47s`；正常 `.\scripts\run_demos.ps1` 连续输出三份稳定 JSON。完整 backend 为 `156 passed, 1 warning`（既有 TestClient 弃用），`git diff --check` 无输出，凭据候选计数为 0。
+- 修复：approval transcript 只从真实 pending/completed snapshots 生成，拒绝等待 snapshot 已含 `tool_succeeded`、缺少证据或最后一次批准不早于唯一执行；PowerShell 新增受测的可选 Python/script 参数但默认行为不变，每次 child 后检查 `$LASTEXITCODE` 并抛固定 path-safe 错误；清理将 `OSError` 变为固定 `RuntimeError`，不再吞掉失败。未改 UI、E2E、policy、旧项目复用、CI 或部署。
+- 后续：此修复待独立复审，随后才可更新 Task 2 完成状态并开始 Task 3。完整修复报告将写入 `.superpowers/sdd/2026-08-09-demos-e2e/task-2-fix-report.md`（忽略文件）。

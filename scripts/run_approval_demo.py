@@ -13,26 +13,60 @@ if str(BACKEND_SRC) not in sys.path:
 from safe_code_harness.api.run_service import RunService
 
 
+def _event_codes(snapshot: dict[str, object]) -> list[str]:
+    events = snapshot.get("events")
+    if not isinstance(events, list):
+        raise RuntimeError("approval event evidence is incomplete")
+    codes: list[str] = []
+    for event in events:
+        if not isinstance(event, dict):
+            raise RuntimeError("approval event evidence is incomplete")
+        code = event.get("summary_code")
+        if not isinstance(code, str):
+            raise RuntimeError("approval event evidence is incomplete")
+        codes.append(code)
+    return codes
+
+
+def _project_approval_transcript(
+    pending: dict[str, object], completed: dict[str, object]
+) -> list[dict[str, object]]:
+    """Derive the stable transcript only from the real pending and completed snapshots."""
+    if pending.get("status") != "waiting_approval" or not isinstance(pending.get("approval_id"), str):
+        raise RuntimeError("the approval scenario did not pause before execution")
+    if "tool_succeeded" in _event_codes(pending):
+        raise RuntimeError("waiting approval evidence already contains execution")
+    if completed.get("status") != "completed":
+        raise RuntimeError("the approval transition did not complete")
+
+    event_codes = _event_codes(completed)
+    approval_positions = [index for index, code in enumerate(event_codes) if code == "approval_approved"]
+    execution_positions = [index for index, code in enumerate(event_codes) if code == "tool_succeeded"]
+    if not approval_positions or len(execution_positions) != 1:
+        raise RuntimeError("approval event evidence is incomplete")
+    approval_position = approval_positions[-1]
+    execution_position = execution_positions[0]
+    if approval_position >= execution_position:
+        raise RuntimeError("approval evidence must precede execution")
+
+    transcript = [{"stage": "waiting_approval", "executed": False}]
+    for index, code in enumerate(event_codes):
+        if index == approval_position:
+            transcript.append({"stage": "approved", "executed": False})
+        elif index == execution_position:
+            transcript.append({"stage": "executed", "executed": True})
+    return transcript
+
+
 def run_approval_demo() -> list[dict[str, object]]:
-    """Project the actual pending, approved-event, and resumed-execution evidence."""
+    """Start and approve a real run, then project its evidence into stable JSON."""
     service = RunService(clock=lambda: datetime(2026, 8, 9, tzinfo=timezone.utc))
     pending = service.start("pending_write")
     approval_id = pending.get("approval_id")
-    if pending.get("status") != "waiting_approval" or not isinstance(approval_id, str):
+    if not isinstance(approval_id, str):
         raise RuntimeError("the approval scenario did not pause before execution")
-
     completed = service.decide(str(pending["id"]), approval_id, "approve")
-    event_codes = [str(event.get("summary_code")) for event in completed.get("events", [])]
-    if completed.get("status") != "completed" or "approval_approved" not in event_codes:
-        raise RuntimeError("the approval transition did not complete")
-    if "tool_succeeded" not in event_codes:
-        raise RuntimeError("the approved action was not executed")
-
-    return [
-        {"stage": "waiting_approval", "executed": False},
-        {"stage": "approved", "executed": False},
-        {"stage": "executed", "executed": True},
-    ]
+    return _project_approval_transcript(pending, completed)
 
 
 def main() -> None:

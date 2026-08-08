@@ -1,14 +1,17 @@
 """Offline contracts for the deterministic Harness mechanism demos."""
 
 import json
+from copy import deepcopy
+from datetime import datetime, timezone
 from pathlib import Path
 import subprocess
 import sys
 
 import pytest
 
-from scripts.run_approval_demo import run_approval_demo
-from scripts.run_feedback_demo import run_feedback_demo
+from safe_code_harness.api.run_service import RunService
+from scripts.run_approval_demo import _project_approval_transcript, run_approval_demo
+from scripts.run_feedback_demo import _remove_demo_workspace, run_feedback_demo
 from scripts.run_guardrail_demo import run_guardrail_demo
 
 
@@ -39,6 +42,78 @@ def test_approval_demo_projects_actual_approval_and_execution_transitions() -> N
         {"stage": "approved", "executed": False},
         {"stage": "executed", "executed": True},
     ]
+
+
+def _approval_snapshots() -> tuple[dict[str, object], dict[str, object]]:
+    service = RunService(clock=lambda: datetime(2026, 8, 9, tzinfo=timezone.utc))
+    pending = service.start("pending_write")
+    approval_id = pending["approval_id"]
+    assert isinstance(approval_id, str)
+    completed = service.decide(str(pending["id"]), approval_id, "approve")
+    return pending, completed
+
+
+def test_approval_projection_rejects_execution_recorded_while_waiting() -> None:
+    """Treating a waiting snapshot with executed work as safe would break this contract."""
+    pending, completed = _approval_snapshots()
+    invalid_pending = deepcopy(pending)
+    invalid_pending["events"].append({"summary_code": "tool_succeeded"})
+
+    with pytest.raises(RuntimeError, match="waiting approval evidence already contains execution"):
+        _project_approval_transcript(invalid_pending, completed)
+
+
+def test_approval_projection_rejects_execution_before_approval() -> None:
+    """Projecting an event order that executes before approval would break this contract."""
+    pending, completed = _approval_snapshots()
+    invalid_completed = deepcopy(completed)
+    events = invalid_completed["events"]
+    approval_index = max(index for index, event in enumerate(events) if event["summary_code"] == "approval_approved")
+    execution_index = next(index for index, event in enumerate(events) if event["summary_code"] == "tool_succeeded")
+    events[approval_index], events[execution_index] = events[execution_index], events[approval_index]
+
+    with pytest.raises(RuntimeError, match="approval evidence must precede execution"):
+        _project_approval_transcript(pending, invalid_completed)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="PowerShell entrypoint is a Windows-only contract")
+def test_windows_demo_entrypoint_stops_after_a_child_failure(tmp_path: Path) -> None:
+    """Continuing after a nonzero demo process would break the entrypoint contract."""
+    failing_script = tmp_path / "fails.py"
+    failing_script.write_text("raise SystemExit(7)\n", encoding="utf-8")
+
+    completed = subprocess.run(
+        [
+            "powershell",
+            "-NoProfile",
+            "-File",
+            str(PROJECT_ROOT / "scripts" / "run_demos.ps1"),
+            "-PythonExecutable",
+            sys.executable,
+            "-DemoScripts",
+            str(failing_script),
+        ],
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert completed.returncode != 0
+    assert "A deterministic demo failed." in completed.stdout + completed.stderr
+
+
+def test_feedback_demo_cleanup_failure_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Silently ignoring a temporary-workspace cleanup error would break this contract."""
+
+    def fail_removal(path: Path) -> None:
+        del path
+        raise OSError("cleanup failed")
+
+    monkeypatch.setattr("scripts.run_feedback_demo.shutil.rmtree", fail_removal)
+
+    with pytest.raises(RuntimeError, match="demo workspace cleanup failed"):
+        _remove_demo_workspace(tmp_path)
 
 
 @pytest.mark.parametrize(
