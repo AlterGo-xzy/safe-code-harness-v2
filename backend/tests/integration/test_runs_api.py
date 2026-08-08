@@ -10,6 +10,13 @@ def client():
         yield test_client
 
 
+def test_fastapi_testclient_uses_the_declared_httpx_client() -> None:
+    import httpx
+    from fastapi.testclient import TestClient
+
+    assert issubclass(TestClient, httpx.Client)
+
+
 def _start_run(client, scenario: str) -> str:
     response = client.post("/api/runs", json={"scenario": scenario})
 
