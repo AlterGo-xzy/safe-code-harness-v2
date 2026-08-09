@@ -190,7 +190,7 @@ def test_feedback_demo_proves_feedback_changes_next_action() -> None:
 **文件：** 新建 `.github/workflows/ci.yml`、`.github/workflows/publish-image.yml`、`.gitlab-ci.yml`、`Dockerfile`、`docker-compose.yml`、`.dockerignore`；修改 `Makefile`、`README.md`。
 **接口与验收：** `make test` 一键运行后端与前端核心测试；每次 push 的 GitHub Actions 和 GitLab `unit-test` 运行测试；默认分支推送构建并将镜像推送 GHCR（在仓库设置公开 package）；镜像在目标机用环境变量/系统凭据配置 Planner key，绝不烘焙入镜像。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 ```python
 def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
@@ -199,12 +199,12 @@ def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
     assert ".env" not in workflow
 ```
 
-- [ ] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/unit/test_distribution_config.py -q`，预期工作流文件不存在或断言失败。
-- [ ] **步骤 3：最小实现**：配置 Python/Node job、Playwright 浏览器安装及 E2E、Docker build；GitHub publish job 使用 `GITHUB_TOKEN` 的 packages 写权限，GitLab job 名固定 `unit-test`。Docker 多阶段构建 WebUI 并由 FastAPI 提供静态文件。
-- [ ] **步骤 4：确认绿色结果与重构**：运行 `make test`、`docker build -t safe-code-harness-v2:local .`、`docker compose up --build` 后调用 `/api/runs`；本地镜像不含 key；推送 PR 后检查两套 CI，默认分支发布后从公开 GHCR pull/run。
+- [x] **步骤 2：确认红色结果**：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_distribution_config.py -q` 首次得到预期 `FileNotFoundError: .github\\workflows\\publish-image.yml`；扩展契约后为 `7 failed`，均指向缺少分发文件或 `Makefile` target。
+- [x] **步骤 3：最小实现**：`0f2b35f` 配置 Python/Node job、Playwright Chromium/E2E、Docker build；GitHub publish job 使用 `GITHUB_TOKEN` 的 packages 写权限，GitLab job 名固定 `unit-test`。Docker 多阶段构建 WebUI，由镜像内 ASGI 入口把静态输出挂载到 FastAPI；容器 Planner key 仅为进程内存/可选平台 secret 环境注入，不烘焙、不读取 `.env`。
+- [x] **步骤 4：确认绿色结果与重构**：focused `7 passed`；完整 backend `166 passed, 1 warning`、frontend `48 passed`、三 demo、build、Chromium E2E `2 passed`。Windows 无 GNU Make，未运行或虚称 `make test`，但其 backend/frontend 两个真实子命令均通过。`docker build -t safe-code-harness-v2:local .` 实际成功；`docker compose up --build --detach --wait` 达到 healthy，`/api/runs`、Planner 空配置和 WebUI 200 均已探测，镜像配置 baked Planner key 计数 0，随后清理容器/网络。GitHub/GitLab 外部 CI、GHCR push/public pull 与 package visibility 仍须在 push/默认分支发布后验证。
 - [ ] **步骤 5：两阶段审查与提交**：先审查 CI/镜像没有改变离线机制与凭据边界，再审查缓存、端口、健康检查、失败日志和镜像大小；提交 `git commit -m "build: add ci and container distribution"`。
 
-**完成记录：** 真实红绿命令、GitHub CI、GitLab CI、GHCR pull/run、审查结论、hash、PR。
+**当前记录：** fresh implementer `/root/t14_implementer` 未读取/复用旧项目，只改任务 14 简报限定文件；源码提交 `0f2b35f build: add ci and container distribution`。RED/GREEN、本地 Docker/Compose/API/WebUI/key 检查如步骤 2-4；`git diff --cached --check` 无输出，高置信凭据候选计数 0。当前待独立 spec/security 审查和代码质量审查；外部 GitHub CI、GitLab CI、GHCR 公开 pull/run、package visibility、分支收尾、push 与 PR 均未完成，不得据本地配置宣称外部通过。
 
 ## 任务 15：发布文档、外部部署与最终交付核验
 
