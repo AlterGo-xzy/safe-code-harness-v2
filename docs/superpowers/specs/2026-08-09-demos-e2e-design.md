@@ -16,7 +16,7 @@
 
 ## 演示设计
 
-- `scripts/run_guardrail_demo.py` 创建临时工作区并调用现有确定性 Rule/CommandGuard 边界；输出包含稳定场景名、`blocked` 布尔值和固定安全原因码。临时目录在 finally 清理，输出不包含绝对路径或敏感内容。
+- `scripts/run_guardrail_demo.py` 直接调用现有确定性 `CommandGuard`/`RuntimePolicy` 边界；它不创建文件或临时工作区，输出只包含稳定场景名、`blocked` 布尔值和固定安全原因码，不包含被检查命令、绝对路径或敏感内容。
 - `scripts/run_feedback_demo.py` 使用受控 MockLLM 序列和最小工具 stub。JSON transcript 至少含两项：第一次 `run_tests` 的 `ok: false`，随后 `write_file`；演示不修改真实项目文件。
 - `scripts/run_approval_demo.py` 使用 RunService 或 AgentLoop 的内存审批状态机，先确认写动作停在 `waiting_approval`，随后批准并恢复，输出显式三阶段序列及执行布尔值。
 - `backend/tests/integration/test_demos.py` 直接导入演示函数并断言结构，而非只匹配 stdout。
@@ -25,6 +25,7 @@
 ## 真实 API 与浏览器 E2E
 
 - Playwright 启动本地 FastAPI 和 Vite 前端。测试设置通过真实 `POST /api/runs` 创建 `pending_write`，这是初始化 API 数据，不是新 UI 功能。
+- 本地 FastAPI 由 E2E 专用入口创建：复用正式 `create_app()` 的真实路由与服务，但注入初始为空的进程内 SecretStore；E2E 不读取或写入 Windows Credential Manager，正式 `main:app` 的生产凭据边界不变。
 - 测试先以 HTTP request 读取该运行，断言后端真实状态为 `waiting_approval` 和存在审批 ID；随后打开浏览器，验证页面显示同一运行的安全时间线与审批控件。
 - 用户操作浏览器内的“批准”按钮；测试随后通过真实 API 读取状态，断言已不再待审批且审批后的执行结果可观察。页面选择/审批交互与 API 断言相互补充，不能以单一页面文字代替后端状态断言。
 - E2E 还在 320px viewport 验证工作台为单列、主要控件可见且文本没有横向溢出，填补任务 11 明确留给任务 13 的证据。

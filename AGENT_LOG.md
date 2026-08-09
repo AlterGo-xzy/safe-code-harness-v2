@@ -280,17 +280,25 @@
 - 验证：完整 demo 为 `12 passed in 0.46s`，正常 `.\scripts\run_demos.ps1` 输出三份稳定、安全 JSON；完整 backend 为 `158 passed, 1 warning`，warning 是既有 TestClient 弃用提示；`git diff --check` 无输出，已变更 diff 的高置信凭据候选计数为 0。
 - 第三次审查与状态：此前 focused `10 passed`、完整 backend `156 passed, 1 warning` 是历史证据；本轮源码/测试已提交 `7bdd85d`，第二次复审的 `tool_failed` 与 later-child 行为发现已修复并验证。第三次独立审查仅指出交接/过程文档仍未同步；`5bf57a3` 文档修正后的 scoped re-review 已 PASS（Critical/Important/Minor 均为 0）。Task 2 已完成，可进入 Task 3。
 
-### 2026-08-10 — Task 13 Task 3：真实 API/浏览器 E2E 实现（审查待执行）
+### 2026-08-10 — Task 13 Task 3：真实 API/浏览器 E2E 实现（实现阶段记录；后续审查见 Task 4）
 
 - 执行者与范围：fresh implementer `/root/t13_task3_implementer` 使用 `test-driven-development`、`systematic-debugging` 和 `verification-before-completion`；只实现 Playwright 真实批准闭环与 320px 证据，未开始 Task 4、任务 14/15、策略扩展或 PR/push，也未读取/迁入旧项目代码。
 - TDD RED：先新增 E2E spec、最小 config 与 `test:e2e`，运行 `npm.cmd run test:e2e` exit 1，精确报错为系统找不到 `playwright`。安装 `@playwright/test` 后，真实双服务首次启动 exit 1，报 t13 `.venv` 缺 `uvicorn`；根因是 `backend[dev]` 只声明 pytest，而批准计划的启动命令直接调用 uvicorn。最小声明 `uvicorn>=0.35,<1` 并 editable 重装。完整前端首次回归又因 Vitest 默认收集 `e2e/workbench.spec.ts` 得到 1 failed suite/48 passed tests；将 Vitest include 限定在 `src/**/*.test.{ts,tsx}` 后关闭。
 - 依赖与真实边界：`npm.cmd install --save-dev @playwright/test` 成功并固定 1.62.1；npm audit 报 3 moderate、1 high、1 critical，未运行破坏性的 force fix。`npx.cmd playwright install chromium` exit 0，`install --list` 确认 1.62.1 的 Chromium、headless shell、ffmpeg 与 winldd。Playwright 以 `reuseExistingServer: false` 启动真实 FastAPI/Vite，Vite `/api` 代理到 127.0.0.1:8000；没有应用 API interception、真实 key/Planner call、raw fields、localStorage、sleep 或 create-run UI。
 - GREEN 与验证：E2E 2/2 passed，浏览器实际点击中文“批准”；直连 API 在点击前证明 `waiting_approval` 与字符串 approval id，点击后证明 `completed` 且事件含 `approval_approved`、`tool_succeeded`、`run_finished`。320x720 中批准按钮可见，HTML/body `scrollWidth <= window.innerWidth`；未发现真实 CSS 缺口，故未改样式。`npm.cmd test` 为 10 files/48 tests，`npm.cmd run build` 成功；完整 backend 为 `158 passed, 1 warning`，warning 是既有 Starlette/TestClient 弃用提示。`git diff --check` 无输出，高置信 staged 凭据候选计数 0。
-- 提交与后续：实现提交 `e18422e test: add real workbench e2e coverage`。下一步是 fresh read-only spec/security reviewer，再做代码质量 reviewer；发现 Critical/Important 必须先 RED→最小修复→复审。Task 3 未经独立审查前不写成闭环，也不进入 Task 4。
+- 提交与当时状态：实现提交 `e18422e test: add real workbench e2e coverage`。当时下一步是 fresh read-only spec/security reviewer 与质量 reviewer；该审查及 320px Important 的 RED→修复→复审实际结果记录在下一节。本条保留的是实现提交当时状态，不代表当前仍待首次审查。
 
 ### 2026-08-10 — Task 13 Task 4：最终验证与视口审查闭环（本地完成，未收尾分支）
 
 - 审查与 TDD：Task 4 的初始 read-only spec/security review 为 C/I/M `0/0/0`；quality review 为 `0/1/0`，指出 320px E2E 的 `toBeVisible()` 未证明实际视口可达。fresh implementer `/root/t13_task3_viewport_fixer` 只处理该项：先以真实元素 bounding-box 交集断言 RED，Chromium 实测底边 `1327.4375 > 720`；最小实现提交 `5ed4bd3 fix: keep mobile approval action in viewport`，仅把既有 `ApprovalPanel` 移至时间线之前。随后 scoped spec/security 与质量 re-review 均 PASS（C/I/M `0/0/0`）。未改 API、CSS、policy、旧项目代码、安全 DTO、凭据或 create-run UI。
 - 协调最终控制验证：使用本 worktree 忽略的 `.venv`，`pytest backend/tests --basetemp .pytest-tmp\\task13-final -q` 为 `158 passed, 1 warning`（既有 Starlette/TestClient 弃用警告）；`scripts/run_demos.ps1` 输出三段稳定 JSON。clean `npm.cmd ci --ignore-scripts` 后，unit 为 `10 files/48 tests`、`npm.cmd run build` 成功、真实 Chromium `npm.cmd run test:e2e` 为 `2 passed`。install 报 5 个上游审计风险（3 moderate、1 high、1 critical），未运行 `npm audit fix --force`。
 - 过程/安全核验：`git diff --check codex/t12-settings-approval-ui..HEAD` 无输出；变更非文档源码的高置信凭据形态候选计数 0。Task 9 的 config/LLM/secret-store/route 专属源和测试相对 `codex/t09-planner-credentials` 无 diff；Task 10 的 workspace/upload/route 专属源和测试相对 `codex/t10-workspace-upload` 无 diff。共享 `main.py`、runs API 和 run service 的差异属于已记录的 Task 1/Task 11 集成，未误写为 T9/T10 安全模块变更。
-- 人工干预与边界：协调会话只执行最终复验、准确回填过程文档和保存 ignored rerun report，未改产品代码、未 push、未创建 PR #13、未运行 `finishing-a-development-branch`。下一步必须由该 skill 呈现用户分支处置选择；Task 14（CI/容器）、Task 15（部署/最终交付）及延后策略扩展仍未开始。
+- 人工干预与当时边界：协调会话只执行当轮复验、准确回填过程文档和保存 ignored rerun report，未改产品代码、未 push、未创建 PR #13、未运行 `finishing-a-development-branch`。该轮原拟下一步进入分支处置，但随后最终全分支审查发现下节所述问题，因此当前必须先完成 scoped re-review；Task 14（CI/容器）、Task 15（部署/最终交付）及延后策略扩展仍未开始。
+
+### 2026-08-10 — Task 13 最终全分支审查修复波（待 scoped re-review）
+
+- 执行者与技能：fresh fix agent `/root/t13_final_fix` 使用 `systematic-debugging`、`test-driven-development` 与 `verification-before-completion`；范围只包含最终 reviewer 的 E2E 凭据隔离 Important 和文档一致性 findings，不 push、不建 PR、不进入 Task 14/15/policy。
+- 根因证据：Playwright 原命令启动 `safe_code_harness.api.main:app`；前端 Planner 初始 GET 经 `get_planner` → `PlannerConfiguration.snapshot()` → `SecretStore.get()` → `_require_adapter()` 构造 Windows Credential Manager。非破坏性运行时 probe 替换该构造器后，GET 返回固定 503 且 `credential_manager_probe_calls` 为 1，证明问题来自 E2E 入口而非 Planner DTO 或浏览器拦截。
+- TDD RED/GREEN：新增 `backend/tests/integration/test_e2e_app.py`，禁止构造 Windows Credential Manager并请求精确 E2E app 的 Planner DTO；首次 focused 为 `1 failed, 1 warning`，预期失败是 `ModuleNotFoundError: safe_code_harness.api.e2e_app`。最小实现新增 E2E-only `create_e2e_app()`，向既有 `create_app()` 注入初始为空的进程内 SecretStore，并将 Playwright uvicorn 命令切至 `safe_code_harness.api.e2e_app:app`；生产 `main:app` 未改。focused GREEN `1 passed, 1 warning`，提交 `7d66d98 fix: isolate browser e2e credentials`。
+- 文档修正：`PROJECT_PROGRESS.md`、`PLAN.md`、本日志与 handoff 统一 Task 3 已经初始审查、Task 4 视口修复已复审、最终隔离修复待 scoped re-review；追踪矩阵不再把已实现的 AgentLoop、反馈/记忆、六维与 API 集成写成待开发，并修复 A 表 separator 列数；设计删除 guardrail demo 创建临时工作区的虚假声明；README 增加本地 E2E 命令及内存凭据/无外部 Planner 边界。
+- 修复后控制证据：完整 backend `159 passed, 1 warning`，warning 仍为既有 Starlette/TestClient 弃用；`scripts/run_demos.ps1` 输出三份稳定 JSON；clean `npm.cmd ci --ignore-scripts` 安装 179 packages 后仍报告 5 个既有上游审计风险（3 moderate、1 high、1 critical），未 force fix；前端 unit `10 files/48 tests`、build 成功、真实 Chromium E2E `2 passed`。最终 diff/凭据扫描与 scoped re-review 仍是进入分支收尾前的门槛。
