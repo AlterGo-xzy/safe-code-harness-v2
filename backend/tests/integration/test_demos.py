@@ -53,11 +53,12 @@ def _approval_snapshots() -> tuple[dict[str, object], dict[str, object]]:
     return pending, completed
 
 
-def test_approval_projection_rejects_execution_recorded_while_waiting() -> None:
-    """Treating a waiting snapshot with executed work as safe would break this contract."""
+@pytest.mark.parametrize("tool_result", ["tool_succeeded", "tool_failed"])
+def test_approval_projection_rejects_any_tool_result_recorded_while_waiting(tool_result: str) -> None:
+    """Treating a waiting snapshot with any tool result as safe would break this contract."""
     pending, completed = _approval_snapshots()
     invalid_pending = deepcopy(pending)
-    invalid_pending["events"].append({"summary_code": "tool_succeeded"})
+    invalid_pending["events"].append({"summary_code": tool_result})
 
     with pytest.raises(RuntimeError, match="waiting approval evidence already contains execution"):
         _project_approval_transcript(invalid_pending, completed)
@@ -76,11 +77,29 @@ def test_approval_projection_rejects_execution_before_approval() -> None:
         _project_approval_transcript(pending, invalid_completed)
 
 
+def test_approval_projection_rejects_a_failed_tool_result_before_approval() -> None:
+    """Accepting a failed tool result before approval would break the approval boundary."""
+    pending, completed = _approval_snapshots()
+    invalid_completed = deepcopy(completed)
+    events = invalid_completed["events"]
+    approval_index = max(index for index, event in enumerate(events) if event["summary_code"] == "approval_approved")
+    events.insert(approval_index, {"summary_code": "tool_failed"})
+
+    with pytest.raises(RuntimeError, match="approval evidence must precede execution"):
+        _project_approval_transcript(pending, invalid_completed)
+
+
 @pytest.mark.skipif(sys.platform != "win32", reason="PowerShell entrypoint is a Windows-only contract")
 def test_windows_demo_entrypoint_stops_after_a_child_failure(tmp_path: Path) -> None:
     """Continuing after a nonzero demo process would break the entrypoint contract."""
     failing_script = tmp_path / "fails.py"
     failing_script.write_text("raise SystemExit(7)\n", encoding="utf-8")
+    marker = tmp_path / "later-child-ran.txt"
+    later_script = tmp_path / "later.py"
+    later_script.write_text(
+        f"from pathlib import Path\nPath({str(marker)!r}).write_text('ran', encoding='utf-8')\n",
+        encoding="utf-8",
+    )
 
     completed = subprocess.run(
         [
@@ -92,6 +111,7 @@ def test_windows_demo_entrypoint_stops_after_a_child_failure(tmp_path: Path) -> 
             sys.executable,
             "-DemoScripts",
             str(failing_script),
+            str(later_script),
         ],
         cwd=PROJECT_ROOT,
         capture_output=True,
@@ -101,6 +121,7 @@ def test_windows_demo_entrypoint_stops_after_a_child_failure(tmp_path: Path) -> 
 
     assert completed.returncode != 0
     assert "A deterministic demo failed." in completed.stdout + completed.stderr
+    assert not marker.exists()
 
 
 def test_feedback_demo_cleanup_failure_is_reported(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

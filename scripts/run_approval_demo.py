@@ -13,6 +13,9 @@ if str(BACKEND_SRC) not in sys.path:
 from safe_code_harness.api.run_service import RunService
 
 
+_TOOL_RESULT_CODES = frozenset({"tool_succeeded", "tool_failed"})
+
+
 def _event_codes(snapshot: dict[str, object]) -> list[str]:
     events = snapshot.get("events")
     if not isinstance(events, list):
@@ -34,7 +37,7 @@ def _project_approval_transcript(
     """Derive the stable transcript only from the real pending and completed snapshots."""
     if pending.get("status") != "waiting_approval" or not isinstance(pending.get("approval_id"), str):
         raise RuntimeError("the approval scenario did not pause before execution")
-    if "tool_succeeded" in _event_codes(pending):
+    if any(code in _TOOL_RESULT_CODES for code in _event_codes(pending)):
         raise RuntimeError("waiting approval evidence already contains execution")
     if completed.get("status") != "completed":
         raise RuntimeError("the approval transition did not complete")
@@ -46,6 +49,11 @@ def _project_approval_transcript(
         raise RuntimeError("approval event evidence is incomplete")
     approval_position = approval_positions[-1]
     execution_position = execution_positions[0]
+    if any(
+        index <= approval_position and code in _TOOL_RESULT_CODES
+        for index, code in enumerate(event_codes)
+    ):
+        raise RuntimeError("approval evidence must precede execution")
     if approval_position >= execution_position:
         raise RuntimeError("approval evidence must precede execution")
 
