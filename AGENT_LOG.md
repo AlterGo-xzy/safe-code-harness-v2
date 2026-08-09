@@ -302,3 +302,7 @@
 - TDD RED/GREEN：新增 `backend/tests/integration/test_e2e_app.py`，禁止构造 Windows Credential Manager并请求精确 E2E app 的 Planner DTO；首次 focused 为 `1 failed, 1 warning`，预期失败是 `ModuleNotFoundError: safe_code_harness.api.e2e_app`。最小实现新增 E2E-only `create_e2e_app()`，向既有 `create_app()` 注入初始为空的进程内 SecretStore，并将 Playwright uvicorn 命令切至 `safe_code_harness.api.e2e_app:app`；生产 `main:app` 未改。focused GREEN `1 passed, 1 warning`，提交 `7d66d98 fix: isolate browser e2e credentials`。
 - 文档修正：`PROJECT_PROGRESS.md`、`PLAN.md`、本日志与 handoff 统一 Task 3 已经初始审查、Task 4 视口修复已复审；追踪矩阵不再把已实现的 AgentLoop、反馈/记忆、六维与 API 集成写成待开发，并修复 A 表 separator 列数；设计删除 guardrail demo 创建临时工作区的虚假声明；README 增加本地 E2E 命令及内存凭据/无外部 Planner 边界。最终 scoped re-review 为 Critical 0、Important 0、Minor 2；两个 Minor 为测试数值的历史/当前措辞和追踪矩阵的状态词，已以本次纯文档修正关闭。
 - 修复后控制证据：完整 backend `159 passed, 1 warning`，warning 仍为既有 Starlette/TestClient 弃用；`scripts/run_demos.ps1` 输出三份稳定 JSON；clean `npm.cmd ci --ignore-scripts` 安装 179 packages 后仍报告 5 个既有上游审计风险（3 moderate、1 high、1 critical），未 force fix；前端 unit `10 files/48 tests`、build 成功、真实 Chromium E2E `2 passed`。最终 diff/凭据扫描及本次文档的只读复核仍是进入分支收尾前的门槛。
+### 2026-08-10 — Task 13：分支收尾
+
+- 最终验证在 `e4599d2` 后重新运行：backend `159 passed, 1 warning`、三份稳定 JSON demo、前端 10 files/48 tests、build 和真实 Chromium E2E `2 passed`，均成功；warning 为既有 TestClient 弃用。
+- 收尾决定：按课程“每个独立模块一个 PR”和 stacked 分支规则，用户选择 `finishing-a-development-branch` 选项 2。已推送 `codex/t13-demos-e2e` 并创建目标为 `codex/t12-settings-approval-ui` 的 [draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)；保留 worktree 等待审查反馈。Task 14/15、策略扩展仍未开始。

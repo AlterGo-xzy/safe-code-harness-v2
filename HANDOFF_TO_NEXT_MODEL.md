@@ -112,3 +112,6 @@ git diff --check codex/t12-settings-approval-ui..HEAD
 ```
 
 PowerShell 环境中 `rg.exe` 曾出现“拒绝访问”；优先使用 `git grep` 或窄范围 `Get-Content`。所有文档/源码修改用 `apply_patch`，保留无关用户改动。
+## 2026-08-10 Task 13 分支收尾更新
+
+Task 13 已推送，并创建目标为 `codex/t12-settings-approval-ui` 的 [draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)。保留本 worktree 和分支处理审查反馈；后续从 Task 14 开始，不得把 CI、分发、部署或策略扩展写成已完成。

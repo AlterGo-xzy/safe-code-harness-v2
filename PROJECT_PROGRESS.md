@@ -131,3 +131,6 @@
 ## 2026-08-10 最新 Task 13 状态（优先于上方各阶段的历史文字）
 
 Task 13 的 Task 1-3、320px 修复及本地控制验证均已实现。最终全分支 reviewer 仍发现一个凭据隔离 Important：Playwright 原先启动生产 `main:app`，前端正常的 Planner 初始 GET 会经 `PlannerConfiguration.snapshot()` → `SecretStore.get()` 懒加载 Windows Credential Manager。运行时探针实际记录 1 次构造尝试和固定 503。`/root/t13_final_fix` 严格 TDD：新增回归先因 `safe_code_harness.api.e2e_app` 不存在得到 RED，再以 `7d66d98 fix: isolate browser e2e credentials` 增加初始为空的进程内 fake、注入现有 `create_app()`，并让 Playwright 启动该专用入口；生产 `main:app` 与 Task 9 存储保持不变。修复后 focused `1 passed`、完整 backend `159 passed, 1 warning`（既有 Starlette/TestClient 弃用警告）、三项 demo 稳定 JSON、clean frontend install 后 unit `10 files/48 tests`、build、真实 Chromium E2E `2 passed`。clean install 仍报告 5 个上游审计风险（3 moderate、1 high、1 critical），未执行 `--force`。最终 scoped re-review 为 Critical 0、Important 0、Minor 2；追踪矩阵、表格、设计和 README findings 已同步，两个文档 Minor 已修正。Task 13 尚未 push、尚无 PR #13；在只读文档复核与最终 diff/凭据扫描完成前不得运行分支收尾；Task 14、15 和用户延后的策略扩展仍未开始。
+## 2026-08-10 Task 13 分支收尾更新
+
+Task 13 最终验证为 backend `159 passed, 1 warning`、三份稳定 JSON demo、前端 48 tests/build、Chromium E2E `2 passed`、diff/高置信凭据候选均为 0。已推送 `codex/t13-demos-e2e`，并创建目标为 `codex/t12-settings-approval-ui` 的 [stacked draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)；保留 branch/worktree 以处理审查反馈。任务 14、15 和延后的策略扩展仍未开始。
