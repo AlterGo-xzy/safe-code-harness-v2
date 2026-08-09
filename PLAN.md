@@ -206,6 +206,8 @@ def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
 
 **当前记录：** fresh implementer `/root/t14_implementer` 未读取/复用旧项目，只改任务 14 简报限定文件；源码提交 `0f2b35f build: add ci and container distribution`。RED/GREEN、本地 Docker/Compose/API/WebUI/key 检查如步骤 2-4；`git diff --cached --check` 无输出，高置信凭据候选计数 0。当前待独立 spec/security 审查和代码质量审查；外部 GitHub CI、GitLab CI、GHCR 公开 pull/run、package visibility、分支收尾、push 与 PR 均未完成，不得据本地配置宣称外部通过。
 
+**初审与修复记录：** 独立 reviewer `/root/t14_reviewer` 结论 C/I/M=`0/3/3`，不批准。fix round `1434a64` 对 Make venv、loopback/无认证边界、根/嵌套 dotenv 规则和 GHCR CI 成功门禁先取得 focused `4 failed, 5 passed`，最小修复后 `9 passed`；完整 backend `168 passed, 1 warning`、frontend `48 passed`、三 demo、build、E2E `2 passed`。Docker build/Compose `--wait` 成功，真实端口为 `127.0.0.1:8000`，runs API 与 WebUI 均 200，随后清理容器/网络。Task 13 已有 draft PR #13，Windows/venv 命令已纠正。当前仍待独立 scoped re-review，步骤 5 不得勾选；外部 CI/GHCR 与 push/PR 仍未完成。
+
 ## 任务 15：发布文档、外部部署与最终交付核验
 
 **工作区与 PR：** `codex/t15-release-evidence` / `.worktrees/t15-release-evidence`，独立 PR。
