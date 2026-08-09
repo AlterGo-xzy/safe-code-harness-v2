@@ -2,7 +2,7 @@
 
 ## 交接结论
 
-代码和过程证据已保存到 Git；Task 13 Task 2 已闭环，Task 3 实现已提交 `e18422e`。真实 FastAPI/Vite/Chromium E2E 当前 `2 passed`，包含浏览器批准闭环和 320px 证据。**下一步必须先完成 Task 3 的独立 spec/security 与代码质量审查；审查闭环后才可进入 Task 4。仍不得开始任务 14、15 或策略扩展。**
+代码和过程证据已保存到 Git；Task 13 Task 1-3 的实现与 Task 4 的本地最终验证均已闭环。质量审查发现的唯一 Important 已由 `5ed4bd3` 修复：先以真实 320x720 Chromium RED 证明 DOM 可见的“批准”按钮仍在视口下方（底边 `1327.4375`），再以真正的 bounding-box 视口交集断言和最小 UI 顺序调整 GREEN；scoped spec/security 与质量复审均为 C/I/M `0/0/0`。**当前仍不得假称已推送、已有 PR #13、CI/容器/部署完成或已开始任务 14、15/策略扩展。下一步仅应按 `finishing-a-development-branch` 让用户决定 Task 13 分支去向。**
 
 本文件是给全新模型的最短可执行入口。开始工作前仍须依次阅读 `PROJECT_PROGRESS.md`、`AGENTS.md`、`PLAN.md`、`REQUIREMENTS_TRACEABILITY.md`、`AGENT_LOG.md`，并先运行 `git status --short`。
 
@@ -72,20 +72,20 @@ Harness 内核、治理、工具、反馈/记忆、主循环、运行/审批 API
 
 Task 2 已登记完成。不得重做已关闭的 `tool_failed` 或 later-child 行为修复；Task 3 实现状态与下一步审查要求见下节。若后续审查发现新的 Critical/Important，按 TDD/最小修复/复审处理。
 
-## Task 13 Task 3：真实浏览器 E2E — 实现完成、审查待执行
+## Task 13 Task 3：真实浏览器 E2E — 已经 Task 4 最终验证
 
 - `frontend/e2e/workbench.spec.ts` 不拦截 API：API request 创建/核验真实 `pending_write`，page 实际点击中文“批准”。
 - `frontend/playwright.config.ts` 以 `reuseExistingServer: false` 启动 t13 `.venv` 的 uvicorn 和 Vite；`frontend/vite.config.ts` 将 `/api` 代理到本地 FastAPI。
 - `@playwright/test` 精确固定 1.62.1；Chromium 安装成功并由 `install --list` 确认。`backend[dev]` 增加 `uvicorn>=0.35,<1`，因为批准计划的启动命令直接依赖它。
-- 当前验证：`npm.cmd run test:e2e` 2 passed；`npm.cmd test` 10 files/48 tests；`npm.cmd run build` 成功；backend 158 passed, 1 既有 warning。320x720 中批准按钮可见且 HTML/body 无横向溢出，因此未改 CSS。
-- TDD 证据：初始缺 Playwright 命令 RED；真实 server 缺 uvicorn RED；Vitest 误收 E2E spec 的回归 RED。三项均有最小修复和 GREEN。npm audit 仍报告 3 moderate、1 high、1 critical，未执行破坏性 `--force` 修复。
+- 视口修复 TDD 证据：已有质量审查指出 `toBeVisible()` 不足；fresh implementer 先把 `expectFullyInsideViewport` 加入 320x720 E2E，得到真实 RED（底边 `1327.4375 > 720`），随后提交 `5ed4bd3 fix: keep mobile approval action in viewport`，仅将 `ApprovalPanel` 置于事件时间线之前。E2E 随后为 `2 passed`；未改变 API、政策、CSS、旧项目代码或安全 DTO。
+- 当前最终本地控制验证（2026-08-10）：`.venv\Scripts\python.exe -m pytest backend/tests --basetemp .pytest-tmp\task13-final -q` 为 `158 passed, 1 warning`（既有 Starlette/TestClient 弃用警告）；`scripts/run_demos.ps1` 输出三段稳定 JSON；clean `npm.cmd ci --ignore-scripts` 后前端 unit 为 `10 files/48 tests`、build 成功、真实 Chromium E2E 为 `2 passed`。install 仅报告 5 个上游审计风险（3 moderate、1 high、1 critical），未 force fix。`git diff --check codex/t12-settings-approval-ui..HEAD` 无输出；高置信凭据候选计数为 0；Task 9/10 的专属受保护源/测试对各自 reviewed branch 无 diff。
+- 审查：Task 4 初始 spec/security review 为 C/I/M `0/0/0`；quality review 曾为 `0/1/0`，唯一 Important 即视口问题。`5ed4bd3` 的 RED→最小修复→GREEN 后，scoped spec/security 与质量 re-review 均 PASS（C/I/M `0/0/0`）。
 
 ## 随后工作顺序（不得提前）
 
-1. Fresh read-only reviewer 对 `c44e5ec..HEAD` 做 Task 3 spec/security 审查，再单独做代码质量审查；重点检查真实 API、浏览器点击、执行证据、320px、端口/生命周期、依赖声明和安全 DTO 不变量。
-2. 若有 Critical/Important，先写失败回归再最小修复并 scoped re-review；不得把 npm audit 的上游问题无条件 `--force` 升级。
-3. 审查清零后，Task 13 最终 Task 4 执行 backend、三演示、干净 frontend install/unit/build/E2E、diff/凭据扫描；重新核对要求文件追踪；更新过程文件；使用 `finishing-a-development-branch` 决定推送和 draft PR #13。
-4. Task 14（CI/容器分发）、Task 15（公网部署/最终交付）和延后的策略扩展都尚未开始。
+1. Task 13 的功能、复审和本地最终控制验证均已记录；不应重做已关闭的演示、E2E 或视口修复。
+2. 接手者须先运行 `finishing-a-development-branch`，向用户呈现分支处置选择。仅在用户选择推送/PR 后，才可推送 `codex/t13-demos-e2e`、创建对 `codex/t12-settings-approval-ui` 的 draft PR #13、回读 GitHub 状态并提交实际 URL/保留 worktree 决定。
+3. Task 14（CI/容器分发）、Task 15（公网部署/最终交付）和延后的策略扩展都尚未开始；不得把本地验证写成上述外部证据。
 
 ## 严格流程与安全不变量
 

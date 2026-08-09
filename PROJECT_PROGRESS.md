@@ -130,4 +130,4 @@
 
 ## 2026-08-10 最新 Task 13 状态（优先于上方任务 13 过程叙述中的暂态文字）
 
-Task 13 Task 3 实现已提交 `e18422e`，当前有效验证为真实浏览器 E2E `2 passed`、前端 10 files/48 tests、build 通过、完整 backend `158 passed, 1 warning`；320x720 实际证明批准按钮可见且无横向溢出。下一步必须先做 Task 3 独立 spec/security 与质量审查并修复 Critical/Important，再进入 Task 4 最终验证与收尾；任务 14、15 和用户延后的策略扩展仍未开始。
+Task 13 的 Task 1-3 实现及 Task 4 本地最终验证已完成。初始 quality review 发现 1 Important：320px 的 `toBeVisible()` 没有证明“批准”控件处于实际视口。fresh implementer 先以 bounding-box 交集断言得到真实 RED（按钮底边 `1327.4375 > 720`），再提交 `5ed4bd3 fix: keep mobile approval action in viewport`，仅将审批面板置于时间线之前；scoped spec/security 与质量 re-review 均 PASS（C/I/M `0/0/0`）。最终控制器实际结果：backend `158 passed, 1 warning`（既有 Starlette/TestClient 弃用警告）、三项 demo 稳定 JSON、clean frontend install 后 unit `10 files/48 tests`、build、真实 Chromium E2E `2 passed`，`git diff --check codex/t12-settings-approval-ui..HEAD` 无输出，高置信凭据候选计数 0，Task 9/10 专属受保护源/测试对各自 reviewed branch 无 diff。clean install 仍报告 5 个上游审计风险（3 moderate、1 high、1 critical），未执行 `--force`。Task 13 尚未 push、尚无 PR #13、尚未运行分支收尾；Task 14、15 和用户延后的策略扩展仍未开始。

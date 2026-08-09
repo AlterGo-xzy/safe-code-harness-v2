@@ -56,8 +56,8 @@
 | A-4-D | 六维最低实现，并选择一个深入维度 | 部分完成（任务 3-4） | 治理主贡献已实现规则、路径沙箱、命令护栏与 HITL 审批状态机；其余五维仍待后续任务。 |
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
 | A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 部分完成（任务 13 Task 2 已完成） | `backend/tests/integration/test_demos.py` 以现有 `MockLLM`、真实 loop/guard/run service 验证三项离线机制；`tool_failed` 和 PowerShell later-child 回归均已先 RED 后闭环。demo `12 passed`、完整 backend `158 passed, 1 warning`；CI 复现仍待任务 14。 |
-| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 部分完成（任务 13 Task 2 完成、Task 3 实现） | `26f9855` 的三份稳定 JSON demo 已审查通过；`e18422e` 另以真实 FastAPI/Vite/Chromium 证明等待审批经浏览器批准后执行完成，并提供 320px 证据。Task 3 独立审查与 Task 4 总体验证仍待执行。 |
-| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成（任务 13 Task 3 实现） | 内核、Mock 单测和 README 索引的离线机制演示均已存在；真实浏览器批准 E2E 已实现且当前 `2 passed`。Task 3 独立审查、CI/分发和最终交付仍待完成。 |
+| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已完成并本地验证（Task 13） | 三份稳定 JSON demo 已审查通过：护栏阻断、MockLLM 反馈闭环改变动作、真实 `RunService` 的等待审批→批准→执行。真实 FastAPI/Vite/Chromium E2E `2 passed`；320x720 初始视口 RED（底边 `1327.4375 > 720`）由 `5ed4bd3` 的最小修复关闭，scoped 双阶段 re-review C/I/M `0/0/0`。Task 14 CI 复现仍待执行。 |
+| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成（本地 Task 13 验证完成） | 本地 backend `158 passed, 1 warning`、离线 demo、前端 unit `48 tests`、build、真实 E2E `2 passed` 已重新实际运行；高置信凭据候选 0。Task 13 尚未 push/PR，CI/分发和最终交付仍待完成。 |
 
 ## 实现前绝对门禁
 

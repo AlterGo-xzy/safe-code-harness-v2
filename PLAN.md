@@ -180,9 +180,9 @@ def test_feedback_demo_proves_feedback_changes_next_action() -> None:
 - [x] **步骤 2：确认红色结果**：demo 初始 RED 与 Playwright 缺命令 RED 均已实际记录；另记录真实服务缺 uvicorn 和 Vitest 误收 spec 的两个回归 RED。
 - [x] **步骤 3：最小实现**：三个 demo 与真实 FastAPI/Vite/Chromium 批准流程均已实现；未拦截 API、未使用 sleep。
 - [x] **步骤 4：确认绿色结果与重构**：Windows 以 `scripts/run_demos.ps1` 代替不可用的 GNU make；demo、E2E、前端单测/build 与 backend 均已通过。Unix-like `make demos` 未在 Windows 假称执行。
-- [ ] **步骤 5：两阶段审查与提交**：先审查演示分别证明 A 项目三条硬机制而非仅打印文案，再审查临时目录清理、无网络依赖和 Playwright 等待条件；提交 `git commit -m "test: add deterministic mechanism demos and e2e coverage"`。
+- [x] **步骤 5：两阶段审查与提交**：Task 1/2 审查已通过；Task 4 初始 spec/security review 为 C/I/M `0/0/0`，quality review 在 `frontend/e2e/workbench.spec.ts` 发现 `toBeVisible()` 不能证明 320x720 视口内可见的 1 个 Important。fresh implementer 先得到真实 RED（按钮底边 `1327.4375 > 720`），以 `5ed4bd3` 的最小面板顺序调整 GREEN；scoped spec/security 与质量 re-review 均 C/I/M `0/0/0`。本地最终控制器重新通过 backend `158 passed, 1 warning`、三 demo、clean frontend install、unit `48 tests`、build、Chromium E2E `2 passed`、diff check 和高置信凭据扫描 0。
 
-**完成记录：** Task 1-2 已完成并审查通过；Task 3 实现提交 `e18422e`，真实 RED/GREEN 与浏览器/320px 证据已记录，等待独立两阶段审查。Task 4、PR #13 和分支收尾尚未执行。
+**完成记录：** Task 1-2 已完成并审查通过；Task 3 实现提交 `e18422e`，视口 fix 提交 `5ed4bd3`。Task 4 已完成本地最终控制验证：backend `158 passed, 1 warning`、三 demo、clean frontend install、unit `48 tests`、build、Chromium E2E `2 passed`、diff check 和高置信凭据候选计数 0；Task 9/10 专属受保护源/测试对各自 reviewed branch 无 diff。quality review 的唯一 Important 已经 RED→最小修复→scoped 双阶段 re-review（C/I/M `0/0/0`）关闭。Task 13 仍未 push、无 PR #13，且按本计划的 Step 5 尚未执行 `finishing-a-development-branch`；CI/容器、部署和策略扩展未开始。
 
 ## 任务 14：GitHub/GitLab CI 与 Docker/GHCR 分发
 
