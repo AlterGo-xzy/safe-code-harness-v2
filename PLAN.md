@@ -158,14 +158,16 @@ git commit -m "chore: establish offline test foundation"
 ## 任务 13：确定性机制演示与浏览器端到端验证
 
 **工作区与 PR：** `codex/t13-demos-e2e` / `.worktrees/t13-demos-e2e`，独立 PR。
-**文件：** 新建 `scripts/run_guardrail_demo.py`、`run_feedback_demo.py`、`run_approval_demo.py`、`frontend/e2e/workbench.spec.ts`；修改 `Makefile`、`README.md`；测试 `backend/tests/integration/test_demos.py`。
+**文件：** 新建三份 `scripts/run_*_demo.py`、`frontend/e2e/workbench.spec.ts`、`frontend/playwright.config.ts`；修改 `Makefile`、`README.md`、`frontend/package*.json`、`frontend/vite.config.ts`、`backend/pyproject.toml`；测试 `backend/tests/integration/test_demos.py`。
 **接口与验收：** 演示输出稳定 JSON。护栏演示必须有 `blocked: true`；反馈演示必须证明第一次 `run_tests` 失败后下一动作变为 `write_file`；审批演示必须依次显示 `waiting_approval -> approved -> executed`。E2E 必须针对真实本地 API 与 UI，不用页面内容替代后端断言。
 
 **Task 1 API 集成检查点（已完成）：** fresh implementer `/root/t13_task1_implementer` 先新增 `test_integrated_api_surface.py`，在任何 merge 前得到预期 RED：`create_app()` 不接受 `secret_store`。随后按顺序以 merge commit `ec613df`、`1664aa2` 合入已审查的 Task 9/10 分支；仅统一 app factory 为三个 service state 和三个 router，Task 9/10 安全源码与测试相对来源分支无 diff。focused GREEN 为 `1 passed`，完整 backend 为 `146 passed`；均只有既有 Starlette/TestClient 弃用 warning。集成测试与过程记录提交为 `fd38e6a`。此检查点不包含 demo、frontend/E2E、320px 浏览器或 policy 工作，以下 Task 13 主清单仍保持未完成。
 
-**Task 2 演示检查点（已完成）：** fresh implementer `/root/t13_task2_implementer` 先创建 `backend/tests/integration/test_demos.py`，初始 RED 为缺少模块的 `ModuleNotFoundError: scripts.run_approval_demo`；最小实现只使用当前仓库的 `CommandGuard`/`RuntimePolicy`、`AgentLoop`/`MockLLM`/反馈/记忆和 `RunService`/`ApprovalStore`，不含网络、真实 key、绝对路径或旧项目代码。初次 GREEN 为 `6 passed in 0.23s`；首次审查的固定转录、PowerShell child 失败与清理吞错三项，均先有补充 RED 后由 `7243dfc` 修复，结果为 demo `10 passed`、backend `156 passed, 1 warning`。第二次审查的 `tool_failed` waiting/approval 边界和 later-child 覆盖，由 `7bdd85d` 先 RED 后关闭；实际验证为 demo `12 passed in 0.46s`、正常 Windows 入口、完整 backend `158 passed, 1 warning`、diff check 无输出、凭据候选计数 0。第三次审查仅发现文档陈旧，`5bf57a3` 修正后 scoped re-review PASS（Critical/Important/Minor 均为 0）。Task 2 已完成；Playwright 或 320px 验证仍未开始。
+**Task 2 演示检查点（已完成）：** fresh implementer `/root/t13_task2_implementer` 先创建 `backend/tests/integration/test_demos.py`，初始 RED 为缺少模块的 `ModuleNotFoundError: scripts.run_approval_demo`；最小实现只使用当前仓库的 `CommandGuard`/`RuntimePolicy`、`AgentLoop`/`MockLLM`/反馈/记忆和 `RunService`/`ApprovalStore`，不含网络、真实 key、绝对路径或旧项目代码。初次 GREEN 为 `6 passed in 0.23s`；首次审查的固定转录、PowerShell child 失败与清理吞错三项，均先有补充 RED 后由 `7243dfc` 修复，结果为 demo `10 passed`、backend `156 passed, 1 warning`。第二次审查的 `tool_failed` waiting/approval 边界和 later-child 覆盖，由 `7bdd85d` 先 RED 后关闭；实际验证为 demo `12 passed in 0.46s`、正常 Windows 入口、完整 backend `158 passed, 1 warning`、diff check 无输出、凭据候选计数 0。第三次审查仅发现文档陈旧，`5bf57a3` 修正后 scoped re-review PASS（Critical/Important/Minor 均为 0）。Task 2 已完成。
 
-- [ ] **步骤 1：写失败测试**
+**Task 3 真实浏览器检查点（实现已完成、独立审查待执行）：** fresh implementer `/root/t13_task3_implementer` 先新增最终形态 E2E 规格、最小 Playwright config 与 `test:e2e`；初始 `npm.cmd run test:e2e` 预期 RED 为系统找不到 `playwright`。指定安装后固定 `@playwright/test` 1.62.1，`npx.cmd playwright install chromium` exit 0 且 `install --list` 确认 Chromium/headless shell。真实服务首次运行再以 `No module named uvicorn` RED，根因为 `backend[dev]` 未声明计划绑定的 server；最小加入 `uvicorn>=0.35,<1` 并 editable 重装。E2E 使用真实本地 FastAPI/Vite 与同源 `/api` proxy，不做 route interception；浏览器实际点击中文“批准”，API 直接核验点击前 `waiting_approval`/字符串 approval id、点击后 `completed` 与 approval/tool/finish 执行事件。320x720 测试证明按钮可见、HTML/body 无横向溢出，故未改 CSS。首次完整前端回归还因 Vitest 默认发现 E2E spec 得到 suite RED，限定单测目录后 GREEN。提交 `e18422e`；最终 E2E `2 passed`、前端 10 files/48 tests、build 成功、backend `158 passed, 1 warning`。Task 3 尚待两阶段独立审查，不能开始 Task 4 或宣称 Task 13 完成。
+
+- [x] **步骤 1：写失败测试**
 
 ```python
 def test_feedback_demo_proves_feedback_changes_next_action() -> None:
@@ -175,12 +177,12 @@ def test_feedback_demo_proves_feedback_changes_next_action() -> None:
     assert transcript[1]["action"] == "write_file"
 ```
 
-- [ ] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/integration/test_demos.py -q`，预期模块不存在或断言失败。
-- [ ] **步骤 3：最小实现**：只基于 MockLLM 和临时工作区构建三个演示；编写 Playwright 启动流程，覆盖创建运行、看到阻止事件、待审批和批准。
-- [ ] **步骤 4：确认绿色结果与重构**：运行 `make demos`、`python -m pytest backend/tests/integration/test_demos.py -q`、`cd frontend; npm.cmd run test:e2e`，预期输出与浏览器断言均稳定通过。
+- [x] **步骤 2：确认红色结果**：demo 初始 RED 与 Playwright 缺命令 RED 均已实际记录；另记录真实服务缺 uvicorn 和 Vitest 误收 spec 的两个回归 RED。
+- [x] **步骤 3：最小实现**：三个 demo 与真实 FastAPI/Vite/Chromium 批准流程均已实现；未拦截 API、未使用 sleep。
+- [x] **步骤 4：确认绿色结果与重构**：Windows 以 `scripts/run_demos.ps1` 代替不可用的 GNU make；demo、E2E、前端单测/build 与 backend 均已通过。Unix-like `make demos` 未在 Windows 假称执行。
 - [ ] **步骤 5：两阶段审查与提交**：先审查演示分别证明 A 项目三条硬机制而非仅打印文案，再审查临时目录清理、无网络依赖和 Playwright 等待条件；提交 `git commit -m "test: add deterministic mechanism demos and e2e coverage"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR、稳定演示和 E2E 证据。
+**完成记录：** Task 1-2 已完成并审查通过；Task 3 实现提交 `e18422e`，真实 RED/GREEN 与浏览器/320px 证据已记录，等待独立两阶段审查。Task 4、PR #13 和分支收尾尚未执行。
 
 ## 任务 14：GitHub/GitLab CI 与 Docker/GHCR 分发
 

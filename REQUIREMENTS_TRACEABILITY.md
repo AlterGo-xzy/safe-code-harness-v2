@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | G-3.1-1 | key 不得硬编码、提交、写日志/history/明文配置 | 部分完成（任务 9、12） | `3074085`、`51eb9c8`：Credential Manager-only、掩码 API、异常链/503 不含 fixture key；Task 12 密钥仅在密码输入提交中读取、finally 清空，且不进 JSX/state/error/URL/localStorage。最终 Git 历史扫描仍待完成。 |
 | G-3.1-2 | 至少一种安全存储；说明环境变量/`.env` 明文风险 | 部分完成（任务 9） | Windows Credential Manager 适配器、fake adapter 和非 Windows fail-closed 测试已完成；README 的环境变量/`.env` 风险说明仍待任务 14/15。 |
-| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12、13 Task 1） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。Task 13 Task 1 已验证合并后真实 Planner API 返回固定四字段 DTO；真实浏览器 E2E 仍待后续 Task 13 工作。 |
+| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12、13 Task 1） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。Task 13 Task 1 已验证合并后真实 Planner API 返回固定四字段 DTO；Task 3 浏览器只覆盖审批，不把它误写成 Planner 凭据浏览器验证。 |
 | G-3.1-4 | SPEC 有凭据威胁模型与对策 | 已完成并验证 | `SPEC.md` 8.1。 |
 | G-3.2-1 | 选择分发形态；容器须单条 build/run 且推送公开 registry | 已设计，尚未执行 | Dockerfile、GHCR publish workflow、公开 `docker pull` 和全新机器运行证据。 |
 | G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 部分完成（任务 13 Task 2） | 新增 README 的离线机制演示命令与边界已由 Windows 入口验证；分发、目标机 key 安全配置、完整限制和容器命令仍待任务 14/15。 |
@@ -17,9 +17,9 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已设计，尚未执行 | `make test`、CI、OCI pull/run、README 新机器步骤。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-12、13 Task 1-2） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 Task 2 已完成三轮 review/fix，并以第三次 scoped re-review PASS 闭环。当前 demo `12 passed`、完整 backend `158 passed, 1 warning`；浏览器工作仍待 Task 3。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1-2） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 2 先因缺模块得到 `ModuleNotFoundError`，后续每个行为修复均先有 RED，包括 `tool_failed` waiting/approval 边界；最终 demo `12 passed`、完整 backend `158 passed, 1 warning`。 |
-| G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11） | 任务 11 的历史记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地未保留安装包、资产 URL 或精确摘要，当前不可复现，不能算作已验证证据，且绝不猜测摘要。任务只采用记录中的技能/设计系统、真实文件产出、可审计原则，未将运行时纳入产品依赖。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-12、13 Task 1-3） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 Task 3 已实现真实 browser/API/320px E2E，当前 E2E `2 passed`，但独立审查尚待执行。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1-3） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 3 先得到缺 Playwright RED，再以缺 uvicorn 和 Vitest 误收 E2E 的回归 RED 驱动最小依赖/发现边界修复；最终 E2E `2 passed`、前端 `48 passed`、backend `158 passed, 1 warning`。 |
+| G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11、13 Task 3） | 任务 11 的 Open Design 安装历史仍不可复现且不猜测摘要；Task 13 Task 3 已用真实 Chromium 在 320x720 验证批准控件可见及 DOM 无横向溢出，未把静态 CSS 检查替代为浏览器证据。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
 | G-4.3 | `PLAN.md`：细任务、文件、要点、失败测试、依赖/并行 | 已完成并验证 | `PLAN.md` 已由 `writing-plans` 生成并在任务 1-4 记录实际 RED/GREEN、审查与提交。 |
@@ -56,8 +56,8 @@
 | A-4-D | 六维最低实现，并选择一个深入维度 | 部分完成（任务 3-4） | 治理主贡献已实现规则、路径沙箱、命令护栏与 HITL 审批状态机；其余五维仍待后续任务。 |
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
 | A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 部分完成（任务 13 Task 2 已完成） | `backend/tests/integration/test_demos.py` 以现有 `MockLLM`、真实 loop/guard/run service 验证三项离线机制；`tool_failed` 和 PowerShell later-child 回归均已先 RED 后闭环。demo `12 passed`、完整 backend `158 passed, 1 warning`；CI 复现仍待任务 14。 |
-| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 部分完成（任务 13 Task 2 已完成） | `26f9855` 的三份 `scripts/run_*_demo.py` 及 Windows 入口已产生稳定 JSON；approval transcript 从真实 snapshots 派生，waiting/approval 前工具结果被拒绝，入口不会在失败 child 后执行 later child。demo `12 passed`、完整 backend `158 passed, 1 warning`；Task 3 E2E 未开始。 |
-| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成（任务 13 Task 2 已完成） | 内核和 Mock 单测已存在；README 已索引离线机制演示，Task 2 已通过第三次 scoped re-review。浏览器 E2E、CI/分发和最终交付仍待完成。 |
+| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 部分完成（任务 13 Task 2 完成、Task 3 实现） | `26f9855` 的三份稳定 JSON demo 已审查通过；`e18422e` 另以真实 FastAPI/Vite/Chromium 证明等待审批经浏览器批准后执行完成，并提供 320px 证据。Task 3 独立审查与 Task 4 总体验证仍待执行。 |
+| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成（任务 13 Task 3 实现） | 内核、Mock 单测和 README 索引的离线机制演示均已存在；真实浏览器批准 E2E 已实现且当前 `2 passed`。Task 3 独立审查、CI/分发和最终交付仍待完成。 |
 
 ## 实现前绝对门禁
 
