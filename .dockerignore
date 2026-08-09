@@ -1,0 +1,17 @@
+.git
+.github
+.worktrees
+.superpowers
+.venv
+.pytest-tmp
+**/__pycache__
+**/*.py[cod]
+**/.pytest_cache
+**/*.egg-info
+**/node_modules
+frontend/dist
+playwright-report
+test-results
+.env
+.env.*
+*.log

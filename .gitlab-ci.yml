@@ -1,0 +1,23 @@
+stages:
+  - test
+
+unit-test:
+  stage: test
+  image: python:3.12-bookworm
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends nodejs npm
+    - python -m venv .venv
+    - .venv/bin/python -m pip install -e "backend[dev]"
+    - npm --prefix frontend ci --ignore-scripts
+    - mkdir -p .pytest-tmp
+  script:
+    - .venv/bin/python -m pytest backend/tests --basetemp .pytest-tmp/gitlab -q
+    - .venv/bin/python scripts/run_guardrail_demo.py
+    - .venv/bin/python scripts/run_feedback_demo.py
+    - .venv/bin/python scripts/run_approval_demo.py
+    - npm --prefix frontend test
+    - npm --prefix frontend run build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
