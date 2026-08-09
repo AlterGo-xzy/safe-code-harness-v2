@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Locator, type Page } from "@playwright/test";
 
 const apiBase = "http://127.0.0.1:8000";
 
@@ -19,6 +19,18 @@ async function createPendingRun(request: APIRequestContext): Promise<RunSnapshot
   const response = await request.get(`${apiBase}/api/runs/${createdBody.id}`);
   expect(response.status()).toBe(200);
   return await response.json() as RunSnapshot;
+}
+
+async function expectFullyInsideViewport(page: Page, locator: Locator): Promise<void> {
+  const box = await locator.boundingBox();
+  const viewport = page.viewportSize();
+
+  expect(box).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(box!.x).toBeGreaterThanOrEqual(0);
+  expect(box!.y).toBeGreaterThanOrEqual(0);
+  expect(box!.x + box!.width).toBeLessThanOrEqual(viewport!.width);
+  expect(box!.y + box!.height).toBeLessThanOrEqual(viewport!.height);
 }
 
 test("real API run is approved through the browser and completes", async ({ page, request }) => {
@@ -54,7 +66,9 @@ test("workbench remains usable at 320px", async ({ page, request }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /运行 pending_write，状态 waiting_approval/ }).last().click();
 
-  await expect(page.getByRole("button", { name: "批准" })).toBeVisible();
+  const approveButton = page.getByRole("button", { name: "批准" });
+  await expect(approveButton).toBeVisible();
+  await expectFullyInsideViewport(page, approveButton);
   expect(await page.evaluate(() => (
     document.documentElement.scrollWidth <= window.innerWidth
     && document.body.scrollWidth <= window.innerWidth
