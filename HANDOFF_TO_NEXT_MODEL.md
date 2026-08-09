@@ -1,8 +1,8 @@
-# SafeCodeHarness v2 — 续开发交接（2026-08-09）
+# SafeCodeHarness v2 — 续开发交接（2026-08-10）
 
 ## 交接结论
 
-代码和过程证据已保存到 Git；当前工作树没有已跟踪的未提交改动。**不要开始 Task 13 Task 3（Playwright/E2E），也不要开始任务 14、15 或策略扩展。**Task 13 Task 2 的第二次独立复审仍有 1 个 Important 和 2 个 Minor 未关闭，必须先按 TDD 修复、全量验证并再次独立复审。
+代码和过程证据已保存到 Git；当前工作树没有已跟踪的未提交改动。**不要开始 Task 13 Task 3（Playwright/E2E），也不要开始任务 14、15 或策略扩展。**第二次独立复审的 1 个 Important 与 2 个 Minor 已完成 RED→最小修复和完整验证；第三次独立审查指出交接/过程文档仍有事实陈旧，本轮仅修正文档，修正后的 scoped re-review 仍待进行。Task 13 Task 2 尚未完成。
 
 本文件是给全新模型的最短可执行入口。开始工作前仍须依次阅读 `PROJECT_PROGRESS.md`、`AGENTS.md`、`PLAN.md`、`REQUIREMENTS_TRACEABILITY.md`、`AGENT_LOG.md`，并先运行 `git status --short`。
 
@@ -10,7 +10,7 @@
 
 - 仓库：`D:\safe-code-harness-v2`；公开远程：`https://github.com/AlterGo-xzy/safe-code-harness-v2`。
 - 当前工作目录：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e`。
-- 当前分支：`codex/t13-demos-e2e`；运行时实现基线为 `7bf3d04 docs: record task 13 demo review fixes`，其后仅有本交接/进度文档提交。接手时以 `git rev-parse HEAD` 获取实际当前 HEAD。
+- 当前分支：`codex/t13-demos-e2e`；运行时修复基线为 `1dbcf55 docs: record task 13 approval-boundary fix`。接手时必须以 `git rev-parse HEAD` 获取实际当前 HEAD。
 - 已核验：在本交接文档创建前，`git status --short` 无输出；没有需要保留的已跟踪用户改动。
 - Task 13 尚未推送、尚未创建 PR #13。不要假称已有 PR。
 - Task 1-12 的 stacked draft PR #1-#12 已存在且尚未合并；Task 13 以 Task 12 分支为基线。
@@ -45,6 +45,8 @@ Harness 内核、治理、工具、反馈/记忆、主循环、运行/审批 API
 - `b2b7e15 docs: record task 13 demo evidence`
 - `7243dfc fix: harden deterministic demo evidence`
 - `7bf3d04 docs: record task 13 demo review fixes`
+- `7bdd85d fix: reject tool results before approval`
+- `1dbcf55 docs: record task 13 approval-boundary fix`
 
 涉及文件：
 
@@ -58,36 +60,21 @@ Harness 内核、治理、工具、反馈/记忆、主循环、运行/审批 API
 已验证、可如实引用的结果：
 
 - 初始 RED：缺少 demo 模块时 `ModuleNotFoundError: scripts.run_approval_demo`。
-- 初次 GREEN：`test_demos.py` `6 passed in 0.23s`；修复后的 focused suite `10 passed in 0.47s`。
+- 历史初次 GREEN：`test_demos.py` `6 passed in 0.23s`；历史修复后的 focused suite `10 passed in 0.47s`。
 - 正常 `./scripts/run_demos.ps1`（PowerShell 写法为 `.\scripts\run_demos.ps1`）输出三段稳定 JSON。
-- 修复后的完整 `backend/tests`：`156 passed, 1 warning`；warning 是既有 Starlette/TestClient 弃用提示。
+- 历史修复后的完整 `backend/tests`：`156 passed, 1 warning`；warning 是既有 Starlette/TestClient 弃用提示。
+- 当前第二次复审修复后的 demo suite：`12 passed in 0.46s`；当前完整 `backend/tests`：`158 passed, 1 warning`，warning 同为既有 Starlette/TestClient 弃用提示。
 - `git diff --check` 无输出；已变更文件的高置信凭据候选计数为 `0`。
 
-## 当前阻断：Task 13 Task 2 第二次复审未通过
+## 当前阻断：Task 13 Task 2 的第三次独立审查文档发现
 
-第二次只读独立复审结论：Critical 0、**Important 1**、Minor 2。没有任何修复在此结论后提交；此前 implementer 已被停止，故当前代码正是 `7bf3d04`。
+第二次只读独立复审结论为 Critical 0、Important 1、Minor 2，三项均已修复：`7bdd85d` 的真实 snapshot 投影会拒绝 waiting 或最终批准前的 `tool_succeeded`、`tool_failed`；PowerShell 回归已证明 failing first child 后的写 marker later child 不运行；四份过程文档已记录真实验证。随后第三次独立审查发现交接与部分过程文档仍未同步这一事实。
 
-必须依序完成以下工作，且每个行为修复先有 RED 测试：
-
-1. **Important：审批等待期必须拒绝任何工具结果。**
-   - 当前 `scripts/run_approval_demo.py` 仅将 `tool_succeeded` 作为等待期提前执行；`tool_failed` 仍可能被忽略。
-   - 在 `backend/tests/integration/test_demos.py` 先加入 `tool_failed` 出现在等待快照或 approval 前的回归，预期 demo 拒绝该不安全事件序列。
-   - 最小修复应拒绝 waiting snapshot 或 approval 前出现的任何工具结果（至少 `tool_succeeded`、`tool_failed`）；保留“waiting 未执行、approved 早于 executed”的真实 snapshot 投影，不得回退成硬编码转录。
-
-2. **Minor：PowerShell 失败传播测试必须证明后续脚本不会运行。**
-   - 现实现已逐 child 检查 `$LASTEXITCODE`，但测试目前只有一个失败 child，无法防止将来退化成循环后只检查最后一次退出码。
-   - 先写“失败 child + 后续成功/写标记 child”的 RED，断言总入口失败且标记未创建/后续脚本未运行；随后最小调整实现或测试辅助。
-
-3. **Minor：修正状态文件的过期文字。**
-   - `PROJECT_PROGRESS.md` 顶部仍写 focused `6 passed` 和“两阶段审查尚待”；应改为初审已完成、修复后 focused `10 passed`、第二次复审未通过且上述三项待处理。
-   - `REQUIREMENTS_TRACEABILITY.md` 仍把完整回归写为未执行；应如实改为 `156 passed, 1 warning`，并标注复审未闭环。
-   - 同步 `PLAN.md`、`AGENT_LOG.md` 和本文件中的完成状态；不要把 Task 2 标为完成。
-
-修复后至少运行：focused demo 测试、`.\scripts\run_demos.ps1`、完整 `backend/tests`、`git diff --check` 和已变更文件凭据候选计数检查。然后用新的独立 reviewer 先做 spec/security、再做质量审查；任何 Critical/Important 必须再走 RED→最小修复→复审。只有两阶段审查通过，才可登记 Task 2 完成并开始 Task 3。
+本轮仅文档修正已开始，修正后的 scoped re-review 仍待进行；这不是 Task 2 完成声明。不得重做已关闭的 `tool_failed` 或 later-child 行为修复，也不得开始 Task 3。若 scoped re-review 有 Critical/Important，按 TDD/最小修复/复审处理；若通过，再按完整 Task 2 收尾流程登记完成。
 
 ## 随后工作顺序（不得提前）
 
-1. 关闭上述 Task 2 复审发现并记录实际命令、输出、commit、review 到四份过程文档。
+1. 完成当前第三次审查的文档修正 scoped re-review，并把实际结论记录到四份过程文档；不要将已关闭的行为修复重新写成待办。
 2. Task 13 Task 3：按已批准的 `docs/superpowers/plans/2026-08-09-demos-e2e.md` 增加 Playwright。真实 FastAPI API 用于创建和核验；**浏览器必须实际点击“批准”**；直接 API 读取必须证明点击前 `waiting_approval`、点击后 `completed` 和 executed 证据。不得拦截 API、不得用 sleep。
 3. Task 3 必须实际验证 320px：批准按钮可见且 `document.documentElement.scrollWidth <= window.innerWidth`。若需修改 CSS，先写失败 E2E。
 4. Playwright 需要 `@playwright/test` 和 Chromium。安装依赖/浏览器是受控网络动作；若失败，记录真实阻断，不能宣称 E2E 成功。Windows 没有 GNU make；不要把 Makefile target 当 Windows 验证。
