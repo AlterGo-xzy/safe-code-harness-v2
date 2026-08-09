@@ -17,7 +17,7 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 部分完成（任务 14 本地） | `Makefile test` 默认使用 README 安装的 `.venv/bin/python` 并串联 backend/frontend；当前 Windows 无 GNU Make，未虚称运行，但两个实际 target 命令分别为 backend `168 passed`、frontend `48 passed`。本地 OCI loopback build/healthy/API/WebUI 已验证；新机器与公开 pull 仍待 Task 15。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-14 实现） | Task 13 已以 PR #13 收尾。Task 14 初审 C/I/M=`0/3/3`，fix `1434a64` 已按 TDD 处理，当前待 scoped re-review；无 GNU Make、外部 CI/GHCR 未验证均如实保留。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-14 实现） | Task 13 已以 PR #13 收尾。Task 14 初审 C/I/M=`0/3/3`，fix `1434a64` 后 scoped spec/security 与质量 re-review 均通过；最终 review C/I/M=`0/0/1`，本次正关闭唯一文档 Minor。无 GNU Make、外部 CI/GHCR 未验证均如实保留。 |
 | G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-14 实现） | Task 14 初始 RED/GREEN 为 `7 failed`→`7 passed`；审查修复又先得到 Make/loopback/dotenv/CI gate 的 `4 failed, 5 passed`，再转为 `9 passed`。完整 backend 当前 `168 passed, 1 warning`、frontend `48 passed`、E2E `2 passed`。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11、13 Task 3） | 任务 11 的 Open Design 安装历史仍不可复现且不猜测摘要；Task 13 Task 3 已用真实 Chromium 在 320x720 验证批准控件可见及 DOM 无横向溢出，未把静态 CSS 检查替代为浏览器证据。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
@@ -28,7 +28,7 @@
 | G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-14） | 任务 1-13 均有独立 worktree/draft PR；任务 14 已在独立 worktree 提交实现，待审查后 push/PR。 |
 | G-4.6-2 | 每 task 一个新鲜 subagent | 部分完成（任务 1-14） | `AGENT_LOG.md` 记录任务 1-14 的 fresh implementer、reviewer、修复 agent 与输出；Task 14 implementer 为 `/root/t14_implementer`。 |
 | G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-14） | 任务 1-14 均记录真实 RED/GREEN；Task 14 初始 `7 failed`→`7 passed`，review fix 为 `4 failed, 5 passed`→`9 passed`。 |
-| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-14） | 任务 1-13 已审查闭环；Task 14 独立初审 C/I/M=`0/3/3`，`1434a64` 已修复全部 findings，当前待 scoped re-review。 |
+| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-14） | 任务 1-13 已审查闭环；Task 14 初审 C/I/M=`0/3/3`，`1434a64` 后两项 scoped re-review 均通过；最终 review C/I/M=`0/0/1`，唯一文档状态 Minor 正由本次提交修正并待只读确认。 |
 | G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 部分完成（任务 1-14） | 任务 1-13 已保留 branch/worktree 并建立 draft PR；Task 14 必须在两阶段审查通过后再执行该 skill。 |
 | G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 部分完成（任务 1-14） | 公开仓库和任务 1-13 stacked draft PR（含 PR #13）已存在；Task 14 本地提交 `0f2b35f`/`1434a64` 待复审和 PR，最终历史扫描仍待交付前执行。 |
 | G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 部分完成（任务 1-14） | 任务 1-13 PR 与任务 1-14 日志均记录 subagent、人工调整及旧代码边界；Task 14 PR 尚未创建。 |
@@ -57,7 +57,7 @@
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
 | A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 已完成并验证 | `backend/tests` 以 `MockLLM`/stub 覆盖 Harness 核心；三 demo 保持稳定 JSON。Task 14 fix 后完整 backend `168 passed, 1 warning`，CI 已定义相同离线测试，但外部 CI 成功状态不作为本地证据。 |
 | A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已完成并验证 | 三份稳定 JSON demo 已审查通过：护栏阻断、MockLLM 反馈闭环改变动作、真实 `RunService` 的等待审批→批准→执行。真实 FastAPI/Vite/Chromium E2E `2 passed`；320x720 初始视口 RED（底边 `1327.4375 > 720`）由 `5ed4bd3` 的最小修复关闭，scoped 双阶段 re-review C/I/M `0/0/0`。上述均为本地证据；Task 14 CI 复现仍待执行。 |
-| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成 | 自实现 Harness、Mock 单测和三项 demo 已在 draft PR #13；Task 14 本地 `0f2b35f`/`1434a64` 增加并加固 CI/OCI 分发。当前 backend `168 passed, 1 warning`、frontend `48`、build/E2E `2 passed`；Task 14 scoped re-review/PR 与最终交付仍待完成。 |
+| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成 | 自实现 Harness、Mock 单测和三项 demo 已在 draft PR #13；Task 14 本地 `0f2b35f`/`1434a64` 增加并加固 CI/OCI 分发。当前 backend `168 passed, 1 warning`、frontend `48`、build/E2E `2 passed`，scoped re-review 已通过；Task 14 文档 Minor 确认/PR 与最终交付仍待完成。 |
 
 ## 实现前绝对门禁
 

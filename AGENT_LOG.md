@@ -322,3 +322,8 @@
 - 修复：`1434a64 fix: harden ci distribution boundaries`。Make 默认实际仓库 venv；GHCR 只在名称为 CI 的 workflow 对默认分支 push 成功后触发，并 checkout `workflow_run.head_sha`；Compose 和两条 Docker run 示例仅绑定 loopback；README 明确应用无认证，公网必须有认证与 TLS gateway；`.dockerignore` 同时保护根和任意嵌套 dotenv；Windows/Unix venv 与 uvicorn 命令已分开纠正。未改 Harness/API、未进入 Task 15、未读旧项目、未用真实 key。
 - 验证：backend `168 passed, 1 warning`（既有 TestClient 弃用），frontend `48 passed`，三 demo、production build、真实 Chromium E2E `2 passed`；Docker build 和 Compose config 通过，Compose healthy 后 `docker port` 精确为 `127.0.0.1:8000`，runs API 返回 200/`[]`，WebUI 根页 200，随后只清理本任务容器/网络。GNU Make 在此 Windows 主机仍不存在，故未虚称执行；其 backend/frontend target 命令均通过。提交前凭据候选计数 0。
 - 状态：Task 13 draft PR #13 的追踪陈旧项已纠正。外部 GitHub/GitLab CI、GHCR push/public pull/package visibility 仍未验证；本轮待 scoped re-review，未 push/PR/finish。
+
+### 2026-08-10 — Task 14：scoped re-review 与最终文档 Minor
+
+- 审查结论：`1434a64` 后 scoped spec/security 与代码质量 re-review 均通过。最终全分支 reviewer 给出 C/I/M=`0/0/1`；唯一 Minor 是 PLAN 的 Task 13/14 状态、交接/追踪矩阵的复审状态以及 README E2E 环境仍带 Task 13 专属措辞，未发现新的产品、CI、Docker、凭据或测试问题。
+- 本次范围：仅修正文档事实，明确 Task 13 已推送并有 draft PR #13、Task 14 CI/容器已经实现且 scoped reviews 通过、最终 Minor 正在关闭，并将 E2E 环境改称 repository/worktree-local `.venv`。未改产品/config/tests，未进入 Task 15，未 push/PR/finish；外部 CI/GHCR 仍未验证。

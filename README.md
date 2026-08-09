@@ -61,7 +61,7 @@ These offline checks are mechanism demonstrations, not browser E2E, CI, containe
 
 ## Local browser E2E
 
-After installing the backend development dependencies into the Task 13 worktree-local `.venv`, installing the frontend packages, and installing Playwright Chromium, run from `frontend`:
+After installing the backend development dependencies into the repository/worktree-local `.venv`, installing the frontend packages, and installing Playwright Chromium, run from `frontend`:
 
 ```powershell
 npm.cmd run test:e2e
