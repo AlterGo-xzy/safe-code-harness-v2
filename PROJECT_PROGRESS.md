@@ -135,3 +135,6 @@ Task 13 的 Task 1-3、320px 修复及本地控制验证均已实现。最终全
 ## 2026-08-10 Task 13 分支收尾更新
 
 Task 13 最终验证为 backend `159 passed, 1 warning`、三份稳定 JSON demo、前端 48 tests/build、Chromium E2E `2 passed`、diff/高置信凭据候选均为 0。已推送 `codex/t13-demos-e2e`，并创建目标为 `codex/t12-settings-approval-ui` 的 [stacked draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)；保留 branch/worktree 以处理审查反馈。任务 14、15 和延后的策略扩展仍未开始。
+## 2026-08-10 Task 14 分支收尾更新
+
+Task 14 已完成本地 CI/容器实现、验证与审查，并已推送 `codex/t14-ci-distribution`；已创建目标为 `codex/t13-demos-e2e` 的 [stacked draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 branch/worktree 以处理审查反馈。外部 GitHub/GitLab CI、GHCR 发布/公开性/匿名 pull-run 与任务 15 仍未验证或完成。

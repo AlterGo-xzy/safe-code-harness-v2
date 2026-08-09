@@ -327,3 +327,6 @@
 
 - 审查结论：`1434a64` 后 scoped spec/security 与代码质量 re-review 均通过。最终全分支 reviewer 给出 C/I/M=`0/0/1`；唯一 Minor 是 PLAN 的 Task 13/14 状态、交接/追踪矩阵的复审状态以及 README E2E 环境仍带 Task 13 专属措辞，未发现新的产品、CI、Docker、凭据或测试问题。
 - 本次范围：仅修正文档事实，明确 Task 13 已推送并有 draft PR #13、Task 14 CI/容器已经实现且 scoped reviews 通过、最终 Minor 正在关闭，并将 E2E 环境改称 repository/worktree-local `.venv`。未改产品/config/tests，未进入 Task 15，未 push/PR/finish；外部 CI/GHCR 仍未验证。
+### 2026-08-10 — Task 14：分支收尾
+
+- 按课程“每个独立模块一个 PR”和 `finishing-a-development-branch` 选项 2，已推送 `codex/t14-ci-distribution` 并创建目标为 `codex/t13-demos-e2e` 的 [draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 worktree 等待审查；外部 CI/GHCR/匿名拉取和任务 15 仍未完成。
