@@ -17,8 +17,8 @@
 | G-3.4-2 | 一键测试；新机器验证凭据与分发 | 部分完成 | 本地 `scripts/test.ps1`、机制 demo 入口及前后端/E2E 命令已验证；CI、OCI pull/run 与全新机器分发/凭据步骤仍待任务 14/15。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
-| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-13） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 的 Task 3/视口审查已执行，最终全分支审查新增的 E2E 凭据隔离问题已完成 RED→最小修复→本地验证，尚待 scoped re-review 与分支收尾。 |
-| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1-3） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 3 先得到缺 Playwright RED，再以缺 uvicorn 和 Vitest 误收 E2E 的回归 RED 驱动最小依赖/发现边界修复；最终 E2E `2 passed`、前端 `48 passed`、backend `158 passed, 1 warning`。 |
+| G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-13） | `AGENT_LOG.md` 记录各 worktree、fresh implementer、TDD、审查、修复和分支状态；Task 13 的最终 scoped re-review 结论为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正；分支收尾仍待执行。 |
+| G-3.6-3 | TDD：红-绿-重构，不得先实现后补测 | 部分完成（任务 1-12、13 Task 1-3） | `PLAN.md` 与 `AGENT_LOG.md` 保留真实 RED/GREEN；Task 13 Task 3 先得到缺 Playwright RED，再以缺 uvicorn 和 Vitest 误收 E2E 的回归 RED 驱动最小依赖/发现边界修复；最终 E2E `2 passed`、前端 `48 passed`、backend 当前为 `159 passed, 1 warning`；Task 2 的 `158 passed` 仅为当时历史证据。 |
 | G-3.6-4 | 有 UI 时说明 Open Design 系统与 skill | 部分完成（任务 11、13 Task 3） | 任务 11 的 Open Design 安装历史仍不可复现且不猜测摘要；Task 13 Task 3 已用真实 Chromium 在 320x720 验证批准控件可见及 DOM 无横向溢出，未把静态 CSS 检查替代为浏览器证据。 |
 | G-4.1 | brainstorming 分块确认后 writing-plans | 已完成并验证 | 本会话逐段确认、`SPEC_PROCESS.md` 四轮节选；用户批准 SPEC 后才可调用 `writing-plans`。 |
 | G-4.2 | `SPEC.md` 的十类内容及 A 赛道附加节 | 已完成并验证 | `SPEC.md` 1-11，含“领域与机制设计”。 |
@@ -28,7 +28,7 @@
 | G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-13） | 任务 1-12 均有独立 worktree/draft PR；任务 13 在独立 worktree 已提交但尚未 push/创建 PR #13。 |
 | G-4.6-2 | 每 task 一个新鲜 subagent | 部分完成（任务 1-13） | `AGENT_LOG.md` 记录任务 1-13 的 fresh implementer、reviewer、修复 agent 与输出。 |
 | G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-13） | 任务 1-13 均记录 RED/GREEN；Task 13 最终修复先以缺专用 E2E app 的回归 RED，后以注入的内存 SecretStore 转绿。 |
-| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-13） | 任务 1-12 及 Task 13 Task 1-3/视口修复已执行两阶段或 scoped 审查；Task 13 最终全分支审查发现的 E2E 隔离与文档问题已修复，尚待 scoped re-review。 |
+| G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 部分完成（任务 1-13） | 任务 1-12 及 Task 13 Task 1-3/视口修复已执行两阶段或 scoped 审查；Task 13 最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正，尚待分支收尾。 |
 | G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 部分完成（任务 1-13） | 任务 1-12 已按 skill 保留 branch/worktree 并建立 draft PR；任务 13 必须在最终复审通过后再执行该 skill。 |
 | G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 部分完成（任务 1-13） | 公开仓库和任务 1-12 draft PR 已存在；任务 13 本地提交尚未 push/PR，最终历史凭据扫描仍待交付前执行。 |
 | G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 部分完成（任务 1-13） | 任务 1-12 的 PR 与任务 1-13 日志均记录 subagent、人工调整及旧代码复用边界；Task 13 PR 尚未创建。 |
@@ -56,7 +56,7 @@
 | A-4-D | 六维最低实现，并选择一个深入维度 | 已完成并验证 | 六维最低实现均已落地：决策封装、动作/工具、上下文/记忆、治理/HITL/沙箱、反馈闭环、声明式配置；治理主贡献另有规则、路径/命令护栏、审批状态机和事件证据的深入实现。 |
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
 | A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 已完成并验证 | `backend/tests` 以 `MockLLM`/stub 覆盖 Harness 核心；`test_demos.py` 以真实 loop/guard/run service 验证三项离线机制，含 `tool_failed` 与 PowerShell later-child 回归。当前 demo `12 passed`、完整 backend `159 passed, 1 warning`；CI 复现属于任务 14 的通用交付门槛。 |
-| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已完成并本地验证（Task 13） | 三份稳定 JSON demo 已审查通过：护栏阻断、MockLLM 反馈闭环改变动作、真实 `RunService` 的等待审批→批准→执行。真实 FastAPI/Vite/Chromium E2E `2 passed`；320x720 初始视口 RED（底边 `1327.4375 > 720`）由 `5ed4bd3` 的最小修复关闭，scoped 双阶段 re-review C/I/M `0/0/0`。Task 14 CI 复现仍待执行。 |
+| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已完成并验证 | 三份稳定 JSON demo 已审查通过：护栏阻断、MockLLM 反馈闭环改变动作、真实 `RunService` 的等待审批→批准→执行。真实 FastAPI/Vite/Chromium E2E `2 passed`；320x720 初始视口 RED（底边 `1327.4375 > 720`）由 `5ed4bd3` 的最小修复关闭，scoped 双阶段 re-review C/I/M `0/0/0`。上述均为本地证据；Task 14 CI 复现仍待执行。 |
 | A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成 | 自实现 Harness 内核、Mock 单测和三项机制演示均已提交到本地 Task 13 历史并验证；当前 backend `159 passed, 1 warning`、demo `12 passed`、前端 unit `48 tests`、build、真实 E2E `2 passed`。Task 13 尚未 push/PR，最终仓库交付仍待分支收尾。 |
 
 ## 实现前绝对门禁

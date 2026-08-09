@@ -2,7 +2,7 @@
 
 ## 交接结论
 
-代码和过程证据已保存到 Git；Task 13 Task 1-3、320px 修复及本地控制验证均已实现。视口 Important 已由 `5ed4bd3` 先 RED 后修复并通过 scoped 双阶段复审。随后最终全分支审查发现 E2E 仍启动生产 `main:app`，Planner 初始 GET 会触及 Windows Credential Manager；`7d66d98` 已以新的失败回归和 E2E-only 内存 SecretStore 入口完成最小修复，生产 app 未改。**该最后修复波尚待 scoped re-review；通过前不得运行 `finishing-a-development-branch`，也不得假称已推送、已有 PR #13、CI/容器/部署完成或已开始任务 14、15/策略扩展。**
+代码和过程证据已保存到 Git；Task 13 Task 1-3、320px 修复及本地控制验证均已实现。视口 Important 已由 `5ed4bd3` 先 RED 后修复并通过 scoped 双阶段复审。随后最终全分支审查发现 E2E 仍启动生产 `main:app`，Planner 初始 GET 会触及 Windows Credential Manager；`7d66d98` 已以新的失败回归和 E2E-only 内存 SecretStore 入口完成最小修复，生产 app 未改。**最终 scoped re-review 结论为 Critical 0、Important 0、Minor 2；两个文档 Minor 已修正。仍不得假称已推送、已有 PR #13、CI/容器/部署完成或已开始任务 14、15/策略扩展；完成只读文档复核与最终 diff/凭据扫描后，才可运行 `finishing-a-development-branch`。**
 
 本文件是给全新模型的最短可执行入口。开始工作前仍须依次阅读 `PROJECT_PROGRESS.md`、`AGENTS.md`、`PLAN.md`、`REQUIREMENTS_TRACEABILITY.md`、`AGENT_LOG.md`，并先运行 `git status --short`。
 
@@ -63,7 +63,7 @@ Harness 内核、治理、工具、反馈/记忆、主循环、运行/审批 API
 - 历史初次 GREEN：`test_demos.py` `6 passed in 0.23s`；历史修复后的 focused suite `10 passed in 0.47s`。
 - 正常 `./scripts/run_demos.ps1`（PowerShell 写法为 `.\scripts\run_demos.ps1`）输出三段稳定 JSON。
 - 历史修复后的完整 `backend/tests`：`156 passed, 1 warning`；warning 是既有 Starlette/TestClient 弃用提示。
-- 当前第二次复审修复后的 demo suite：`12 passed in 0.46s`；当前完整 `backend/tests`：`158 passed, 1 warning`，warning 同为既有 Starlette/TestClient 弃用提示。
+- Task 2 第二次复审修复当时的 demo suite：`12 passed in 0.46s`；当时完整 `backend/tests`：`158 passed, 1 warning`，warning 同为既有 Starlette/TestClient 弃用提示。当前全仓库控制验证见后文的 `159 passed, 1 warning`。
 - `git diff --check` 无输出；已变更文件的高置信凭据候选计数为 `0`。
 
 ## Task 13 Task 2：已完成并验证
@@ -72,7 +72,7 @@ Harness 内核、治理、工具、反馈/记忆、主循环、运行/审批 API
 
 Task 2 已登记完成。不得重做已关闭的 `tool_failed` 或 later-child 行为修复；Task 3 实现状态与下一步审查要求见下节。若后续审查发现新的 Critical/Important，按 TDD/最小修复/复审处理。
 
-## Task 13 Task 3/4：真实浏览器 E2E 与最终隔离修复 — 待 scoped re-review
+## Task 13 Task 3/4：真实浏览器 E2E 与最终隔离修复 — scoped re-review 已完成
 
 - `frontend/e2e/workbench.spec.ts` 不拦截 API：API request 创建/核验真实 `pending_write`，page 实际点击中文“批准”。
 - `frontend/playwright.config.ts` 以 `reuseExistingServer: false` 启动 t13 `.venv` 的 `safe_code_harness.api.e2e_app:app` 和 Vite；`frontend/vite.config.ts` 将 `/api` 代理到本地 FastAPI。专用 app 向现有 factory 注入初始为空的进程内 SecretStore，避免本地 E2E 读取/写入 Windows Credential Manager；生产 `main:app` 保持 Task 9 的真实存储边界。
@@ -80,12 +80,12 @@ Task 2 已登记完成。不得重做已关闭的 `tool_failed` 或 later-child 
 - 视口修复 TDD 证据：已有质量审查指出 `toBeVisible()` 不足；fresh implementer 先把 `expectFullyInsideViewport` 加入 320x720 E2E，得到真实 RED（底边 `1327.4375 > 720`），随后提交 `5ed4bd3 fix: keep mobile approval action in viewport`，仅将 `ApprovalPanel` 置于事件时间线之前。E2E 随后为 `2 passed`；未改变 API、政策、CSS、旧项目代码或安全 DTO。
 - 最终隔离修复 TDD：运行时 probe 已证明默认 app 的 Planner GET 构造一次 Credential Manager；新增 `test_e2e_app.py` 后 focused RED 为缺少 `safe_code_harness.api.e2e_app`，`7d66d98` 后 focused GREEN `1 passed, 1 warning`，且断言精确空 DTO 与零 Credential Manager 构造。
 - 当前本地控制验证（2026-08-10）：完整 backend `159 passed, 1 warning`（既有 Starlette/TestClient 弃用警告）；`scripts/run_demos.ps1` 输出三段稳定 JSON；clean `npm.cmd ci --ignore-scripts` 后前端 unit 为 `10 files/48 tests`、build 成功、真实 Chromium E2E 为 `2 passed`。install 仍报告 5 个上游审计风险（3 moderate、1 high、1 critical），未 force fix。
-- 审查：Task 4 初始 spec/security review 为 C/I/M `0/0/0`；视口 quality Important 已由 `5ed4bd3` 修复并经 scoped 双阶段 re-review PASS。最终全分支 reviewer 的 E2E 隔离与文档 findings 已修复，但本修复波尚待 scoped re-review。
+- 审查：Task 4 初始 spec/security review 为 C/I/M `0/0/0`；视口 quality Important 已由 `5ed4bd3` 修复并经 scoped 双阶段 re-review PASS。最终全分支修复的 scoped re-review 为 Critical 0、Important 0、Minor 2；两个 Minor（本文件的历史/当前测试数值措辞及追踪矩阵状态词）已在本次文档修正中关闭。
 
 ## 随后工作顺序（不得提前）
 
-1. 不重做已关闭的 demo 或视口修复；先对 `7d66d98` 及其文档修复执行 scoped spec/security 与质量 re-review，重点核对 E2E app 绝不触及 OS 凭据、Playwright 确实使用专用入口、生产 app 不变，以及权威文档状态一致。
-2. 只有 scoped re-review 无 Critical/Important 且最终 diff/凭据扫描通过后，才运行 `finishing-a-development-branch`，向用户呈现分支处置选择。仅在用户选择推送/PR 后，才可推送 `codex/t13-demos-e2e`、创建对 `codex/t12-settings-approval-ui` 的 draft PR #13、回读 GitHub 状态并提交实际 URL/保留 worktree 决定。
+1. 不重做已关闭的 demo 或视口修复；最终 scoped re-review 已确认 E2E app 不触及 OS 凭据、Playwright 使用专用入口且生产 app 不变。先对本次两项文档 Minor 做只读复核，再完成最终 diff/凭据扫描。
+2. 完成上述复核后，运行 `finishing-a-development-branch`，向用户呈现分支处置选择。仅在用户选择推送/PR 后，才可推送 `codex/t13-demos-e2e`、创建对 `codex/t12-settings-approval-ui` 的 draft PR #13、回读 GitHub 状态并提交实际 URL/保留 worktree 决定。
 3. Task 14（CI/容器分发）、Task 15（公网部署/最终交付）和延后的策略扩展都尚未开始；不得把本地验证写成上述外部证据。
 
 ## 严格流程与安全不变量
