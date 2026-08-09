@@ -2,7 +2,7 @@
 
 ## 交接结论
 
-代码和过程证据已保存到 Git；当前工作树没有已跟踪的未提交改动。**不要开始 Task 13 Task 3（Playwright/E2E），也不要开始任务 14、15 或策略扩展。**第二次独立复审的 1 个 Important 与 2 个 Minor 已完成 RED→最小修复和完整验证；第三次独立审查指出交接/过程文档仍有事实陈旧，本轮仅修正文档，修正后的 scoped re-review 仍待进行。Task 13 Task 2 尚未完成。
+代码和过程证据已保存到 Git；Task 13 Task 2 已闭环。第二次独立复审的 1 个 Important 与 2 个 Minor 均已 RED→最小修复和完整验证；第三次 scoped re-review 确认交接/过程文档修正后为 PASS（Critical/Important/Minor 均为 0）。**可以开始 Task 13 Task 3（真实本地 API/浏览器 E2E 与 320px）；仍不得开始任务 14、15 或策略扩展。**
 
 本文件是给全新模型的最短可执行入口。开始工作前仍须依次阅读 `PROJECT_PROGRESS.md`、`AGENTS.md`、`PLAN.md`、`REQUIREMENTS_TRACEABILITY.md`、`AGENT_LOG.md`，并先运行 `git status --short`。
 
@@ -66,20 +66,19 @@ Harness 内核、治理、工具、反馈/记忆、主循环、运行/审批 API
 - 当前第二次复审修复后的 demo suite：`12 passed in 0.46s`；当前完整 `backend/tests`：`158 passed, 1 warning`，warning 同为既有 Starlette/TestClient 弃用提示。
 - `git diff --check` 无输出；已变更文件的高置信凭据候选计数为 `0`。
 
-## 当前阻断：Task 13 Task 2 的第三次独立审查文档发现
+## Task 13 Task 2：已完成并验证
 
-第二次只读独立复审结论为 Critical 0、Important 1、Minor 2，三项均已修复：`7bdd85d` 的真实 snapshot 投影会拒绝 waiting 或最终批准前的 `tool_succeeded`、`tool_failed`；PowerShell 回归已证明 failing first child 后的写 marker later child 不运行；四份过程文档已记录真实验证。随后第三次独立审查发现交接与部分过程文档仍未同步这一事实。
+第二次只读独立复审结论为 Critical 0、Important 1、Minor 2，三项均已修复：`7bdd85d` 的真实 snapshot 投影会拒绝 waiting 或最终批准前的 `tool_succeeded`、`tool_failed`；PowerShell 回归已证明 failing first child 后的写 marker later child 不运行；四份过程文档已记录真实验证。随后第三次独立审查发现交接与部分过程文档仍未同步；文档提交 `5bf57a3` 后的 scoped re-review 已批准，Critical/Important/Minor 均为 0。
 
-本轮仅文档修正已开始，修正后的 scoped re-review 仍待进行；这不是 Task 2 完成声明。不得重做已关闭的 `tool_failed` 或 later-child 行为修复，也不得开始 Task 3。若 scoped re-review 有 Critical/Important，按 TDD/最小修复/复审处理；若通过，再按完整 Task 2 收尾流程登记完成。
+Task 2 已登记完成。不得重做已关闭的 `tool_failed` 或 later-child 行为修复；下一步严格按批准计划开始 Task 3。若后续审查发现新的 Critical/Important，按 TDD/最小修复/复审处理。
 
 ## 随后工作顺序（不得提前）
 
-1. 完成当前第三次审查的文档修正 scoped re-review，并把实际结论记录到四份过程文档；不要将已关闭的行为修复重新写成待办。
-2. Task 13 Task 3：按已批准的 `docs/superpowers/plans/2026-08-09-demos-e2e.md` 增加 Playwright。真实 FastAPI API 用于创建和核验；**浏览器必须实际点击“批准”**；直接 API 读取必须证明点击前 `waiting_approval`、点击后 `completed` 和 executed 证据。不得拦截 API、不得用 sleep。
-3. Task 3 必须实际验证 320px：批准按钮可见且 `document.documentElement.scrollWidth <= window.innerWidth`。若需修改 CSS，先写失败 E2E。
-4. Playwright 需要 `@playwright/test` 和 Chromium。安装依赖/浏览器是受控网络动作；若失败，记录真实阻断，不能宣称 E2E 成功。Windows 没有 GNU make；不要把 Makefile target 当 Windows 验证。
-5. Task 13 最终 Task 4：执行 backend、三演示、干净 frontend install/unit/build/E2E、diff/凭据扫描；重新核对要求文件追踪；更新过程文件；使用 `finishing-a-development-branch` 决定推送和 draft PR #13。
-6. Task 14（CI/容器分发）、Task 15（公网部署/最终交付）和延后的策略扩展都尚未开始。
+1. Task 13 Task 3：按已批准的 `docs/superpowers/plans/2026-08-09-demos-e2e.md` 增加 Playwright。真实 FastAPI API 用于创建和核验；**浏览器必须实际点击“批准”**；直接 API 读取必须证明点击前 `waiting_approval`、点击后 `completed` 和 executed 证据。不得拦截 API、不得用 sleep。
+2. Task 3 必须实际验证 320px：批准按钮可见且 `document.documentElement.scrollWidth <= window.innerWidth`。若需修改 CSS，先写失败 E2E。
+3. Playwright 需要 `@playwright/test` 和 Chromium。安装依赖/浏览器是受控网络动作；若失败，记录真实阻断，不能宣称 E2E 成功。Windows 没有 GNU make；不要把 Makefile target 当 Windows 验证。
+4. Task 13 最终 Task 4：执行 backend、三演示、干净 frontend install/unit/build/E2E、diff/凭据扫描；重新核对要求文件追踪；更新过程文件；使用 `finishing-a-development-branch` 决定推送和 draft PR #13。
+5. Task 14（CI/容器分发）、Task 15（公网部署/最终交付）和延后的策略扩展都尚未开始。
 
 ## 严格流程与安全不变量
 
