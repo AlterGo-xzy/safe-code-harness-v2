@@ -272,3 +272,10 @@
 - 审查：fresh read-only reviewer `/root/t13_task2_fix_reviewer` 未运行测试、未修改文件，结论为 Critical 0、Important 1、Minor 2。Important：审批演示仍只将 `tool_succeeded` 认作等待/批准前执行，未拒绝 `tool_failed`；必须先写失败回归并拒绝任意工具结果。Minor：PowerShell 测试只有单一失败 child，必须证明 first child 失败时 later child 不运行；`PROJECT_PROGRESS.md` 与 `REQUIREMENTS_TRACEABILITY.md` 有 focused `6 passed`/完整回归未执行的过期陈述。
 - 人工决定：用户要求先保存现有成果并停止继续实现，故不在此复审结论后修改代码、不启动 Task 3/Playwright/策略扩展。`7243dfc`、`7bf3d04` 已保存全部已完成实现/文档；当前 worktree 的 `git status --short` 无输出。
 - 交接：新增 `HANDOFF_TO_NEXT_MODEL.md`，含分支/HEAD、可如实引用的 RED/GREEN、三个未闭环问题、环境差异、下一步 TDD 命令和不变量。后续模型必须先关闭该 Important 和两个 Minor、完整验证、再次独立审查，才可进入 Task 13 Task 3。
+
+### 2026-08-10 — Task 13 Task 2：第二次复审发现的第 2 轮修复（验证与复审待进行）
+
+- 范围与来源：fresh implementer `/root/t13_task2_fix2_implementer` 只处理第二次复审的 1 Important/2 Minor；未读、复制或咨询旧项目，未开始 Task 3/Playwright、策略扩展、CI、分发或部署。
+- TDD：先将 waiting 回归参数化为 `tool_succeeded`/`tool_failed`，并新增 completed snapshot 在最后 `approval_approved` 前出现 `tool_failed` 的回归；RED focused 为 `2 failed, 2 passed`，两处均因未抛 `RuntimeError`。另将 PowerShell 回归改为 failing first child 加写 marker 的 later child；现有逐 child `$LASTEXITCODE` 检查已使该行为通过，故不改生产脚本。最小源码修复为 approval 投影在 waiting 或最后批准前拒绝 `tool_succeeded`、`tool_failed`；focused GREEN 为 `4 passed, 8 deselected in 0.26s`。
+- 验证：完整 demo 为 `12 passed in 0.46s`，正常 `.\scripts\run_demos.ps1` 输出三份稳定、安全 JSON；完整 backend 为 `158 passed, 1 warning`，warning 是既有 TestClient 弃用提示；`git diff --check` 无输出，已变更 diff 的高置信凭据候选计数为 0。
+- 状态：此前 focused `10 passed`、完整 backend `156 passed, 1 warning` 是历史证据；本轮源码/测试已提交 `7bdd85d`，第三次独立审查尚未进行。Task 2 未完成，不得开始 Task 3。
