@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     image: safe-code-harness-v2:local
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     read_only: true
     tmpfs:
       - /tmp

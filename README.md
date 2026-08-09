@@ -12,7 +12,18 @@ python -m venv .venv
 npm --prefix frontend ci --ignore-scripts
 ```
 
-On Windows, use `.venv\\Scripts\\python.exe` instead of `.venv/bin/python`. Run the API with `python -m uvicorn safe_code_harness.api.main:app --app-dir backend/src --host 127.0.0.1 --port 8000` and run `npm --prefix frontend run dev` in another terminal.
+On a Unix-like system, run the API with `.venv/bin/python -m uvicorn safe_code_harness.api.main:app --app-dir backend/src --host 127.0.0.1 --port 8000` and run `npm --prefix frontend run dev` in another terminal.
+
+On Windows PowerShell, use the repository virtual environment and Windows command shims:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e "backend[dev]"
+npm.cmd --prefix frontend ci --ignore-scripts
+.\.venv\Scripts\python.exe -m uvicorn safe_code_harness.api.main:app --app-dir backend/src --host 127.0.0.1 --port 8000
+```
+
+Run `npm.cmd --prefix frontend run dev` in another PowerShell terminal.
 
 ## Tests
 
@@ -34,7 +45,7 @@ On a Unix-like system with Python available, run:
 make demos
 ```
 
-On Windows, after creating the Task 13 worktree-local Python environment, run:
+On Windows, after creating the repository worktree-local Python environment, run:
 
 ```powershell
 .\scripts\run_demos.ps1
@@ -64,7 +75,7 @@ Build and run the OCI image with one command each:
 
 ```sh
 docker build -t safe-code-harness-v2:local .
-docker run --rm --name safe-code-harness -p 8000:8000 safe-code-harness-v2:local
+docker run --rm --name safe-code-harness -p 127.0.0.1:8000:8000 safe-code-harness-v2:local
 ```
 
 Open `http://localhost:8000`. The image uses a multi-stage Node build and serves the compiled WebUI from the FastAPI process. The equivalent Compose command is `docker compose up --build`.
@@ -73,10 +84,12 @@ The default-branch publish workflow targets this GHCR package:
 
 ```sh
 docker pull ghcr.io/altergo-xzy/safe-code-harness-v2:latest
-docker run --rm -p 8000:8000 ghcr.io/altergo-xzy/safe-code-harness-v2:latest
+docker run --rm -p 127.0.0.1:8000:8000 ghcr.io/altergo-xzy/safe-code-harness-v2:latest
 ```
 
 These pull commands become usable only after the publish workflow has run and the GitHub package visibility is set to public. Package visibility is a repository-owner setting; it is not claimed as verified by the local Task 14 implementation.
+
+The application does not implement authentication. The local Docker and Compose examples therefore bind only to `127.0.0.1`; do not widen that host binding on a shared machine. A public deployment must place the service behind an authentication and TLS gateway (or add an equivalent authenticated application boundary) before exposing approval, Planner configuration, or workspace upload APIs.
 
 ## Planner key safety
 
@@ -86,7 +99,7 @@ The Linux container keeps a key only in process memory. Entering it through the 
 
 ## CI/CD
 
-`.github/workflows/ci.yml` runs tests on every push and pull request, installs Playwright Chromium, runs the real browser E2E, and builds the container image. `.github/workflows/publish-image.yml` uses the scoped GitHub token with `packages: write` only on the repository default branch. `.gitlab-ci.yml` supplies the required `unit-test` job for backend tests, demos, frontend tests and the frontend build on pushes and merge requests.
+`.github/workflows/ci.yml` runs tests on every push and pull request, installs Playwright Chromium, runs the real browser E2E, and builds the container image. After that CI workflow completes successfully for a push to the repository default branch, `.github/workflows/publish-image.yml` checks out the tested commit and uses the scoped GitHub token with `packages: write`. `.gitlab-ci.yml` supplies the required `unit-test` job for backend tests, demos, frontend tests and the frontend build on pushes and merge requests.
 
 ## Repository layout
 
@@ -103,5 +116,6 @@ The Linux container keeps a key only in process memory. Entering it through the 
 - Core tests and demos use Mock/stub components and need no network or key.
 - The container process-memory key store is deliberately non-persistent; Windows Credential Manager is unavailable inside the Linux image.
 - The image is designed for port 8000 and runs as an unprivileged user with a writable temporary workspace. Compose also drops capabilities and uses a read-only root filesystem.
+- The application has no authentication layer; local container examples are loopback-only, and public hosting requires an authenticated TLS gateway.
 - The local build currently targets the Docker engine's selected architecture. Multi-architecture publication, an externally verified public GHCR pull, hosted HTTPS, and a public deployment URL remain Task 15 verification work.
 - External GitHub Actions, GitLab CI, GHCR visibility and registry pull/run results are not local evidence and must be recorded only after those services actually run.

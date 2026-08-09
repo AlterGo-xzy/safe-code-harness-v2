@@ -1,4 +1,4 @@
-PYTHON ?= python3
+PYTHON ?= .venv/bin/python
 NPM ?= npm
 
 .PHONY: test backend-test frontend-test demos
