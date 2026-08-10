@@ -32,6 +32,11 @@ def create_run(payload: CreateRunRequest, request: Request) -> dict[str, object]
     return _service(request).start(payload.scenario)
 
 
+@router.get("")
+def list_runs(request: Request) -> list[dict[str, object]]:
+    return _service(request).list_summaries()
+
+
 @router.get("/{run_id}", response_model=None)
 def get_run(run_id: str, request: Request) -> dict[str, object] | JSONResponse:
     try:
