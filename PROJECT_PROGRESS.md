@@ -159,3 +159,7 @@ Task 14 已完成本地 CI/容器实现、验证与审查，并已推送 `codex/
 ## 2026-08-10 PR 集成进度：#10 已合并（优先）
 
 PR #10 已在其专属 worktree 对 `origin/main` 做受控 merge。冲突仅为两份过程文档和共享 `api/main.py`；新真实 API regression 在未解析状态为预期 `SyntaxError` RED，最小 factory 组合后 focused `1 passed, 1 warning`、完整 backend `146 passed, 1 warning`，diff/marker/高置信凭据候选为 0。fresh reviewer C/I/M=`0/0/0` 后，PR retarget main、ready、GitHub 回读 `CLEAN`，并于 `2026-08-10T11:46:12Z` 普通 merge 为 `696214d`。branch/worktree 依用户指令保留。main 当前覆盖 Task 1–10；下一条 #11 仍需同等门槛。Task14 workflow 尚未到达 main。
+
+## 2026-08-10 PR 集成进度：#11 已合并（优先）
+
+PR #11 对 main 的冲突仅为历史文档，运行时代码由 Git 自动组合。完整 backend 以 `PYTHONPATH` 明确指向 Task11 当前源码验证为 `146 passed, 1 warning`；前端 `15 passed`、build 通过，diff/marker/高置信凭据候选为 0。fresh reviewer C/I/M=`0/0/0` 后，PR retarget main、ready、GitHub `CLEAN`，于 `2026-08-10T11:58:36Z` 普通 merge 为 `622c472`；branch/worktree 保留。main 当前覆盖 Task1–11，下一条为 #12。

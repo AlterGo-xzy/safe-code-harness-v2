@@ -553,6 +553,10 @@ it("renders a blocked rule decision in the run timeline", () => {
 
 Task10 与 Task9 的共享 factory 冲突经 test-first 组合修复：RED 为未解析 marker 的 `SyntaxError`，GREEN focused `1 passed, 1 warning`、完整 backend `146 passed, 1 warning`、diff/marker/credential scan clean。fresh review C/I/M=`0/0/0`；PR #10 已 retarget main、ready、GitHub `CLEAN` 后普通 merge `696214d`。保留 branch/worktree；下一个 #11 仍须重新验证、复审和真实 PR 状态回读。
 
+### 2026-08-10 — 已授权 stacked PR 集成续记：#11
+
+Task11 的冲突只在历史文档；runtime 自动合并。完整 backend `146 passed, 1 warning`、frontend `15 passed`、build、diff/marker/credential scan clean；fresh review C/I/M=`0/0/0`。PR #11 已 retarget main、ready、`CLEAN` 后普通 merge `622c472`，保留 branch/worktree。
+
 ## 任务 12：审批、Planner 与 ZIP 上传界面（策略扩展延后）
 
 **工作区与 PR：** `codex/t12-settings-approval-ui` / `.worktrees/t12-settings-approval-ui`；已创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留 worktree 等待审查。

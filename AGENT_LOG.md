@@ -402,3 +402,8 @@
 - 诊断与 TDD：在 Task10 专属 worktree 以 `git merge origin/main --no-commit --no-ff` 重现两份过程文档和 `api/main.py` 冲突；根因为 Task9/10 都追加 app factory。新 cross-route test 在 marker 状态 RED 为 `SyntaxError`；仅组合已有 Planner `SecretStore` 注入、WorkspaceRegistry 和 config/runs/workspaces routers 后 GREEN `1 passed, 1 warning`。
 - 完整验证与审查：完整 backend `146 passed, 1 warning`（既有 TestClient deprecation），diff、marker、凭据候选均为 0。fresh `/root/t10_merge_reviewer` 只读审查 `6681ed1` C/I/M=`0/0/0`，确认密钥 fail-closed/redaction 与 ZIP 预校验均保留。
 - 外部结果：`6eb7721` 推送后，PR #10 retarget `main`、mark ready，API 回读 `CLEAN`；普通 merge 成功，GitHub 回读 merge commit `696214d594257c1693eccd311e4fa9ae4861d869`、时间 `2026-08-10T11:46:12Z`。按用户指令未删除 branch/worktree。Task14 CI workflow 仍未抵达 main。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#11
+
+- Task11 与 current main 的冲突仅是历史过程文档；保留双方记录后运行时源自动合并。完整 backend 以 Task15 venv 加 `PYTHONPATH` 指向 Task11 当前源码，得到 `146 passed, 1 warning`；frontend 为 4 files/15 tests、build 成功，diff/marker/凭据候选均为 0。
+- fresh reviewer `/root/t11_merge_reviewer` C/I/M=`0/0/0`，确认只读 DTO UI、无写 API/localStorage/凭据，以及 Task9/10 安全边界未变。PR #11 retarget/ready/CLEAN 后普通 merge `622c47270985e33ecaa3ba64b2f1a0fa082f0bbf`（`2026-08-10T11:58:36Z`）；未删除 branch/worktree。

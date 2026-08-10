@@ -79,3 +79,5 @@ G-5-3 更新为部分完成待人工字数口径确认：用户提供的正文�
 G-4.7-1/2 的当前外部状态：PR #1–#9 已由 GitHub API 回读为 merged；#4–#9 merge commits 依次为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`、`a2abb83`。#9 的堆叠冲突仅涉及过程日志并已在完整 backend `114 passed, 1 warning`、diff/凭据检查和 fresh C/I/M=`0/0/0` 独立审查后合并。尚未完成的是 #10–#14、Task15 PR/收尾、Task14 workflow 抵达 main 后的 GHCR public/匿名 pull-run；本修正覆盖上方“#1–#14 均未合并”的历史快照。
 
 G-4.7-1/2 当前更新：PR #10 也已由 GitHub 回读为 merged（`696214d`）。该合并以前述 Red/Green integration test、完整 backend `146 passed, 1 warning`、diff/marker/credential scan clean 和 fresh C/I/M=`0/0/0` 为前提；仍待 #11–#14、Task15 PR/收尾，以及 Task14 workflow 抵达 main 后 GHCR public/匿名 pull/run 的真实外部证据。
+
+G-4.7-1/2 当前更新：PR #11 已由 GitHub 回读为 merged（`622c472`）；完整 backend `146 passed, 1 warning`、frontend 15 tests/build、diff/marker/credential scan clean、fresh C/I/M=`0/0/0`。仍待 #12–#14、Task15 PR/收尾，以及 Task14 workflow 抵达 main 后 GHCR public/匿名 pull/run。
