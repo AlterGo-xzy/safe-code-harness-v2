@@ -182,7 +182,7 @@ def test_feedback_demo_proves_feedback_changes_next_action() -> None:
 - [x] **步骤 4：确认绿色结果与重构**：Windows 以 `scripts/run_demos.ps1` 代替不可用的 GNU make；demo、E2E、前端单测/build 与 backend 均已通过。Unix-like `make demos` 未在 Windows 假称执行。
 - [x] **步骤 5：两阶段审查与提交**：Task 1/2 审查已通过；Task 4 初始 spec/security review 为 C/I/M `0/0/0`，quality review 的 320x720 Important 已由 `5ed4bd3` RED→GREEN 并经 scoped 双阶段 re-review 清零。最终全分支审查继续发现 E2E OS 凭据隔离 Important 与文档事实问题；代码修复 `7d66d98` 先有 `ModuleNotFoundError: safe_code_harness.api.e2e_app` RED，再以专用内存 SecretStore 入口 GREEN。最终控制器重跑为 backend `159 passed, 1 warning`、三 demo、clean frontend install、unit `48 tests`、build、Chromium E2E `2 passed`；最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正。
 
-**当前记录：** Task 1-2 已完成并审查通过；Task 3 实现提交 `e18422e`，视口 fix 提交 `5ed4bd3`，E2E 凭据隔离修复提交 `7d66d98`。后者新增自动回归，证明专用 E2E app 的 Planner 初始 GET 返回确定性空配置且不会构造 Windows Credential Manager；生产 `main:app` 未改。修复后控制验证为 backend `159 passed, 1 warning`、三 demo 稳定 JSON、clean frontend install、unit `48 tests`、build、Chromium E2E `2 passed`。最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正；完成只读文档复核和最终 diff/凭据扫描后才可运行 `finishing-a-development-branch`。Task 13 仍未 push、无 PR #13；CI/容器、部署和策略扩展未开始。
+**当前记录：** Task 1-2 已完成并审查通过；Task 3 实现提交 `e18422e`，视口 fix 提交 `5ed4bd3`，E2E 凭据隔离修复提交 `7d66d98`。后者新增自动回归，证明专用 E2E app 的 Planner 初始 GET 返回确定性空配置且不会构造 Windows Credential Manager；生产 `main:app` 未改。修复后控制验证为 backend `159 passed, 1 warning`、三 demo 稳定 JSON、clean frontend install、unit `48 tests`、build、Chromium E2E `2 passed`。最终 scoped re-review 的两个文档 Minor 已修正，随后完成分支收尾：`codex/t13-demos-e2e` 已推送并创建 [stacked draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)。Task 14 的 CI/容器实现现已开始并进入最终文档 Minor 修正；Task 15 部署和策略扩展未开始。
 
 ## 任务 14：GitHub/GitLab CI 与 Docker/GHCR 分发
 
@@ -190,7 +190,7 @@ def test_feedback_demo_proves_feedback_changes_next_action() -> None:
 **文件：** 新建 `.github/workflows/ci.yml`、`.github/workflows/publish-image.yml`、`.gitlab-ci.yml`、`Dockerfile`、`docker-compose.yml`、`.dockerignore`；修改 `Makefile`、`README.md`。
 **接口与验收：** `make test` 一键运行后端与前端核心测试；每次 push 的 GitHub Actions 和 GitLab `unit-test` 运行测试；默认分支推送构建并将镜像推送 GHCR（在仓库设置公开 package）；镜像在目标机用环境变量/系统凭据配置 Planner key，绝不烘焙入镜像。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 ```python
 def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
@@ -199,12 +199,14 @@ def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
     assert ".env" not in workflow
 ```
 
-- [ ] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/unit/test_distribution_config.py -q`，预期工作流文件不存在或断言失败。
-- [ ] **步骤 3：最小实现**：配置 Python/Node job、Playwright 浏览器安装及 E2E、Docker build；GitHub publish job 使用 `GITHUB_TOKEN` 的 packages 写权限，GitLab job 名固定 `unit-test`。Docker 多阶段构建 WebUI 并由 FastAPI 提供静态文件。
-- [ ] **步骤 4：确认绿色结果与重构**：运行 `make test`、`docker build -t safe-code-harness-v2:local .`、`docker compose up --build` 后调用 `/api/runs`；本地镜像不含 key；推送 PR 后检查两套 CI，默认分支发布后从公开 GHCR pull/run。
+- [x] **步骤 2：确认红色结果**：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_distribution_config.py -q` 首次得到预期 `FileNotFoundError: .github\\workflows\\publish-image.yml`；扩展契约后为 `7 failed`，均指向缺少分发文件或 `Makefile` target。
+- [x] **步骤 3：最小实现**：`0f2b35f` 配置 Python/Node job、Playwright Chromium/E2E、Docker build；GitHub publish job 使用 `GITHUB_TOKEN` 的 packages 写权限，GitLab job 名固定 `unit-test`。Docker 多阶段构建 WebUI，由镜像内 ASGI 入口把静态输出挂载到 FastAPI；容器 Planner key 仅为进程内存/可选平台 secret 环境注入，不烘焙、不读取 `.env`。
+- [x] **步骤 4：确认绿色结果与重构**：focused `7 passed`；完整 backend `166 passed, 1 warning`、frontend `48 passed`、三 demo、build、Chromium E2E `2 passed`。Windows 无 GNU Make，未运行或虚称 `make test`，但其 backend/frontend 两个真实子命令均通过。`docker build -t safe-code-harness-v2:local .` 实际成功；`docker compose up --build --detach --wait` 达到 healthy，`/api/runs`、Planner 空配置和 WebUI 200 均已探测，镜像配置 baked Planner key 计数 0，随后清理容器/网络。GitHub/GitLab 外部 CI、GHCR push/public pull 与 package visibility 仍须在 push/默认分支发布后验证。
 - [ ] **步骤 5：两阶段审查与提交**：先审查 CI/镜像没有改变离线机制与凭据边界，再审查缓存、端口、健康检查、失败日志和镜像大小；提交 `git commit -m "build: add ci and container distribution"`。
 
-**完成记录：** 真实红绿命令、GitHub CI、GitLab CI、GHCR pull/run、审查结论、hash、PR。
+**当前记录：** fresh implementer `/root/t14_implementer` 未读取/复用旧项目，只改任务 14 简报限定文件；源码提交 `0f2b35f build: add ci and container distribution`。RED/GREEN、本地 Docker/Compose/API/WebUI/key 检查如步骤 2-4；`git diff --cached --check` 无输出，高置信凭据候选计数 0。当前待独立 spec/security 审查和代码质量审查；外部 GitHub CI、GitLab CI、GHCR 公开 pull/run、package visibility、分支收尾、push 与 PR 均未完成，不得据本地配置宣称外部通过。
+
+**初审与修复记录：** 独立 reviewer `/root/t14_reviewer` 结论 C/I/M=`0/3/3`，不批准。fix round `1434a64` 对 Make venv、loopback/无认证边界、根/嵌套 dotenv 规则和 GHCR CI 成功门禁先取得 focused `4 failed, 5 passed`，最小修复后 `9 passed`；完整 backend `168 passed, 1 warning`、frontend `48 passed`、三 demo、build、E2E `2 passed`。Docker build/Compose `--wait` 成功，真实端口为 `127.0.0.1:8000`，runs API 与 WebUI 均 200，随后清理容器/网络。随后 scoped spec/security 与质量 re-review 均通过；最终全分支 review 为 C/I/M=`0/0/1`，唯一 Minor 是本段及交接/追踪/README 的陈旧状态措辞，本次纯文档提交正在修正。步骤 5 在该文档 Minor 获只读确认前不勾选；外部 CI/GHCR 与 Task 14 push/PR 仍未完成。
 
 ## 任务 15：发布文档、外部部署与最终交付核验
 

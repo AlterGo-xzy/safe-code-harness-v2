@@ -1,6 +1,15 @@
-PYTHON ?= python
+PYTHON ?= .venv/bin/python
+NPM ?= npm
 
-.PHONY: demos
+.PHONY: test backend-test frontend-test demos
+
+test: backend-test frontend-test
+
+backend-test:
+	$(PYTHON) -m pytest backend/tests
+
+frontend-test:
+	$(NPM) --prefix frontend test
 
 demos:
 	$(PYTHON) scripts/run_guardrail_demo.py

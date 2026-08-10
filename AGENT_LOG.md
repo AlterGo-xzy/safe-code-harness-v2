@@ -318,6 +318,31 @@
 
 - 最终验证在 `e4599d2` 后重新运行：backend `159 passed, 1 warning`、三份稳定 JSON demo、前端 10 files/48 tests、build 和真实 Chromium E2E `2 passed`，均成功；warning 为既有 TestClient 弃用。
 - 收尾决定：按课程“每个独立模块一个 PR”和 stacked 分支规则，用户选择 `finishing-a-development-branch` 选项 2。已推送 `codex/t13-demos-e2e` 并创建目标为 `codex/t12-settings-approval-ui` 的 [draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)；保留 worktree 等待审查反馈。Task 14/15、策略扩展仍未开始。
+
+### 2026-08-10 — Task 14：CI 与 OCI 分发实现（待两阶段审查）
+
+- 执行者、技能与范围：fresh implementer `/root/t14_implementer` 在独立 `codex/t14-ci-distribution` worktree 使用 `executing-plans`、`using-git-worktrees`、`test-driven-development`、`systematic-debugging` 与 `verification-before-completion`。prompt 绑定只做 GitHub/GitLab CI、Docker/GHCR 分发和四份过程记录；未开始 Task 15/部署/策略扩展，未读取或复用旧项目代码，未使用真实 key，未 push/建 PR。
+- TDD RED：先只新增计划绑定测试，focused exit 1，精确为 `.github/workflows/publish-image.yml` 不存在的 `FileNotFoundError`；再在任何分发配置前扩展 push CI、默认分支/packages 权限、精确 `unit-test`、`make test` 双端核心测试、多阶段 FastAPI 静态服务、Compose 健康和无烘焙 key 契约，得到 `7 failed`。初次 GREEN 的唯一失败是测试把合法 `os.environ` 误判为 `.env` 文件；收窄为禁止 COPY/加载 `.env` 后 focused `7 passed`。
+- 实现：新增 `.github/workflows/ci.yml`（每次 push/PR 的 Windows 后端、demo、前端、Chromium E2E，并在 Ubuntu 构建 Docker）、`publish-image.yml`（仅默认分支、`packages: write`、`GITHUB_TOKEN`、GHCR）、`.gitlab-ci.yml`（顶层精确 `unit-test`）、多阶段 `Dockerfile`、加固的 Compose 与 `.dockerignore`。镜像以非 root 用户运行、健康检查 `/api/runs`、FastAPI 挂载 WebUI；Linux 容器 Planner secret 只在进程内存，可由托管平台 secret 环境初始注入，不进入构建参数、层、Compose 或 `.env`。README 明确 Windows Credential Manager、容器环境风险、公开 package 需外部设置且未验证。
+- 验证与调试：本机 Python 3.14.5 满足 `>=3.12`；baseline backend `159 passed, 1 warning`、frontend `48 passed`、build/E2E `2 passed`。最终 backend `166 passed, 1 warning`（同一既有 Starlette/TestClient 弃用），frontend `48 passed`、三份稳定 JSON demo、build、E2E `2 passed`，Compose config 成功。首次 Docker 因 daemon 未启动失败；后续 Compose 等 Docker Desktop 启动后实际构建成功并 healthy。预提交 E2E 的 8000 冲突经只读进程证据定位为本任务 Compose 容器而非 Playwright 遗留；使用 `compose --wait` 后 `/api/runs` 可访问、Planner JSON 为 `configured:false`、根页 200/含 WebUI，镜像配置 baked key 计数 0，随后只清理本任务容器/网络。GNU Make 不存在，故 `make test` 未运行；其两个子命令均实际通过。`npm ci` 仍报告既有 5 个审计风险（3 moderate、1 high、1 critical），未执行 force fix。
+- 提交与外部边界：源码提交 `0f2b35f build: add ci and container distribution`；提交前 `git diff --cached --check` 无输出，高置信凭据候选计数 0。外部 GitHub Actions、GitLab pipeline、GHCR push/public pull、package visibility 未运行/未验证；下一步必须先做独立 spec/security 审查，再做代码质量审查，修复 findings 后才可进入 `finishing-a-development-branch`。
+
+### 2026-08-10 — Task 14：初审修复 round 1（待 scoped re-review）
+
+- 审查与根因：独立 reviewer `/root/t14_reviewer` 给出 C/I/M=`0/3/3`。逐项检查确认：Makefile 默认 `python3` 与 README 的 `.venv` 安装路径断裂；Compose/README `8000:8000` 会把没有认证的审批、配置和上传 API 暴露到所有网卡；`.dockerignore` 虽有根 dotenv 规则，但测试既不读取它也不固定嵌套 frontend 变体；独立 publish push workflow 不依赖 CI 成功。追踪矩阵 G-4.7-1/2 仍误写 Task 13 无 PR，README Windows 反斜杠与 API 解释器也不准确。
+- TDD：在修配置前扩展 `test_distribution_config.py`。RED 为 `4 failed, 5 passed`：分别缺 `workflow_run` 成功/default push/被测 SHA，缺 `.venv/bin/python`，缺 `127.0.0.1`/无认证 gateway 文档，缺 `**/.env` 与 `**/.env.*`。最小实现后 focused `9 passed`；删除任一门禁、loopback 或 dotenv 规则会再次失败。
+- 修复：`1434a64 fix: harden ci distribution boundaries`。Make 默认实际仓库 venv；GHCR 只在名称为 CI 的 workflow 对默认分支 push 成功后触发，并 checkout `workflow_run.head_sha`；Compose 和两条 Docker run 示例仅绑定 loopback；README 明确应用无认证，公网必须有认证与 TLS gateway；`.dockerignore` 同时保护根和任意嵌套 dotenv；Windows/Unix venv 与 uvicorn 命令已分开纠正。未改 Harness/API、未进入 Task 15、未读旧项目、未用真实 key。
+- 验证：backend `168 passed, 1 warning`（既有 TestClient 弃用），frontend `48 passed`，三 demo、production build、真实 Chromium E2E `2 passed`；Docker build 和 Compose config 通过，Compose healthy 后 `docker port` 精确为 `127.0.0.1:8000`，runs API 返回 200/`[]`，WebUI 根页 200，随后只清理本任务容器/网络。GNU Make 在此 Windows 主机仍不存在，故未虚称执行；其 backend/frontend target 命令均通过。提交前凭据候选计数 0。
+- 状态：Task 13 draft PR #13 的追踪陈旧项已纠正。外部 GitHub/GitLab CI、GHCR push/public pull/package visibility 仍未验证；本轮待 scoped re-review，未 push/PR/finish。
+
+### 2026-08-10 — Task 14：scoped re-review 与最终文档 Minor
+
+- 审查结论：`1434a64` 后 scoped spec/security 与代码质量 re-review 均通过。最终全分支 reviewer 给出 C/I/M=`0/0/1`；唯一 Minor 是 PLAN 的 Task 13/14 状态、交接/追踪矩阵的复审状态以及 README E2E 环境仍带 Task 13 专属措辞，未发现新的产品、CI、Docker、凭据或测试问题。
+- 本次范围：仅修正文档事实，明确 Task 13 已推送并有 draft PR #13、Task 14 CI/容器已经实现且 scoped reviews 通过、最终 Minor 正在关闭，并将 E2E 环境改称 repository/worktree-local `.venv`。未改产品/config/tests，未进入 Task 15，未 push/PR/finish；外部 CI/GHCR 仍未验证。
+### 2026-08-10 — Task 14：分支收尾
+
+- 按课程“每个独立模块一个 PR”和 `finishing-a-development-branch` 选项 2，已推送 `codex/t14-ci-distribution` 并创建目标为 `codex/t13-demos-e2e` 的 [draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 worktree 等待审查；外部 CI/GHCR/匿名拉取和任务 15 仍未完成。
+### 上游集成历史（合并保留）
 ### 上游历史记录（合并保留）
 ### 2026-08-10 — 上游 Task 9–10 集成历史（保留）
 
