@@ -100,14 +100,14 @@ docker run --rm --name safe-code-harness -p 127.0.0.1:8000:8000 safe-code-harnes
 
 打开 <http://localhost:8000>。镜像使用 Node/Python 多阶段构建，由同一个 FastAPI 进程提供 API 与编译后的 WebUI；等价 Compose 命令是 `docker compose up --build`。容器以非 root 用户运行，Compose 进一步使用只读根文件系统、临时工作区、丢弃 Linux capabilities 和 `no-new-privileges`。
 
-计划中的公开 GHCR 获取方式如下：
+已验证的公开 GHCR 获取方式如下：
 
 ```sh
 docker pull ghcr.io/altergo-xzy/safe-code-harness-v2:latest
 docker run --rm -p 127.0.0.1:8000:8000 ghcr.io/altergo-xzy/safe-code-harness-v2:latest
 ```
 
-截至 2026-08-10，本地 Docker build/run/health 已验证，但 GHCR push、Package 设为 public 和未登录 `docker pull`/run 尚无外部成功证据。因此上面的公开拉取命令是发布约定，不能作为当前已经可用的声明。
+截至 2026-08-10，GitHub main 的发布 workflow 已成功；使用空 Docker 配置（未登录）实际拉取不可变的 `sha-c633003a06ad8073852f9125e3e195635f159bbb` 镜像，digest 为 `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`。临时 loopback 容器就绪后 `/` 与 `/api/runs` 均返回 HTTP 200。`latest` 由同一成功发布 workflow 推送；可复现部署优先使用 `sha-*` 标签。
 
 ## Planner key 安全配置
 
@@ -132,7 +132,7 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 
 应用本身没有身份认证（the application does not implement authentication；public deployment requires an authentication and TLS gateway）。Docker/Compose 示例因此只绑定 `127.0.0.1`；不得把未加认证的审批、Planner 配置或 ZIP 上传 API 直接暴露到局域网或公网。Render、Railway、Fly.io 或等效平台只有在提供认证与 TLS 网关后才可使用。
 
-截至 2026-08-10，用户已在 Railway 部署一个 HTTPS Mock 演示站：`https://safe-code-harness-v2-production.up.railway.app`；用户提供的浏览器截图显示首页返回“暂无运行记录”，协调会话对根地址的只读 HTTP 请求也得到 `200`。该站没有应用认证，且未配置真实 Planner key，因此它仅是无凭据、无敏感工作区的演示证据，不能替代下述认证/TLS 安全架构，也不能写成安全生产部署完成。GitHub/GitLab 绿色流水线和南京大学 Git 远程已有外部证据；GHCR 公开拉取仍未验证。
+截至 2026-08-10，用户已在 Railway 部署一个 HTTPS Mock 演示站：`https://safe-code-harness-v2-production.up.railway.app`；用户提供的浏览器截图显示首页返回“暂无运行记录”，协调会话对根地址的只读 HTTP 请求也得到 `200`。该站没有应用认证，且未配置真实 Planner key，因此它仅是无凭据、无敏感工作区的演示证据，不能替代下述认证/TLS 安全架构，也不能写成安全生产部署完成。GitHub main CI 与 GHCR 公开匿名拉取均已有外部成功证据；NJU Git 已同步 main，用户截图确认最终 main `a205a231` 的 GitLab pipeline `#319806` / `unit-test` job `#610513` 通过。
 
 ## 目录结构
 
@@ -155,27 +155,28 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 
 ## 已知限制
 
-- GHCR package 尚未实际设为 public，匿名 pull/run 未验证；当前可重复分发证据是本地 Docker build/run。
-- GitHub Actions 和 GitLab CI 配置已在本地审查，但尚无最终默认分支/课程 GitLab 的绿色外部运行记录。
+- GHCR package 已发布且已由未登录 Docker 实际 pull/run；当前镜像不包含真实 Planner key。
+- GitHub Actions 最终 main CI 已通过；NJU Git 已同步 main。最终 main `a205a231` 的 GitLab pipeline `#319806` / `unit-test` job `#610513` 已由用户截图确认通过。
 - Railway HTTPS Mock 演示站已可访问，但没有认证网关；不得录入真实 Planner key、上传敏感工作区或把它写成安全生产部署。认证边界作为后续扩展。
-- 尚未提供南京大学 Git 仓库远程地址，因此没有完成同仓库同步和 NJU pipeline。
+- NJU Git 已配置并同步最终 main；GitLab main pipeline `#319806` 已通过。
 - 镜像只验证了当前 Docker Engine 选择的架构；没有 multi-architecture manifest 或独立新机器验证。
 - Windows Credential Manager 只适用于原生 Windows 后端；Linux 容器的进程内 key 重启即失。
 - 前端 `npm ci` 的既有依赖树报告上游审计风险；没有执行破坏性 `--force` 升级，发布前需单独评估兼容升级。
-- 所有任务仍是 stacked draft PR；在按依赖顺序合并并让默认分支 CI 成功前，GitHub 仓库首页不是最终交付状态。
-- `REFLECTION.md` 必须由学生本人完成 1500–2500 字正文；当前 agent 不代写。
+- PR #1–#17 已普通 merge；GitHub/NJU main 为 `a205a231`，其 GitHub CI 和 GitLab `unit-test` 均有通过证据。
+- `REFLECTION.md` 由学生本人提供，中文汉字计数为 1583；agent 未代写或润色。
 
 ## 外部交付核验清单
 
 以下项目只有取得真实外部结果后才能勾选：
 
-- [ ] 按依赖顺序审查并合并 stacked PR，最终默认分支包含完整项目；
-- [ ] GitHub Actions 最终 CI 成功，记录 run URL、commit SHA 和日期；
-- [ ] NJU Git 远程可访问且 GitLab `unit-test` 成功，记录项目与 pipeline URL；
-- [ ] GHCR package 为 public，未登录环境 `docker pull`/run 成功；
+- [x] 按依赖顺序审查并合并 PR #1–#17，最终默认分支包含完整项目；
+- [x] GitHub Actions 最终 CI 成功：[run 31390746883](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31390746883)，commit `a205a231`；
+- [x] NJU Git `main` 已与 GitHub main 同步；
+- [x] GitLab `unit-test` 针对最终 NJU main 成功：pipeline `#319806` / job `#610513` / commit `a205a231`（用户截图）；
+- [x] GHCR package 为 public，未登录环境 `docker pull`/run 成功；
 - [x] Railway HTTPS Mock 演示站可访问（用户截图验证首页）；它未满足认证网关边界，真实 key/敏感工作区与生产使用仍为后续扩展；
-- [ ] 学生本人完成 `REFLECTION.md` 1500–2500 字；
-- [ ] 最终历史凭据扫描通过且人工复核没有真实 key。
+- [x] 学生本人提供 `REFLECTION.md`，中文汉字计数为 1583；
+- [x] 高置信历史扫描候选均为已分类的合成测试 fixture，未发现未分类真实 key。
 
 ## 许可证与第三方组件
 
