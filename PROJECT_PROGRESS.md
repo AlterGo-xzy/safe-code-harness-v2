@@ -126,4 +126,4 @@
 
 ## 2026-08-10 PR #10 与 main 的受控集成（审查待进行）
 
-PR #10 的 `DIRTY` 已在 `codex/t10-workspace-upload` 重现为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py` 三处冲突。根因是 Task 9 与 Task 10 都向同一 app factory 添加独立状态/路由。协调会话先新增真实 API 回归，当前冲突标记下预期 RED 为 `SyntaxError`；最小组合同时保留可注入 `SecretStore` 的 Planner、`WorkspaceRegistry` 和三条 routers。focused GREEN `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，冲突标记/diff/高置信凭据候选均为 0。尚未提交、推送或 merge：须 fresh 独立审查 C/I/M 后才可继续。
+PR #10 的 `DIRTY` 已在 `codex/t10-workspace-upload` 重现为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py` 三处冲突。根因是 Task 9 与 Task 10 都向同一 app factory 添加独立状态/路由。协调会话先新增真实 API 回归，当前冲突标记下预期 RED 为 `SyntaxError`；最小组合同时保留可注入 `SecretStore` 的 Planner、`WorkspaceRegistry` 和三条 routers。focused GREEN `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，冲突标记/diff/高置信凭据候选均为 0。fresh 只读 reviewer `/root/t10_merge_reviewer` 对 `6681ed1` 的 C/I/M=`0/0/0`，确认未丢弃路由/state，Task 9 fail-closed/redaction 和 Task 10 ZIP 预校验均保持；现仅待推送并按用户授权普通 merge。

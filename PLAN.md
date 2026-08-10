@@ -550,4 +550,4 @@ it("submits approval without rendering the secret key", async () => {
 
 ### 2026-08-10 — PR #10/main 集成修复（审查待进行）
 
-在用户授权按顺序普通 merge 后，#10 相对当前 main 的冲突为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 和共享 `api/main.py`。根因是 Task 9 Planner 需要可注入 `SecretStore`/config router，Task 10 需要 `WorkspaceRegistry`/workspace router；不能选择任一侧。先写 `test_app_factory_integration.py`，未解析 main 时得到预期 `SyntaxError` RED；随后仅组合已有 imports/state/router，测试实际获得 Planner 200 的 `configured=false` 和非法 ZIP 固定 400。focused 为 `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，diff/marker/credential scan clean。提交与 merge 必须等待 fresh 独立审查。
+在用户授权按顺序普通 merge 后，#10 相对当前 main 的冲突为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 和共享 `api/main.py`。根因是 Task 9 Planner 需要可注入 `SecretStore`/config router，Task 10 需要 `WorkspaceRegistry`/workspace router；不能选择任一侧。先写 `test_app_factory_integration.py`，未解析 main 时得到预期 `SyntaxError` RED；随后仅组合已有 imports/state/router，测试实际获得 Planner 200 的 `configured=false` 和非法 ZIP 固定 400。focused 为 `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，diff/marker/credential scan clean。fresh reviewer `/root/t10_merge_reviewer` 复核 `6681ed1` 为 C/I/M=`0/0/0`，可合并；后续只执行推送、PR retarget/普通 merge，不扩展功能范围。

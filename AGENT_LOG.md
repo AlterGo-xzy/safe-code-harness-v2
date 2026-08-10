@@ -209,4 +209,4 @@
 - 技能与诊断：协调会话依 `systematic-debugging` 在本 worktree 执行 `git merge origin/main --no-commit --no-ff`，重现三处冲突；读双方版本后确认 `main.py` 是同一工厂的独立追加，而非业务规则冲突。使用 `test-driven-development` 先新增跨路由真实 API regression。
 - RED/GREEN：新测试在未解析标记时以 `SyntaxError: <<<<<<< HEAD` collection error 失败；仅合并 `SecretStore`、`PlannerConfiguration`、`WorkspaceRegistry` 与已有 router 注册后，focused `1 passed, 1 warning`。断言可注入 fake Windows secret store 下 Planner GET 为 200/`configured=false`，且同一 app 的坏 ZIP 上传为不带路径的固定 400。
 - 验证：完整 `pytest backend/tests --basetemp .pytest-tmp\t10-main-integration -q` 为 `146 passed, 1 warning`；warning 是既有 TestClient deprecation。staged diff check、tracked marker scan 和本次差异高置信凭据形态计数均为 0。
-- 后续：冲突仍只处于已解决、未提交 merge 状态；不得推送或 GitHub merge。必须 fresh 独立只读审查该 integration diff，Critical/Important 为零后才可提交 merge、推送并合并 PR #10。
+- 审查与后续：fresh 只读 reviewer `/root/t10_merge_reviewer` 审查 `6681ed1`，结论 C/I/M=`0/0/0`、可合并；其确认两 parent 均被保留、cross-route test 是 real API behavior、Task 9 fail-closed/redaction 与 Task 10 写入前 ZIP 预校验未被弱化。现可按用户授权推送、retarget 和普通 GitHub merge；不删除 branch/worktree。

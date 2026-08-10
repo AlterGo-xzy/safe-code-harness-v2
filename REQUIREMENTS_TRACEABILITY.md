@@ -68,4 +68,4 @@
 
 ## 2026-08-10 PR #10 集成追踪（审查待进行）
 
-G-4.6-1/2 与 A-7 的本轮证据：Task 10 的独立 worktree 在合入已审查 Task 9 main 后，先以 real API regression 复现共享 factory 未组合的 RED，再在未修改 Planner/ZIP 独立规则的前提下同时注册 config、runs、workspaces 三路由与两类 app state。完整 backend `146 passed, 1 warning`、diff/marker/credential scans clean。此为待审查的集成结果，不等同于 PR #10 已合并；fresh review、merge commit、GitHub 状态仍未完成。
+G-4.6-1/2 与 A-7 的本轮证据：Task 10 的独立 worktree 在合入已审查 Task 9 main 后，先以 real API regression 复现共享 factory 未组合的 RED，再在未修改 Planner/ZIP 独立规则的前提下同时注册 config、runs、workspaces 三路由与两类 app state。完整 backend `146 passed, 1 warning`、diff/marker/credential scans clean。fresh reviewer `/root/t10_merge_reviewer` 对 merge commit `6681ed1` 为 C/I/M=`0/0/0`；本地审查门槛已满足，但 PR #10 的推送、GitHub merge 状态仍须真实回读后才能标为已完成。
