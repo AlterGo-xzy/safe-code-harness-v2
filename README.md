@@ -59,29 +59,6 @@ npm.cmd --prefix frontend test
 
 生产构建和真实 Chromium E2E：
 
-
-## 可选扩展：仅本机真实 Planner 模式
-
-### 作用与范围
-
-SafeCodeHarness 默认使用确定性的 Mock LLM，因此离线测试、机制演示、浏览器审批闭环和 Railway 演示站都不需要真实 API key。
-
-本扩展增加“本地真实 Planner”模式：用户在自己的 Windows 电脑上配置一个 OpenAI-compatible API 后，Planner 可以实际向该服务请求一次 JSON 动作建议，再交由 SafeCodeHarness 自己实现的 AgentLoop、治理规则、审批状态机和工具分派器执行。
-
-该扩展具有以下边界：
-
-- 仅位于独立分支 `codex/extension-local-real-planner`。
-- 不属于当前 `main`、GitHub 发布镜像或 Railway Mock 演示站。
-- 尚未合并、未部署；删除该分支即可完整回退，不影响已交付项目。
-- Planner 只负责提出动作建议，不直接拥有写文件、运行测试或执行命令的权限。
-- 默认仍为 Mock；真实模式必须由用户显式开启，且绝不会自动降级到 Mock。
-
-### 获取扩展分支
-
-```powershell
-git clone --branch codex/extension-local-real-planner --single-branch https://github.com/AlterGo-xzy/safe-code-harness-v2.git
-Set-Location safe-code-harness-v2
-
 ```powershell
 npm.cmd --prefix frontend run build
 Push-Location frontend
@@ -187,6 +164,29 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 - 前端 `npm ci` 的既有依赖树报告上游审计风险；没有执行破坏性 `--force` 升级，发布前需单独评估兼容升级。
 - PR #1–#17 已普通 merge；GitHub/NJU main 为 `a205a231`，其 GitHub CI 和 GitLab `unit-test` 均有通过证据。
 - `REFLECTION.md` 由学生本人提供，中文汉字计数为 1583；agent 未代写或润色。
+
+
+## 可选扩展：仅本机真实 Planner 模式
+
+### 作用与范围
+
+SafeCodeHarness 默认使用确定性的 Mock LLM，因此离线测试、机制演示、浏览器审批闭环和 Railway 演示站都不需要真实 API key。
+
+本扩展增加“本地真实 Planner”模式：用户在自己的 Windows 电脑上配置一个 OpenAI-compatible API 后，Planner 可以实际向该服务请求一次 JSON 动作建议，再交由 SafeCodeHarness 自己实现的 AgentLoop、治理规则、审批状态机和工具分派器执行。
+
+该扩展具有以下边界：
+
+- 仅位于独立分支 `codex/extension-local-real-planner`。
+- 不属于当前 `main`、GitHub 发布镜像或 Railway Mock 演示站。
+- 尚未合并、未部署；删除该分支即可完整回退，不影响已交付项目。
+- Planner 只负责提出动作建议，不直接拥有写文件、运行测试或执行命令的权限。
+- 默认仍为 Mock；真实模式必须由用户显式开启，且绝不会自动降级到 Mock。
+
+### 获取扩展分支
+
+```powershell
+git clone --branch codex/extension-local-real-planner --single-branch https://github.com/AlterGo-xzy/safe-code-harness-v2.git
+Set-Location safe-code-harness-v2
 
 
 ## 许可证与第三方组件
