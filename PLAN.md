@@ -158,10 +158,16 @@ git commit -m "chore: establish offline test foundation"
 ## 任务 13：确定性机制演示与浏览器端到端验证
 
 **工作区与 PR：** `codex/t13-demos-e2e` / `.worktrees/t13-demos-e2e`，独立 PR。
-**文件：** 新建 `scripts/run_guardrail_demo.py`、`run_feedback_demo.py`、`run_approval_demo.py`、`frontend/e2e/workbench.spec.ts`；修改 `Makefile`、`README.md`；测试 `backend/tests/integration/test_demos.py`。
+**文件：** 新建三份 `scripts/run_*_demo.py`、`frontend/e2e/workbench.spec.ts`、`frontend/playwright.config.ts`、E2E 专用 `backend/src/safe_code_harness/api/e2e_app.py`；修改 `Makefile`、`README.md`、`frontend/package*.json`、`frontend/vite.config.ts`、`backend/pyproject.toml`；测试 `backend/tests/integration/test_demos.py`、`test_e2e_app.py`。
 **接口与验收：** 演示输出稳定 JSON。护栏演示必须有 `blocked: true`；反馈演示必须证明第一次 `run_tests` 失败后下一动作变为 `write_file`；审批演示必须依次显示 `waiting_approval -> approved -> executed`。E2E 必须针对真实本地 API 与 UI，不用页面内容替代后端断言。
 
-- [ ] **步骤 1：写失败测试**
+**Task 1 API 集成检查点（已完成）：** fresh implementer `/root/t13_task1_implementer` 先新增 `test_integrated_api_surface.py`，在任何 merge 前得到预期 RED：`create_app()` 不接受 `secret_store`。随后按顺序以 merge commit `ec613df`、`1664aa2` 合入已审查的 Task 9/10 分支；仅统一 app factory 为三个 service state 和三个 router，Task 9/10 安全源码与测试相对来源分支无 diff。focused GREEN 为 `1 passed`，完整 backend 为 `146 passed`；均只有既有 Starlette/TestClient 弃用 warning。集成测试与过程记录提交为 `fd38e6a`。此检查点不包含 demo、frontend/E2E、320px 浏览器或 policy 工作，以下 Task 13 主清单仍保持未完成。
+
+**Task 2 演示检查点（已完成）：** fresh implementer `/root/t13_task2_implementer` 先创建 `backend/tests/integration/test_demos.py`，初始 RED 为缺少模块的 `ModuleNotFoundError: scripts.run_approval_demo`；最小实现只使用当前仓库的 `CommandGuard`/`RuntimePolicy`、`AgentLoop`/`MockLLM`/反馈/记忆和 `RunService`/`ApprovalStore`，不含网络、真实 key、绝对路径或旧项目代码。初次 GREEN 为 `6 passed in 0.23s`；首次审查的固定转录、PowerShell child 失败与清理吞错三项，均先有补充 RED 后由 `7243dfc` 修复，结果为 demo `10 passed`、backend `156 passed, 1 warning`。第二次审查的 `tool_failed` waiting/approval 边界和 later-child 覆盖，由 `7bdd85d` 先 RED 后关闭；实际验证为 demo `12 passed in 0.46s`、正常 Windows 入口、完整 backend `158 passed, 1 warning`、diff check 无输出、凭据候选计数 0。第三次审查仅发现文档陈旧，`5bf57a3` 修正后 scoped re-review PASS（Critical/Important/Minor 均为 0）。Task 2 已完成。
+
+**Task 3 真实浏览器检查点（实现及初始两阶段审查已完成）：** fresh implementer `/root/t13_task3_implementer` 先新增最终形态 E2E 规格、最小 Playwright config 与 `test:e2e`；初始 `npm.cmd run test:e2e` 预期 RED 为系统找不到 `playwright`。指定安装后固定 `@playwright/test` 1.62.1，`npx.cmd playwright install chromium` exit 0 且 `install --list` 确认 Chromium/headless shell。真实服务首次运行再以 `No module named uvicorn` RED，根因为 `backend[dev]` 未声明计划绑定的 server；最小加入 `uvicorn>=0.35,<1` 并 editable 重装。E2E 使用真实本地 FastAPI/Vite 与同源 `/api` proxy，不做 route interception；浏览器实际点击中文“批准”，API 直接核验点击前 `waiting_approval`/字符串 approval id、点击后 `completed` 与 approval/tool/finish 执行事件。初始 320x720 断言只证明 DOM 可见；Task 4 quality review 发现该 Important 后，`5ed4bd3` 以真实视口 RED 和最小面板顺序修复，并经 scoped 双阶段 re-review 清零。最终全分支审查又发现 Playwright 使用生产 `main:app`，Planner 初始 GET 会触及 Windows Credential Manager；最终修复波先以缺少专用入口得到 RED，再由 `7d66d98` 注入初始为空的进程内 SecretStore，并把 Playwright 切到 `e2e_app:app`。该修复本地 E2E `2 passed`、backend `159 passed, 1 warning`；最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正，待只读文档复核后再收尾。
+
+- [x] **步骤 1：写失败测试**
 
 ```python
 def test_feedback_demo_proves_feedback_changes_next_action() -> None:
@@ -171,12 +177,12 @@ def test_feedback_demo_proves_feedback_changes_next_action() -> None:
     assert transcript[1]["action"] == "write_file"
 ```
 
-- [ ] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/integration/test_demos.py -q`，预期模块不存在或断言失败。
-- [ ] **步骤 3：最小实现**：只基于 MockLLM 和临时工作区构建三个演示；编写 Playwright 启动流程，覆盖创建运行、看到阻止事件、待审批和批准。
-- [ ] **步骤 4：确认绿色结果与重构**：运行 `make demos`、`python -m pytest backend/tests/integration/test_demos.py -q`、`cd frontend; npm.cmd run test:e2e`，预期输出与浏览器断言均稳定通过。
-- [ ] **步骤 5：两阶段审查与提交**：先审查演示分别证明 A 项目三条硬机制而非仅打印文案，再审查临时目录清理、无网络依赖和 Playwright 等待条件；提交 `git commit -m "test: add deterministic mechanism demos and e2e coverage"`。
+- [x] **步骤 2：确认红色结果**：demo 初始 RED 与 Playwright 缺命令 RED 均已实际记录；另记录真实服务缺 uvicorn 和 Vitest 误收 spec 的两个回归 RED。
+- [x] **步骤 3：最小实现**：三个 demo 与真实 FastAPI/Vite/Chromium 批准流程均已实现；未拦截 API、未使用 sleep。
+- [x] **步骤 4：确认绿色结果与重构**：Windows 以 `scripts/run_demos.ps1` 代替不可用的 GNU make；demo、E2E、前端单测/build 与 backend 均已通过。Unix-like `make demos` 未在 Windows 假称执行。
+- [x] **步骤 5：两阶段审查与提交**：Task 1/2 审查已通过；Task 4 初始 spec/security review 为 C/I/M `0/0/0`，quality review 的 320x720 Important 已由 `5ed4bd3` RED→GREEN 并经 scoped 双阶段 re-review 清零。最终全分支审查继续发现 E2E OS 凭据隔离 Important 与文档事实问题；代码修复 `7d66d98` 先有 `ModuleNotFoundError: safe_code_harness.api.e2e_app` RED，再以专用内存 SecretStore 入口 GREEN。最终控制器重跑为 backend `159 passed, 1 warning`、三 demo、clean frontend install、unit `48 tests`、build、Chromium E2E `2 passed`；最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR、稳定演示和 E2E 证据。
+**当前记录：** Task 1-2 已完成并审查通过；Task 3 实现提交 `e18422e`，视口 fix 提交 `5ed4bd3`，E2E 凭据隔离修复提交 `7d66d98`。后者新增自动回归，证明专用 E2E app 的 Planner 初始 GET 返回确定性空配置且不会构造 Windows Credential Manager；生产 `main:app` 未改。修复后控制验证为 backend `159 passed, 1 warning`、三 demo 稳定 JSON、clean frontend install、unit `48 tests`、build、Chromium E2E `2 passed`。最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正；完成只读文档复核和最终 diff/凭据扫描后才可运行 `finishing-a-development-branch`。Task 13 仍未 push、无 PR #13；CI/容器、部署和策略扩展未开始。
 
 ## 任务 14：GitHub/GitLab CI 与 Docker/GHCR 分发
 

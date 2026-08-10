@@ -75,10 +75,10 @@ export function App() {
         </section>
         <section className="panel" aria-labelledby="timeline-heading">
           <h2 id="timeline-heading">事件时间线</h2>
-          {detailError ? <p className="state-message state-message--error">无法加载运行详情</p> : detail?.id === selectedRunId ? <RunTimeline events={detail.events} /> : <p className="state-message">正在加载运行详情…</p>}
           {detail?.id === selectedRunId && detail.status === "waiting_approval" && detail.approvalId ? (
             <ApprovalPanel runId={detail.id} approvalId={detail.approvalId} onResolved={() => reloadRun(detail.id)} />
           ) : null}
+          {detailError ? <p className="state-message state-message--error">无法加载运行详情</p> : detail?.id === selectedRunId ? <RunTimeline events={detail.events} /> : <p className="state-message">正在加载运行详情…</p>}
         </section>
       </div>
       <div className="control-grid">

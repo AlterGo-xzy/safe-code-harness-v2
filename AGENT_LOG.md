@@ -184,6 +184,10 @@
 
 - `/root/t08_implementer` 提交 `974d73b`、`7afa279`；API 只经 ApprovalStore 和 AgentLoop.resume 恢复，拒绝无工具分发，事件脱敏可序列化。
 - 审查的 httpx2 依赖缺口经干净安装验证修复，scoped re-review PASS；full backend `96 passed`、一键 unit `88 passed`；上游 Starlette 弃用警告已如实记录。
+- 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
+- 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
+
+### 上游历史记录（合并保留）
 
 ## 2026-08-08 T10：安全 ZIP 上传与隔离工作区
 
@@ -194,13 +198,14 @@
 
 ## 2026-08-08 T9：凭据存储与 OpenAI-compatible Planner
 
-- worktree/分支：`D:\\safe-code-harness-v2\\.worktrees\\t09-planner-credentials` / `codex/t09-planner-credentials`，基线 `2de48a2`。触发技能：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`systematic-debugging`、`verification-before-completion`；SDD 简报明确禁止真实 key、网络调用和明文/磁盘回退。
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t09-planner-credentials` / `codex/t09-planner-credentials`，基线 `2de48a2`。触发技能：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`systematic-debugging`、`verification-before-completion`；SDD 简报明确禁止真实 key、网络调用和明文/磁盘回退。
 - 用户决策与安全边界：用户选择暂不配置 OpenAI-compatible API key，之后再通过前端录入。协调会话仅做 presence 检查并得到 `OPENAI_API_KEY_STATUS=absent`，未读取或输出任何值；功能和测试只用 `fixture-secret-2026` 与 fake adapter/transport。
 - 实现 subagent：`/root/t09_implementer` 提交 `3074085 feat: add secure optional planner configuration`。新增 Windows Credential Manager-only `SecretStore`、掩码 `GET/PUT/DELETE /api/config/planner` 和可注入 HTTP transport 的单次 Planner LLM。非 Windows 和适配器失败均 fail-closed，配置响应只含 `configured`、`masked_suffix`、`base_url`、`model`；未使用旧项目代码。
 - TDD：模块缺失时 focused RED 是 `4 failed, 4 errors`；初始 GREEN focused `8 passed`、全量 `104 passed`。`/root/t09_reviewer` 的威胁模型审查发现 Important：`raise ... from exc` 会让潜在含 key 的底层错误存在于 traceback。implementer 先用会抛含 fixture key 的 fake adapter 得到修复 RED `4 failed, 10 passed`，随后在 SecretStore 和配置路由的六处异常转换使用 `from None`，提交 `51eb9c8 fix: prevent credential exception-chain leaks`；另补无 key 不调 fake transport和空白 key 422。修复 GREEN focused `14 passed`、full backend `110 passed`。
 - 两阶段审查：首轮拒绝并报告上述 Important；scoped re-review 核对 set/get/clear 与 GET/PUT/DELETE 的 traceback/503 均不含 fixture key，且无 key 时传输调用为零，结论 PASS、无 C/I/M。协调会话独立运行完整 backend `110 passed, 1 warning`，运行 `scripts/test.ps1` unit `96 passed`；唯一 warning 为既有 Starlette/TestClient 对 httpx 的弃用提示。
 - 人工干预与教训：协调会话未编辑功能源码，只调度审查、运行独立验证并回填证据。接口“不回显”不足以保证安全；异常 cause、traceback 和错误日志也必须被视为凭据数据流并有失败回归。
 - 分支收尾：依照用户在前序任务持续采用的 `finishing-a-development-branch` 选项 2，推送 `codex/t09-planner-credentials` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)。保留该 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
+### 上游历史记录（合并保留）
 - 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
 - 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
 
@@ -240,6 +245,80 @@
 - 六项 Minor 均关闭：补齐非字符串审批 ID；三种 Planner 方法的 HTTP/网络脱敏；将 `PROJECT_PROGRESS.md` 日期改为 2026-08-09；统一 Task 1/2 未读取、复制或咨询旧代码且三个路径仅为未来扩展入口；修正 App/面板状态归属并加入 Planner 加载反馈；补齐 Planner 与上传 pending 禁用回归。设计、详细计划和四份过程文档均按实际事实修正。
 - 边界未扩张：无 policy API/UI/backend、localStorage、raw fields、server paths 或 Planner key state/error echo。策略扩展仍按用户决定延后；任务 13 的真实 API、浏览器和 320px E2E 仍未执行。
 - 分支收尾：用户要求按要求文件操作，故采用 `finishing-a-development-branch` 选项 2；已推送 `codex/t12-settings-approval-ui` 并创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)。保留 worktree 处理审查反馈；未合并或删除分支。
+
+## 2026-08-08 T10：安全 ZIP 上传与隔离工作区
+
+- 分支/worktree：`codex/t10-workspace-upload` / `D:\\safe-code-harness-v2\\.worktrees\\t10-workspace-upload`，基线 `2de48a2`。实现 `/root/t10_implementer` 先 RED，后仅参考旧 `routes_workspace.py:75-118` 的 ZipInfo/symlink 概念，未复制旧跳过敏感文件或异常回显行为。
+- 提交 `698e4dc`、`b546c89`、`d15a4fd`：全量预校验并拒绝 ZIP Slip、ADS、NUL、UNC、Windows 设备名、重复条目、symlink、敏感/缓存目录、成员与大小上限；仅当前上传创建的目录可被清理，UUID 碰撞保留旧工作区；API 固定 path-free 400。
+- 审查：首审 1 Critical/3 Important、scoped review 1 Important，均先有失败回归后修复；最终 PASS，无 C/I/M。协调验证完整 backend `127 passed`、脚本 unit `113 passed`，各有既有 TestClient 弃用 warning。下一步按收尾 skill 建立独立 draft PR。
+- 分支收尾：沿用 `finishing-a-development-branch` 选项 2，推送 `codex/t10-workspace-upload` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #10](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/10)。保留 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
+
+## 2026-08-09 T13 Task 1：真实 Task 8/9/10 API 集成
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e` / `codex/t13-demos-e2e`；fresh implementer `/root/t13_task1_implementer` 使用 `executing-plans`、`using-git-worktrees`、`test-driven-development` 与 `verification-before-completion`，严格限定为后端 API 集成，不做 frontend、E2E、demo 或 policy。
+- 环境与基线：brief 中的 `..\.venv\Scripts\python.exe` 不存在；改用本 worktree 内被 `.gitignore` 排除的 `.venv` 并 editable install `backend[dev]`，避免误加载其他 worktree 的 editable source。合并前完整 backend 为 `100 passed`，只有既有 Starlette/TestClient 对 httpx 的弃用 warning。
+- TDD RED：先新增 `backend/tests/integration/test_integrated_api_surface.py`，fixture 以 `FakeSecretStore` 调用 `create_app(secret_store=...)`，且断言 runs、Planner 四字段 DTO 与非法非 ZIP 上传。任何 merge 前 focused 命令 exit 1，预期错误为 `TypeError: create_app() got an unexpected keyword argument 'secret_store'`。
+- 合并与冲突：Task 9 以 `ec613df` 合入，冲突仅 `AGENT_LOG.md`、`PROJECT_PROGRESS.md`、`REQUIREMENTS_TRACEABILITY.md`，保留 T9 reviewed 记录与更新的 T11/T12 记录；Task 10 以 `1664aa2` 合入，冲突为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py`。factory 按 brief 统一三个 state 和三个 router；Task 9/10 安全源文件与测试相对各自 reviewed branch 的 scoped diff 均无输出。
+- GREEN：focused integration `1 passed, 1 warning`；完整 `backend/tests` 为 `146 passed, 1 warning`。warning 仍为既有 TestClient 弃用提示，不是本集成引入的失败。未使用真实 key、应用网络调用或旧项目源码。
+- 提交：Task 9/10 merge commits 分别为 `ec613df`、`1664aa2`；集成测试与四份过程文档提交为 `fd38e6a feat: integrate planner and workspace APIs`。
+- 剩余范围：Task 13 的三个确定性 demo、Playwright 真实浏览器流程与 320px 验证仍未执行；策略扩展仍按用户决定延后。完整命令和证据见 `.superpowers/sdd/2026-08-09-demos-e2e/task-1-report.md`。
+
+## 2026-08-09 T13 Task 2：离线确定性机制演示（审查待执行）
+
+- worktree/分支：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e` / `codex/t13-demos-e2e`；fresh implementer `/root/t13_task2_implementer` 按 `subagent-driven-development` brief 使用 `test-driven-development`。范围严格限于三份离线 demo、其集成测试、跨平台入口与 README 说明；未开始 Playwright、policy 扩展、CI、容器或部署，也未读取或迁入旧项目代码。
+- TDD RED：新增 `backend/tests/integration/test_demos.py` 后运行 `.\.venv\Scripts\python.exe -m pytest backend\tests\integration\test_demos.py --basetemp .pytest-tmp\task13-demos-red -q`，预期在收集期以 `ModuleNotFoundError: No module named 'scripts.run_approval_demo'` 失败。测试验证实际 CLI JSON 行为，而非源文本；同时拒绝 `C:`、`D:` 和 `secret` 输出。
+- 最小实现与边界：guardrail 直接调用现有 `CommandGuard(RuntimePolicy())`；反馈 demo 用固定响应的 `MockLLM` 子类，第二次动作前确认失败测试反馈已进入真实 `AgentLoop` context，并用临时目录内的有界工具 double 后在 `finally` 清理。首次版本的 approval demo 虽调用真实 `RunService.start/decide`，但返回值是固定字面量，不能构成“实际投影”证据；该不准确表述已在修复记录中更正。三份 CLI 仅输出稳定 JSON；没有网络、真实 LLM、key、项目工作区 mutation 或绝对路径输出。
+- GREEN：同测试为 `6 passed in 0.23s`；`.\scripts\run_demos.ps1` 成功连续输出阻止、反馈修复、批准后执行三份 JSON。完整 backend 回归为 `152 passed, 1 warning`，warning 是既有 Starlette/TestClient 对 httpx 的弃用提示；`git diff --check` 无输出，高置信凭据候选只报告计数 `0`。`Makefile` 为 Unix-like 环境提供 `demos` target；当前 Windows 没有 GNU make，未运行且未宣称其成功。README 仅说明离线 demos，明确不把它们写成 E2E/CI/部署证据。
+- 提交与后续：源代码及首次证据提交为 `26f9855 test: add deterministic mechanism demos`。Task 2 尚待独立 spec/security 审查与代码质量审查；之后才可进入 Task 3 的真实 API/browser/320px 工作。完整执行报告将写入 `.superpowers/sdd/2026-08-09-demos-e2e/task-2-report.md`（忽略文件）。
+
+## 2026-08-09 T13 Task 2：首次审查修复（复审待执行）
+
+- 反馈验证：首次审查的三项发现均可由当前代码复现，且不改变 Task 2 范围。approval demo 的根因是它没有读取 snapshots；进一步诊断确认现有安全 DTO 在 completed snapshot 中会把两条 approval event 都映射为 `approval_approved`，因此修复使用真正执行前的最后一个批准事件，而不改动 Task 8 的安全投影。PowerShell 根因是外部命令的 `$LASTEXITCODE` 不会在无检查时令脚本失败；cleanup 根因是 `ignore_errors=True`。
+- TDD：先对缺少 `_project_approval_transcript` 得到 import RED；其后事件顺序回归以不匹配固定错误 RED，确认重复 approval 投影需要精确定位。另有 PowerShell 临时 `SystemExit(7)` child 的 RED（entrypoint returncode 为 0），以及缺少 `_remove_demo_workspace` 的 import RED。修复后 approval 子集 `4 passed`、PowerShell 子集 `1 passed`、cleanup 子集 `1 passed`，完整 `test_demos.py` 为 `10 passed in 0.47s`；正常 `.\scripts\run_demos.ps1` 连续输出三份稳定 JSON。完整 backend 为 `156 passed, 1 warning`（既有 TestClient 弃用），`git diff --check` 无输出，凭据候选计数为 0。
+
+- 修复：approval transcript 只从真实 pending/completed snapshots 生成，拒绝等待 snapshot 已含 `tool_succeeded`、缺少证据或最后一次批准不早于唯一执行；PowerShell 新增受测的可选 Python/script 参数但默认行为不变，每次 child 后检查 `$LASTEXITCODE` 并抛固定 path-safe 错误；清理将 `OSError` 变为固定 `RuntimeError`，不再吞掉失败。未改 UI、E2E、policy、旧项目复用、CI 或部署。
+- 提交与后续：修复提交为 `7243dfc fix: harden deterministic demo evidence`。此修复待独立复审，随后才可更新 Task 2 完成状态并开始 Task 3。完整修复报告将写入 `.superpowers/sdd/2026-08-09-demos-e2e/task-2-fix-report.md`（忽略文件）。
+
+### 2026-08-09 — Task 13 Task 2：第二次独立复审与冻结交接
+
+- 审查：fresh read-only reviewer `/root/t13_task2_fix_reviewer` 未运行测试、未修改文件，结论为 Critical 0、Important 1、Minor 2。Important：审批演示仍只将 `tool_succeeded` 认作等待/批准前执行，未拒绝 `tool_failed`；必须先写失败回归并拒绝任意工具结果。Minor：PowerShell 测试只有单一失败 child，必须证明 first child 失败时 later child 不运行；`PROJECT_PROGRESS.md` 与 `REQUIREMENTS_TRACEABILITY.md` 有 focused `6 passed`/完整回归未执行的过期陈述。
+- 人工决定：用户要求先保存现有成果并停止继续实现，故不在此复审结论后修改代码、不启动 Task 3/Playwright/策略扩展。`7243dfc`、`7bf3d04` 已保存全部已完成实现/文档；当前 worktree 的 `git status --short` 无输出。
+- 交接：新增 `HANDOFF_TO_NEXT_MODEL.md`，含分支/HEAD、可如实引用的 RED/GREEN、三个未闭环问题、环境差异、下一步 TDD 命令和不变量。后续模型必须先关闭该 Important 和两个 Minor、完整验证、再次独立审查，才可进入 Task 13 Task 3。
+
+### 2026-08-10 — Task 13 Task 2：三轮 review/fix 后完成
+
+- 范围与来源：fresh implementer `/root/t13_task2_fix2_implementer` 只处理第二次复审的 1 Important/2 Minor；未读、复制或咨询旧项目，未开始 Task 3/Playwright、策略扩展、CI、分发或部署。
+- TDD：先将 waiting 回归参数化为 `tool_succeeded`/`tool_failed`，并新增 completed snapshot 在最后 `approval_approved` 前出现 `tool_failed` 的回归；RED focused 为 `2 failed, 2 passed`，两处均因未抛 `RuntimeError`。另将 PowerShell 回归改为 failing first child 加写 marker 的 later child；现有逐 child `$LASTEXITCODE` 检查已使该行为通过，故不改生产脚本。最小源码修复为 approval 投影在 waiting 或最后批准前拒绝 `tool_succeeded`、`tool_failed`；focused GREEN 为 `4 passed, 8 deselected in 0.26s`。
+- 验证：完整 demo 为 `12 passed in 0.46s`，正常 `.\scripts\run_demos.ps1` 输出三份稳定、安全 JSON；完整 backend 为 `158 passed, 1 warning`，warning 是既有 TestClient 弃用提示；`git diff --check` 无输出，已变更 diff 的高置信凭据候选计数为 0。
+- 第三次审查与状态：此前 focused `10 passed`、完整 backend `156 passed, 1 warning` 是历史证据；本轮源码/测试已提交 `7bdd85d`，第二次复审的 `tool_failed` 与 later-child 行为发现已修复并验证。第三次独立审查仅指出交接/过程文档仍未同步；`5bf57a3` 文档修正后的 scoped re-review 已 PASS（Critical/Important/Minor 均为 0）。Task 2 已完成，可进入 Task 3。
+
+### 2026-08-10 — Task 13 Task 3：真实 API/浏览器 E2E 实现（实现阶段记录；后续审查见 Task 4）
+
+- 执行者与范围：fresh implementer `/root/t13_task3_implementer` 使用 `test-driven-development`、`systematic-debugging` 和 `verification-before-completion`；只实现 Playwright 真实批准闭环与 320px 证据，未开始 Task 4、任务 14/15、策略扩展或 PR/push，也未读取/迁入旧项目代码。
+- TDD RED：先新增 E2E spec、最小 config 与 `test:e2e`，运行 `npm.cmd run test:e2e` exit 1，精确报错为系统找不到 `playwright`。安装 `@playwright/test` 后，真实双服务首次启动 exit 1，报 t13 `.venv` 缺 `uvicorn`；根因是 `backend[dev]` 只声明 pytest，而批准计划的启动命令直接调用 uvicorn。最小声明 `uvicorn>=0.35,<1` 并 editable 重装。完整前端首次回归又因 Vitest 默认收集 `e2e/workbench.spec.ts` 得到 1 failed suite/48 passed tests；将 Vitest include 限定在 `src/**/*.test.{ts,tsx}` 后关闭。
+- 依赖与真实边界：`npm.cmd install --save-dev @playwright/test` 成功并固定 1.62.1；npm audit 报 3 moderate、1 high、1 critical，未运行破坏性的 force fix。`npx.cmd playwright install chromium` exit 0，`install --list` 确认 1.62.1 的 Chromium、headless shell、ffmpeg 与 winldd。Playwright 以 `reuseExistingServer: false` 启动真实 FastAPI/Vite，Vite `/api` 代理到 127.0.0.1:8000；没有应用 API interception、真实 key/Planner call、raw fields、localStorage、sleep 或 create-run UI。
+- GREEN 与验证：E2E 2/2 passed，浏览器实际点击中文“批准”；直连 API 在点击前证明 `waiting_approval` 与字符串 approval id，点击后证明 `completed` 且事件含 `approval_approved`、`tool_succeeded`、`run_finished`。320x720 中批准按钮可见，HTML/body `scrollWidth <= window.innerWidth`；未发现真实 CSS 缺口，故未改样式。`npm.cmd test` 为 10 files/48 tests，`npm.cmd run build` 成功；完整 backend 为 `158 passed, 1 warning`，warning 是既有 Starlette/TestClient 弃用提示。`git diff --check` 无输出，高置信 staged 凭据候选计数 0。
+- 提交与当时状态：实现提交 `e18422e test: add real workbench e2e coverage`。当时下一步是 fresh read-only spec/security reviewer 与质量 reviewer；该审查及 320px Important 的 RED→修复→复审实际结果记录在下一节。本条保留的是实现提交当时状态，不代表当前仍待首次审查。
+
+### 2026-08-10 — Task 13 Task 4：最终验证与视口审查闭环（本地完成，未收尾分支）
+
+- 审查与 TDD：Task 4 的初始 read-only spec/security review 为 C/I/M `0/0/0`；quality review 为 `0/1/0`，指出 320px E2E 的 `toBeVisible()` 未证明实际视口可达。fresh implementer `/root/t13_task3_viewport_fixer` 只处理该项：先以真实元素 bounding-box 交集断言 RED，Chromium 实测底边 `1327.4375 > 720`；最小实现提交 `5ed4bd3 fix: keep mobile approval action in viewport`，仅把既有 `ApprovalPanel` 移至时间线之前。随后 scoped spec/security 与质量 re-review 均 PASS（C/I/M `0/0/0`）。未改 API、CSS、policy、旧项目代码、安全 DTO、凭据或 create-run UI。
+- 协调最终控制验证：使用本 worktree 忽略的 `.venv`，`pytest backend/tests --basetemp .pytest-tmp\\task13-final -q` 为 `158 passed, 1 warning`（既有 Starlette/TestClient 弃用警告）；`scripts/run_demos.ps1` 输出三段稳定 JSON。clean `npm.cmd ci --ignore-scripts` 后，unit 为 `10 files/48 tests`、`npm.cmd run build` 成功、真实 Chromium `npm.cmd run test:e2e` 为 `2 passed`。install 报 5 个上游审计风险（3 moderate、1 high、1 critical），未运行 `npm audit fix --force`。
+- 过程/安全核验：`git diff --check codex/t12-settings-approval-ui..HEAD` 无输出；变更非文档源码的高置信凭据形态候选计数 0。Task 9 的 config/LLM/secret-store/route 专属源和测试相对 `codex/t09-planner-credentials` 无 diff；Task 10 的 workspace/upload/route 专属源和测试相对 `codex/t10-workspace-upload` 无 diff。共享 `main.py`、runs API 和 run service 的差异属于已记录的 Task 1/Task 11 集成，未误写为 T9/T10 安全模块变更。
+- 人工干预与当时边界：协调会话只执行当轮复验、准确回填过程文档和保存 ignored rerun report，未改产品代码、未 push、未创建 PR #13、未运行 `finishing-a-development-branch`。该轮原拟下一步进入分支处置，但随后最终全分支审查发现下节所述问题；其最终 scoped re-review 结果见下节。Task 14（CI/容器）、Task 15（部署/最终交付）及延后策略扩展仍未开始。
+
+### 2026-08-10 — Task 13 最终全分支审查修复波（scoped re-review：C/I/M 0/0/2，文档 Minor 已修正）
+
+- 执行者与技能：fresh fix agent `/root/t13_final_fix` 使用 `systematic-debugging`、`test-driven-development` 与 `verification-before-completion`；范围只包含最终 reviewer 的 E2E 凭据隔离 Important 和文档一致性 findings，不 push、不建 PR、不进入 Task 14/15/policy。
+- 根因证据：Playwright 原命令启动 `safe_code_harness.api.main:app`；前端 Planner 初始 GET 经 `get_planner` → `PlannerConfiguration.snapshot()` → `SecretStore.get()` → `_require_adapter()` 构造 Windows Credential Manager。非破坏性运行时 probe 替换该构造器后，GET 返回固定 503 且 `credential_manager_probe_calls` 为 1，证明问题来自 E2E 入口而非 Planner DTO 或浏览器拦截。
+- TDD RED/GREEN：新增 `backend/tests/integration/test_e2e_app.py`，禁止构造 Windows Credential Manager并请求精确 E2E app 的 Planner DTO；首次 focused 为 `1 failed, 1 warning`，预期失败是 `ModuleNotFoundError: safe_code_harness.api.e2e_app`。最小实现新增 E2E-only `create_e2e_app()`，向既有 `create_app()` 注入初始为空的进程内 SecretStore，并将 Playwright uvicorn 命令切至 `safe_code_harness.api.e2e_app:app`；生产 `main:app` 未改。focused GREEN `1 passed, 1 warning`，提交 `7d66d98 fix: isolate browser e2e credentials`。
+- 文档修正：`PROJECT_PROGRESS.md`、`PLAN.md`、本日志与 handoff 统一 Task 3 已经初始审查、Task 4 视口修复已复审；追踪矩阵不再把已实现的 AgentLoop、反馈/记忆、六维与 API 集成写成待开发，并修复 A 表 separator 列数；设计删除 guardrail demo 创建临时工作区的虚假声明；README 增加本地 E2E 命令及内存凭据/无外部 Planner 边界。最终 scoped re-review 为 Critical 0、Important 0、Minor 2；两个 Minor 为测试数值的历史/当前措辞和追踪矩阵的状态词，已以本次纯文档修正关闭。
+- 修复后控制证据：完整 backend `159 passed, 1 warning`，warning 仍为既有 Starlette/TestClient 弃用；`scripts/run_demos.ps1` 输出三份稳定 JSON；clean `npm.cmd ci --ignore-scripts` 安装 179 packages 后仍报告 5 个既有上游审计风险（3 moderate、1 high、1 critical），未 force fix；前端 unit `10 files/48 tests`、build 成功、真实 Chromium E2E `2 passed`。最终 diff/凭据扫描及本次文档的只读复核仍是进入分支收尾前的门槛。
+### 2026-08-10 — Task 13：分支收尾
+
+- 最终验证在 `e4599d2` 后重新运行：backend `159 passed, 1 warning`、三份稳定 JSON demo、前端 10 files/48 tests、build 和真实 Chromium E2E `2 passed`，均成功；warning 为既有 TestClient 弃用。
+- 收尾决定：按课程“每个独立模块一个 PR”和 stacked 分支规则，用户选择 `finishing-a-development-branch` 选项 2。已推送 `codex/t13-demos-e2e` 并创建目标为 `codex/t12-settings-approval-ui` 的 [draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)；保留 worktree 等待审查反馈。Task 14/15、策略扩展仍未开始。
+### 上游历史记录（合并保留）
 ### 2026-08-10 — 上游 Task 9–10 集成历史（保留）
 
 ### 2026-08-10 — PR #10/main 集成（已完成，历史记录）
