@@ -65,3 +65,7 @@
 2. `writing-plans` 产生并提交符合 G-4.3 的 `PLAN.md`。
 3. 使用不同类型的新 agent，仅凭 SPEC+PLAN 完成冷启动验证，并据结果修订 SPEC/PLAN。
 4. 为所有实现模块建立 worktree/PR 与 task 编号。前三项任一缺失时，不得编写实现代码。
+
+## 2026-08-10 Task 15 发布依赖更新
+
+G-4.10 的 GHCR 外部验证仍为部分完成：只读 GitHub 查询表明 PR #1-#14 尚未合并且 `publish-image.yml` 不在默认分支（workflow 查询 404）。这说明需要先完成 stacked 合并和默认分支 CI，之后才可声明 GHCR package public 或匿名 pull/run 的真实结果。

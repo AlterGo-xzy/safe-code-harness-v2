@@ -139,3 +139,7 @@ Task 13 最终验证为 backend `159 passed, 1 warning`、三份稳定 JSON demo
 ## 2026-08-10 Task 14 分支收尾更新
 
 Task 14 已完成本地 CI/容器实现、验证与审查，并已推送 `codex/t14-ci-distribution`；已创建目标为 `codex/t13-demos-e2e` 的 [stacked draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 branch/worktree 以处理审查反馈。外部 GitHub/GitLab CI、GHCR 发布/公开性/匿名 pull-run 与任务 15 仍未验证或完成。
+
+## 2026-08-10 Task 15：GHCR 发布前置依赖（优先）
+
+只读 GitHub 盘点确认 PR #1-#14 都仍是 draft，Task 15 尚无 PR；GitHub 对默认分支查询 `publish-image.yml` 返回 404，证明发布 workflow 尚未抵达默认分支。因此 GHCR 发布、package public 与匿名 pull/run 的可验证前提是：先按 stacked 顺序完成审查/合并，让 Task 14 的 workflow 到达默认分支并通过默认分支 CI。此结论不是镜像或代码失败；它不能由当前 Task 15 分支绕过。学生本人 1500-2500 字反思、Task 15 PR/收尾也仍待完成。

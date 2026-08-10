@@ -233,6 +233,10 @@ def test_readme_contains_reproducible_run_and_key_safety_instructions() -> None:
 
 ## 计划自审
 
+### 2026-08-10 Task 15 外部发布依赖更新
+
+`gh pr list` 的只读结果为 PR #1-#14 全部 draft，Task 15 无 PR；对默认分支查询 `.github/workflows/publish-image.yml` 返回 404。故 GHCR 不能在当前 Task 15 分支发布：必须先经用户授权按 stacked 链完成审查/合并，待 Task 14 的发布 workflow 抵达默认分支且默认分支 CI 成功，再验证 package public 与匿名 `docker pull`/run。
+
 - [ ] **SPEC 覆盖：** 任务 2、5、6、7 覆盖 Harness 六维和 A 项目自主主循环；任务 3、4、7、8、12、13 覆盖深度治理与 HITL；任务 9 覆盖凭据威胁模型；任务 10 覆盖租户/工作区边界；任务 11、12 覆盖 Open Design WebUI；任务 13 覆盖三类机制演示；任务 14、15 覆盖一键测试、CI、分发、公共部署与提交证据。
 - [ ] **流程覆盖：** 已完成 brainstorming；本计划由 writing-plans 产出；任务 0 是强制的不同类型 agent 冷启动门槛；任务 1-15 逐个使用 worktree、fresh subagent、TDD、两阶段审查、PR；任务 15 使用 requesting-code-review 与 finishing-a-development-branch。
 - [ ] **执行前门槛：** 在 `PLAN.md` 本次提交并由用户确认后，先做任务 0；未把任务 0 的完整证据与修订提交前，禁止创建任何 `backend/` 或 `frontend/` 实现文件。

@@ -373,3 +373,8 @@
 - Railway：对 `https://safe-code-harness-v2-production.up.railway.app` 的只读 HTTP 根请求得到 `200`。响应为 SPA 静态文档，未包含运行时中文空状态文字；空状态仍仅以用户浏览器截图作为证据。
 - GitHub/GHCR：GitHub Actions run `31379732809`（head `6aa5274`）在观察时为 `in_progress`；`gh run watch` 在 55 秒窗口超时，未取得结论。`gh api /users/AlterGo-xzy/packages?package_type=container` 返回 403，明确要求 `read:packages` scope；未尝试改变 token scope、查询私有值、登录/登出 Docker，不能由此推断 GHCR 是否存在或公开。
 - 后续同轮结果：用 `gh run view` 读取同一 run 的最终 JSON，结论为 `success`；`test` job 的 backend tests、demos、frontend tests、build、Playwright Chromium E2E 均成功，`docker-build` job 也成功。该结果证明 push CI 与容器构建，不证明 GHCR 已发布或允许匿名拉取。
+
+### 2026-08-10 — Task 15：发布前置依赖只读盘点
+
+- 只读结果：`gh pr list` 显示 PR #1-#14 全部为 draft，形成从 #1 的 `main` 到 #14 的 stacked 链；Task 15 没有 PR。按 `.github/workflows/publish-image.yml` 查询 GitHub 默认分支返回 HTTP 404，证明该工作流尚未到达默认分支。
+- 结论：当前没有可运行的默认分支 GHCR 发布工作流，不能尝试/宣称 GHCR push、package public 或匿名 pull。下一步是学生审查并明确授权如何顺序合并 stacked PR；Task 14 合并后还需等待默认分支 CI 成功。该结论是流程依赖，不是代码或容器失败。
