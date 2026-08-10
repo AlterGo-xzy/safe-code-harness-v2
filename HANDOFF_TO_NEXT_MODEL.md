@@ -1,20 +1,21 @@
 # SafeCodeHarness v2 — 续开发交接（2026-08-10）
 
-## 交接结论
+## 交接结论（当前权威状态）
 
-代码和过程证据已保存到 Git；Task 13 Task 1-3、320px 修复及本地控制验证均已实现。视口 Important 已由 `5ed4bd3` 先 RED 后修复并通过 scoped 双阶段复审。随后最终全分支审查发现 E2E 仍启动生产 `main:app`，Planner 初始 GET 会触及 Windows Credential Manager；`7d66d98` 已以新的失败回归和 E2E-only 内存 SecretStore 入口完成最小修复，生产 app 未改。**最终 scoped re-review 结论为 Critical 0、Important 0、Minor 2；两个文档 Minor 已修正。仍不得假称已推送、已有 PR #13、CI/容器/部署完成或已开始任务 14、15/策略扩展；完成只读文档复核与最终 diff/凭据扫描后，才可运行 `finishing-a-development-branch`。**
+任务 1-14 已形成 stacked draft PR #1-#14；Task 15 位于独立 `codex/t15-release-evidence` worktree，本地发布资料、测试、证据与两阶段审查已经闭环。提交链为 `9acb2ae`、`60528ae`、`84a10b4`、`93f3415`；初审总计 C/I/M=`0/0/1`，唯一 Task 14 PLAN 历史 Minor 经 `93f3415` 修复后，限定复审为 `0/0/0`。本地结果为 backend `169 passed, 1 warning`、三份稳定 JSON demo、frontend `48 passed`、build 和真实 Chromium E2E `2 passed`。
+
+**Task 15 整体仍未完成。** 当前分支尚未 push、没有 Task 15 PR，也未运行 `finishing-a-development-branch`。NJU Git remote、带认证/TLS 网关的公网 URL、GitHub/GitLab 最终实跑、GHCR public 与未登录 pull/run、学生本人 1500-2500 字 `REFLECTION.md` 正文仍是外部阻断。不得把本地审查通过写成这些外部结果。下方 Task 13 细节保留为历史证据；与本节冲突的旧“当前状态”均以本节和 `PROJECT_PROGRESS.md` 为准。
 
 本文件是给全新模型的最短可执行入口。开始工作前仍须依次阅读 `PROJECT_PROGRESS.md`、`AGENTS.md`、`PLAN.md`、`REQUIREMENTS_TRACEABILITY.md`、`AGENT_LOG.md`，并先运行 `git status --short`。
 
 ## 精确仓库状态
 
 - 仓库：`D:\safe-code-harness-v2`；公开远程：`https://github.com/AlterGo-xzy/safe-code-harness-v2`。
-- 当前工作目录：`D:\safe-code-harness-v2\.worktrees\t13-demos-e2e`。
-- 当前分支：`codex/t13-demos-e2e`；Task 3 实现提交为 `e18422e test: add real workbench e2e coverage`。接手时必须以 `git rev-parse HEAD` 获取实际当前 HEAD。
-- 已核验：在本交接文档创建前，`git status --short` 无输出；没有需要保留的已跟踪用户改动。
-- Task 13 尚未推送、尚未创建 PR #13。不要假称已有 PR。
-- Task 1-12 的 stacked draft PR #1-#12 已存在且尚未合并；Task 13 以 Task 12 分支为基线。
-- `.venv` 和 `.superpowers/sdd` 位于本 Task 13 worktree、均为忽略项，不能提交。计划中的 `..\.venv` 不存在；本 worktree 本地 `.venv\Scripts\python.exe` 是已实际使用的解释器。
+- 当前工作目录：`D:\safe-code-harness-v2\.worktrees\t15-release-evidence`。
+- 当前分支：`codex/t15-release-evidence`；接手时必须以 `git rev-parse HEAD` 获取包含本次状态回填提交在内的实际 HEAD。
+- 本轮回填前 `git status --short` 无输出；没有需要保留的已跟踪用户改动。
+- Task 1-14 的 stacked draft PR #1-#14 已存在且尚未合并；Task 15 基于 Task 14 分支，尚未 push/PR。
+- `.venv`、`.superpowers/`、`frontend/node_modules`、`frontend/dist` 和浏览器产物均为本 worktree 忽略项，不能提交。
 
 ## 已完成并已保存的内容
 
@@ -84,9 +85,9 @@ Task 2 已登记完成。不得重做已关闭的 `tool_failed` 或 later-child 
 
 ## 随后工作顺序（不得提前）
 
-1. 不重做已关闭的 demo 或视口修复；最终 scoped re-review 已确认 E2E app 不触及 OS 凭据、Playwright 使用专用入口且生产 app 不变。先对本次两项文档 Minor 做只读复核，再完成最终 diff/凭据扫描。
-2. 完成上述复核后，运行 `finishing-a-development-branch`，向用户呈现分支处置选择。仅在用户选择推送/PR 后，才可推送 `codex/t13-demos-e2e`、创建对 `codex/t12-settings-approval-ui` 的 draft PR #13、回读 GitHub 状态并提交实际 URL/保留 worktree 决定。
-3. Task 14（CI/容器分发）、Task 15（公网部署/最终交付）和延后的策略扩展都尚未开始；不得把本地验证写成上述外部证据。
+1. 不重做已关闭的 Task 13/14 或 Task 15 本地审查修复；先取得缺失的外部输入和真实结果：NJU Git remote、允许使用的托管平台及认证/TLS gateway、默认分支 GitHub/GitLab 最终绿色记录、GHCR public/匿名 pull-run，以及学生本人反思正文。
+2. 每项外部动作只能在用户授权和账户/远程可用后执行，必须记录真实 URL、日期、commit 和结果；失败或缺输入继续保持外部阻断。
+3. 外部门槛满足并回填后，才可运行 `finishing-a-development-branch`；当前不得 push `codex/t15-release-evidence`、创建 Task 15 PR 或假称最终交付完成。延后策略扩展仍不属于 Task 15 本地发布资料范围。
 
 ## 严格流程与安全不变量
 
@@ -99,16 +100,16 @@ Task 2 已登记完成。不得重做已关闭的 `tool_failed` 或 later-child 
 ## 有用命令
 
 ```powershell
-Set-Location D:\safe-code-harness-v2\.worktrees\t13-demos-e2e
+Set-Location D:\safe-code-harness-v2\.worktrees\t15-release-evidence
 git status --short
-.\.venv\Scripts\python.exe -m pytest backend\tests\integration\test_demos.py --basetemp .pytest-tmp\task13-demos -q
-.\.venv\Scripts\python.exe -m pytest backend\tests\integration\test_e2e_app.py --basetemp .pytest-tmp\task13-e2e-app -q
 .\scripts\run_demos.ps1
-.\.venv\Scripts\python.exe -m pytest backend\tests --basetemp .pytest-tmp\task13-backend -q
+.\.venv\Scripts\python.exe -m pytest backend\tests --basetemp .pytest-tmp\task15-backend -q
 Set-Location frontend
+npm.cmd test
+npm.cmd run build
 npm.cmd run test:e2e
 Set-Location ..
-git diff --check codex/t12-settings-approval-ui..HEAD
+git diff --check codex/t14-ci-distribution..HEAD
 ```
 
 PowerShell 环境中 `rg.exe` 曾出现“拒绝访问”；优先使用 `git grep` 或窄范围 `Get-Content`。所有文档/源码修改用 `apply_patch`，保留无关用户改动。
