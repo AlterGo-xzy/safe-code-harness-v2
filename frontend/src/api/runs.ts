@@ -21,6 +21,10 @@ export type RunDetail = {
   approvalId: string | null;
 };
 
+export type CreateRunInput =
+  | { mode: "mock"; scenario: "pending_write" | "secret_write" }
+  | { mode: "real"; task: string; workspaceId: string };
+
 type JsonRecord = Record<string, unknown>;
 
 function isRecord(value: unknown): value is JsonRecord {
@@ -103,5 +107,23 @@ export async function getRun(runId: string, signal?: AbortSignal): Promise<RunDe
     return toDetail(await response.json());
   } catch {
     throw new Error("无法加载运行详情");
+  }
+}
+
+export async function createRun(input: CreateRunInput): Promise<RunDetail> {
+  const message = "无法创建运行";
+  const payload = input.mode === "mock"
+    ? { mode: "mock", scenario: input.scenario }
+    : { mode: "real", task: input.task, workspace_id: input.workspaceId };
+  try {
+    const response = await fetch("/api/runs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error();
+    return toDetail(await response.json());
+  } catch {
+    throw new Error(message);
   }
 }

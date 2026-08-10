@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { uploadWorkspace, type WorkspaceUploadResult } from "../api/workspaces";
 
-export function WorkspaceUpload() {
+export function WorkspaceUpload({ onUploaded }: { onUploaded?: (workspace: WorkspaceUploadResult) => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<WorkspaceUploadResult | null>(null);
   const [pending, setPending] = useState(false);
@@ -15,7 +15,9 @@ export function WorkspaceUpload() {
     setPending(true);
     setHasError(false);
     try {
-      setResult(await uploadWorkspace(file));
+      const uploaded = await uploadWorkspace(file);
+      setResult(uploaded);
+      onUploaded?.(uploaded);
     } catch {
       setHasError(true);
     } finally {

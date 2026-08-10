@@ -9,7 +9,8 @@ RUN npm run build
 FROM python:3.12-slim AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    SAFE_CODE_HARNESS_DEPLOYMENT=mock
 
 WORKDIR /app
 COPY backend/ /app/backend/

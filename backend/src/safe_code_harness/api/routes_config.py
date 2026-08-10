@@ -3,6 +3,7 @@ from pydantic import BaseModel, field_validator
 
 from safe_code_harness.config.planner_settings import PlannerSettings
 from safe_code_harness.config.secret_store import SecretStore, SecretStoreUnavailableError
+from safe_code_harness.llm.openai_compatible import OpenAICompatibleLLM, PlannerNotConfiguredError
 
 
 router = APIRouter(prefix="/api/config/planner", tags=["config"])
@@ -40,6 +41,13 @@ class PlannerConfiguration:
     def clear(self) -> PlannerSettings:
         self._secret_store.clear()
         return self.snapshot()
+
+    def create_llm(self) -> OpenAICompatibleLLM:
+        """Create the real, single-call adapter without exposing its secret."""
+
+        if not self._secret_store.get():
+            raise PlannerNotConfiguredError("Planner API key is not configured")
+        return OpenAICompatibleLLM(self._base_url, self._model, self._secret_store)
 
 
 def _configuration(request: Request) -> PlannerConfiguration:

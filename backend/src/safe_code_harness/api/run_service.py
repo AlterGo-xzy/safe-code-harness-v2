@@ -1,15 +1,24 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import subprocess
 from typing import Callable, Literal
 
 from safe_code_harness.core.agent_loop import AgentLoop, RunConfig, RunState
 from safe_code_harness.core.models import Action
 from safe_code_harness.feedback.evaluator import FeedbackEvaluator
 from safe_code_harness.governance.approval import ApprovalStateError, ApprovalStore
+from safe_code_harness.governance.command_guard import CommandGuard
+from safe_code_harness.governance.path_sandbox import PathSandbox
+from safe_code_harness.governance.policy import RuntimePolicy
 from safe_code_harness.governance.rules import RuleEvaluator
 from safe_code_harness.llm.mock import MockLLM
 from safe_code_harness.memory.store import MemoryStore
-from safe_code_harness.tools.dispatcher import ToolResult
+from safe_code_harness.tools.dispatcher import ToolDispatcher, ToolResult
+from safe_code_harness.tools.file_tools import FileTools
+from safe_code_harness.tools.memory_tools import MemoryTools
+from safe_code_harness.tools.shell_tools import ShellTools
+from safe_code_harness.tools.test_tools import TestTools
+from safe_code_harness.workspaces.registry import Workspace
 
 
 _TIMELINE_DISPLAY_STATUS = {
@@ -125,6 +134,48 @@ class RunService:
         )
         return self.snapshot(run_id)
 
+    def start_real(self, task: str, workspace: Workspace, llm: object) -> dict[str, object]:
+        """Run a locally opted-in real Planner inside one uploaded workspace.
+
+        The LLM is only the proposal source.  It cannot bypass the existing
+        deterministic policy, path sandbox, or approval state machine.
+        """
+
+        if not task.strip():
+            raise ValueError("task is required")
+
+        run_id = f"run-{self._next_run_id}"
+        self._next_run_id += 1
+        approvals = ApprovalStore()
+        policy = RuntimePolicy()
+        config = RunConfig(
+            max_steps=6,
+            approval_actions=frozenset({"write_file", "run_tests", "run_command"}),
+            run_id=run_id,
+        )
+        loop = AgentLoop(
+            llm=llm,
+            rules=RuleEvaluator(policy),
+            approvals=approvals,
+            tools=self._workspace_tools(workspace, policy),
+            feedback=FeedbackEvaluator(),
+            memory=MemoryStore(run_id=run_id, max_entries=10, max_bytes=4096),
+        )
+        state = loop.run(task.strip(), config)
+        created_at = self._timestamp()
+        self._runs[run_id] = _ManagedRun(
+            loop=loop,
+            config=config,
+            approvals=approvals,
+            state=state,
+            approval_id=state.approval_id,
+            scenario="local_real_planner",
+            created_at=created_at,
+            updated_at=created_at,
+            creation_order=self._next_run_id - 1,
+        )
+        return self.snapshot(run_id)
+
     def list_summaries(self) -> list[dict[str, object]]:
         return [
             self._summary(run_id, managed)
@@ -190,6 +241,26 @@ class RunService:
         if timestamp.tzinfo is None:
             return timestamp.replace(tzinfo=timezone.utc)
         return timestamp.astimezone(timezone.utc)
+
+    @staticmethod
+    def _workspace_tools(workspace: Workspace, policy: RuntimePolicy) -> ToolDispatcher:
+        def runner(arguments: list[str], timeout: float) -> subprocess.CompletedProcess[str]:
+            return subprocess.run(
+                arguments,
+                cwd=workspace.root,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                check=False,
+            )
+
+        guard = CommandGuard(policy)
+        return ToolDispatcher(
+            file_tools=FileTools(PathSandbox(workspace.root, policy)),
+            test_tools=TestTools(guard, runner),
+            shell_tools=ShellTools(guard, runner),
+            memory_tools=MemoryTools(),
+        )
 
     @staticmethod
     def _timestamp_value(timestamp: datetime) -> str:

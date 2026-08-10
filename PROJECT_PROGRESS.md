@@ -6,6 +6,14 @@
 
 ## 当前真实状态
 
+## 2026-08-10 可回退扩展：仅本机真实 Planner（未合并）
+
+- 用户授权新增可选功能，但要求保留已交付内容、发生问题可回退。实现位于隔离 `codex/extension-local-real-planner` / `D:\safe-code-harness-v2\.worktrees\extension-local-real-planner`，基于 GitHub `main`；未修改 `main`、NJU `main` 或 Railway 服务。
+- 默认仍是 Mock。只有本机进程同时设置 `SAFE_CODE_HARNESS_ENABLE_REAL_PLANNER=1`、已配置 Planner key、上传工作区并在页面显式选择“本地真实 Planner”时，`OpenAICompatibleLLM` 才进入 AgentLoop。模型提出的写入、测试和命令仍必须审批，文件仍受 PathSandbox 约束；缺开关/key/工作区会明确拒绝，绝不静默回落为 Mock。
+- Docker/Railway 镜像内置 `SAFE_CODE_HARNESS_DEPLOYMENT=mock`，故即使误设真实开关仍拒绝真实模式。当前 Railway URL 继续保持无 key 的 Mock 演示，不得录入真实 key。
+- 已验证：focused 后端覆盖禁用、容器 mock 锁定、缺 key 与真实模式审批/工作区写入；完整 backend 为 `174 passed, 1 warning`。前端新增创建运行入口，unit `53 passed`、production build 通过。Docker multi-stage 镜像实际构建成功；以真实开关启动该镜像后，`POST /api/runs` 的真实模式仍返回 `403`，证明镜像的 mock 锁定生效。没有配置真实 key、没有发送实际外部 API 请求，也没有部署扩展。
+- 扩展已本地提交（以本分支当前 `HEAD` 为准），尚未 push、PR、merge 或部署；若用户决定试用，先在本机设置开关并通过 Planner 面板录入自己的 key，再上传无敏感内容的 ZIP 并手工选择真实模式。出现任何问题可直接丢弃该分支/worktree，已交付 main 不受影响。
+
 ## 2026-08-10 最终交付外部证据更新（优先于下方历史快照）
 
 - GitHub PR #1–#17 均已普通 merge；最后一次完整运行时验证的 GitHub/NJU `main` 基线为 `a205a231cf30e09bc3c86c55a394572a5f309029`。本条之后如仅有文档补正，必须以 `git rev-parse origin/main` 获取实际最新 SHA，且不得把该补正误说成重新执行过完整运行时验证。#15 修复 Planner 初始异步配置未完成时允许保存/清除的竞态，先有 focused RED，最小修复后独立审查 C/I/M=`0/0/0`。

@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from "vitest";
 
-import { getRun, listRuns } from "./runs";
+import { createRun, getRun, listRuns } from "./runs";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -93,4 +93,20 @@ it("replaces a detail JSON exception with the fixed Chinese error", async () => 
   }));
 
   await expect(getRun("r-1")).rejects.toThrow(/^无法加载运行详情$/);
+});
+
+it("sends an explicit local real Planner payload without a key", async () => {
+  const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+    id: "run-1", scenario: "local_real_planner", status: "waiting_approval", approval_id: "approval-1", events: [],
+  }), { status: 201 }));
+  vi.stubGlobal("fetch", fetchMock);
+
+  await expect(createRun({ mode: "real", task: "read the project", workspaceId: "workspace-1" })).resolves.toMatchObject({
+    id: "run-1", scenario: "local_real_planner", approvalId: "approval-1",
+  });
+
+  expect(fetchMock).toHaveBeenCalledWith("/api/runs", expect.objectContaining({
+    method: "POST",
+    body: JSON.stringify({ mode: "real", task: "read the project", workspace_id: "workspace-1" }),
+  }));
 });

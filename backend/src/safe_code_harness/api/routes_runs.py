@@ -1,6 +1,6 @@
 from typing import Literal
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -10,13 +10,18 @@ from safe_code_harness.api.run_service import (
     RunNotFoundError,
     RunService,
 )
+from safe_code_harness.config.local_planner import real_planner_enabled
+from safe_code_harness.llm.openai_compatible import PlannerNotConfiguredError
 
 
 router = APIRouter(prefix="/api/runs", tags=["runs"])
 
 
 class CreateRunRequest(BaseModel):
-    scenario: Literal["pending_write", "secret_write"]
+    mode: Literal["mock", "real"] = "mock"
+    scenario: Literal["pending_write", "secret_write"] | None = None
+    task: str | None = None
+    workspace_id: str | None = None
 
 
 def _service(request: Request) -> RunService:
@@ -29,7 +34,24 @@ def _not_found(code: str, message: str) -> JSONResponse:
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_run(payload: CreateRunRequest, request: Request) -> dict[str, object]:
-    return _service(request).start(payload.scenario)
+    if payload.mode == "mock":
+        if payload.scenario is None:
+            raise HTTPException(status_code=422, detail="mock scenario is required")
+        return _service(request).start(payload.scenario)
+
+    if not real_planner_enabled():
+        raise HTTPException(status_code=403, detail="local real Planner mode is disabled")
+    if not payload.task or not payload.workspace_id:
+        raise HTTPException(status_code=422, detail="task and workspace_id are required")
+    try:
+        workspace = request.app.state.workspace_registry.get(payload.workspace_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="workspace not found") from None
+    try:
+        llm = request.app.state.planner_configuration.create_llm()
+        return _service(request).start_real(payload.task, workspace, llm)
+    except PlannerNotConfiguredError:
+        raise HTTPException(status_code=409, detail="Planner API key is not configured") from None
 
 
 @router.get("")

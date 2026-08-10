@@ -111,6 +111,18 @@ docker run --rm -p 127.0.0.1:8000:8000 ghcr.io/altergo-xzy/safe-code-harness-v2:
 
 ## Planner key 安全配置
 
+### 可选：仅本机的真实 Planner 运行
+
+默认运行模式仍为离线 Mock。若要在本机让已配置的 OpenAI-compatible Planner 实际驱动 Harness，必须先在 PowerShell 显式启用：
+
+```powershell
+$env:SAFE_CODE_HARNESS_ENABLE_REAL_PLANNER = "1"
+```
+
+随后在 WebUI 中依次上传本地项目 ZIP、保存 Planner 地址/模型/key，并在“创建运行”选择“本地真实 Planner”。真实模式没有自动降级：缺少该开关、工作区或 key 时会拒绝创建；模型提出的 `write_file`、`run_tests`、`run_command` 仍必须先经本地审批，路径仍受工作区沙箱约束。
+
+镜像内置 `SAFE_CODE_HARNESS_DEPLOYMENT=mock`，因此即使误设真实 Planner 开关，Docker/Railway Mock 容器也会拒绝真实模式。公网认证和多用户密钥隔离仍是独立的后续扩展。
+
 默认 Mock LLM 完全不需要 key。
 
 Windows 原生运行时，可在 WebUI 的 Planner 设置中通过密码输入框录入、更新或清除可选 key；后端只把它写入 Windows Credential Manager，GET API 和界面只显示是否已配置及掩码，不回显明文。非 Windows 原生环境没有 Credential Manager 适配器时拒绝持久化，不降级到明文文件。
