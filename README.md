@@ -187,7 +187,7 @@ SafeCodeHarness 默认使用确定性的 Mock LLM，因此离线测试、机制�
 ```powershell
 git clone --branch codex/extension-local-real-planner --single-branch https://github.com/AlterGo-xzy/safe-code-harness-v2.git
 Set-Location safe-code-harness-v2
-
+```
 
 ## 许可证与第三方组件
 
