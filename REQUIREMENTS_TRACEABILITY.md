@@ -9,6 +9,9 @@
 | G-3.1-1 | key 不得硬编码、提交、写日志/history/明文配置 | 部分完成（任务 9、12） | `3074085`、`51eb9c8`：Credential Manager-only、掩码 API、异常链/503 不含 fixture key；Task 12 密钥仅在密码输入提交中读取、finally 清空，且不进 JSX/state/error/URL/localStorage。最终 Git 历史扫描仍待完成。 |
 | G-3.1-2 | 至少一种安全存储；说明环境变量/`.env` 明文风险 | 部分完成（任务 9） | Windows Credential Manager 适配器、fake adapter 和非 Windows fail-closed 测试已完成；README 的环境变量/`.env` 风险说明仍待任务 14/15。 |
 | G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12、13 Task 1） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。Task 13 Task 1 已验证合并后真实 Planner API 返回固定四字段 DTO；Task 3 浏览器只覆盖审批，不把它误写成 Planner 凭据浏览器验证。 |
+| G-3.1-1 | key 不得硬编码、提交、写日志/history/明文配置 | 部分完成（任务 12 前端边界） | `SPEC.md` 8.1；Task 12 密钥仅在密码输入的提交中读取、finally 清空，且不进 JSX/state/error/URL/localStorage；对 `codex/t11-workbench-ui..HEAD` 的高置信凭据扫描只报告计数 0。仍需最终 Git 历史扫描。 |
+| G-3.1-2 | 至少一种安全存储；说明环境变量/`.env` 明文风险 | 已设计，尚未执行 | Windows Credential Manager 适配器和确定性 Mock 测试；README 说明 `.env` 风险与不推荐命令行 `export`。 |
+| G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 12 前端单测） | Task 12 有隐藏输入、掩码后缀、初始加载、保存/清除、mutation pending 禁用和不回显单测；Planner GET/PUT/DELETE 的 non-OK 与网络异常均验证只返回固定中文错误。任务 13 仍需针对合并后真实 API 的浏览器 E2E，安全存储本身也仍须按后续任务完成。 |
 | G-3.1-4 | SPEC 有凭据威胁模型与对策 | 已完成并验证 | `SPEC.md` 8.1。 |
 | G-3.2-1 | 选择分发形态；容器须单条 build/run 且推送公开 registry | 已设计，尚未执行 | Dockerfile、GHCR publish workflow、公开 `docker pull` 和全新机器运行证据。 |
 | G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 部分完成（任务 13 Task 2） | 新增 README 的离线机制演示命令与边界已由 Windows 入口验证；分发、目标机 key 安全配置、完整限制和容器命令仍待任务 14/15。 |
@@ -65,3 +68,7 @@
 2. `writing-plans` 产生并提交符合 G-4.3 的 `PLAN.md`。
 3. 使用不同类型的新 agent，仅凭 SPEC+PLAN 完成冷启动验证，并据结果修订 SPEC/PLAN。
 4. 为所有实现模块建立 worktree/PR 与 task 编号。前三项任一缺失时，不得编写实现代码。
+
+## 2026-08-10 PR #10/#11 集成追踪（已完成，历史记录）
+
+G-4.6-1/2 当前事实：PR #10 已以 `696214d`、PR #11 已以 `622c472` 合并；两者均有完整回归、diff/marker/credential scan clean 和 fresh C/I/M=`0/0/0` 证据。Task12 仍待其自身复审和 GitHub 状态回读。

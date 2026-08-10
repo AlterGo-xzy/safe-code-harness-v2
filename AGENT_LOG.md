@@ -187,6 +187,15 @@
 - 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
 - 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
 
+### 上游历史记录（合并保留）
+
+## 2026-08-08 T10：安全 ZIP 上传与隔离工作区
+
+- 分支/worktree：`codex/t10-workspace-upload` / `D:\\safe-code-harness-v2\\.worktrees\\t10-workspace-upload`，基线 `2de48a2`。实现 `/root/t10_implementer` 先 RED，后仅参考旧 `routes_workspace.py:75-118` 的 ZipInfo/symlink 概念，未复制旧跳过敏感文件或异常回显行为。
+- 提交 `698e4dc`、`b546c89`、`d15a4fd`：全量预校验并拒绝 ZIP Slip、ADS、NUL、UNC、Windows 设备名、重复条目、symlink、敏感/缓存目录、成员与大小上限；仅当前上传创建的目录可被清理，UUID 碰撞保留旧工作区；API 固定 path-free 400。
+- 审查：首审 1 Critical/3 Important、scoped review 1 Important，均先有失败回归后修复；最终 PASS，无 C/I/M。协调验证完整 backend `127 passed`、脚本 unit `113 passed`，各有既有 TestClient 弃用 warning。下一步按收尾 skill 建立独立 draft PR。
+- 分支收尾：沿用 `finishing-a-development-branch` 选项 2，推送 `codex/t10-workspace-upload` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #10](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/10)。保留 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
+
 ## 2026-08-08 T9：凭据存储与 OpenAI-compatible Planner
 
 - worktree/分支：`D:\safe-code-harness-v2\.worktrees\t09-planner-credentials` / `codex/t09-planner-credentials`，基线 `2de48a2`。触发技能：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`systematic-debugging`、`verification-before-completion`；SDD 简报明确禁止真实 key、网络调用和明文/磁盘回退。
@@ -196,6 +205,9 @@
 - 两阶段审查：首轮拒绝并报告上述 Important；scoped re-review 核对 set/get/clear 与 GET/PUT/DELETE 的 traceback/503 均不含 fixture key，且无 key 时传输调用为零，结论 PASS、无 C/I/M。协调会话独立运行完整 backend `110 passed, 1 warning`，运行 `scripts/test.ps1` unit `96 passed`；唯一 warning 为既有 Starlette/TestClient 对 httpx 的弃用提示。
 - 人工干预与教训：协调会话未编辑功能源码，只调度审查、运行独立验证并回填证据。接口“不回显”不足以保证安全；异常 cause、traceback 和错误日志也必须被视为凭据数据流并有失败回归。
 - 分支收尾：依照用户在前序任务持续采用的 `finishing-a-development-branch` 选项 2，推送 `codex/t09-planner-credentials` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)。保留该 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
+### 上游历史记录（合并保留）
+- 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
+- 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
 
 ## 2026-08-09 T11：受治理运行工作台的复核与过程证据
 
@@ -306,3 +318,12 @@
 
 - 最终验证在 `e4599d2` 后重新运行：backend `159 passed, 1 warning`、三份稳定 JSON demo、前端 10 files/48 tests、build 和真实 Chromium E2E `2 passed`，均成功；warning 为既有 TestClient 弃用。
 - 收尾决定：按课程“每个独立模块一个 PR”和 stacked 分支规则，用户选择 `finishing-a-development-branch` 选项 2。已推送 `codex/t13-demos-e2e` 并创建目标为 `codex/t12-settings-approval-ui` 的 [draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)；保留 worktree 等待审查反馈。Task 14/15、策略扩展仍未开始。
+### 上游历史记录（合并保留）
+### 2026-08-10 — 上游 Task 9–10 集成历史（保留）
+
+### 2026-08-10 — PR #10/main 集成（已完成，历史记录）
+
+- 技能与诊断：协调会话依 `systematic-debugging` 在本 worktree 执行 `git merge origin/main --no-commit --no-ff`，重现三处冲突；读双方版本后确认 `main.py` 是同一工厂的独立追加，而非业务规则冲突。使用 `test-driven-development` 先新增跨路由真实 API regression。
+- RED/GREEN：新测试在未解析标记时以 `SyntaxError: <<<<<<< HEAD` collection error 失败；仅合并 `SecretStore`、`PlannerConfiguration`、`WorkspaceRegistry` 与已有 router 注册后，focused `1 passed, 1 warning`。断言可注入 fake Windows secret store 下 Planner GET 为 200/`configured=false`，且同一 app 的坏 ZIP 上传为不带路径的固定 400。
+- 验证：完整 `pytest backend/tests --basetemp .pytest-tmp\t10-main-integration -q` 为 `146 passed, 1 warning`；warning 是既有 TestClient deprecation。staged diff check、tracked marker scan 和本次差异高置信凭据形态计数均为 0。
+- 后续事实：fresh reviewer `/root/t10_merge_reviewer` C/I/M=`0/0/0` 后 PR #10 已普通 merge `696214d`；PR #11 已在相同门槛后普通 merge `622c472`。两者未删除 branch/worktree。
