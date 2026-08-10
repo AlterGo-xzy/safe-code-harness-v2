@@ -378,3 +378,8 @@
 
 - 只读结果：`gh pr list` 显示 PR #1-#14 全部为 draft，形成从 #1 的 `main` 到 #14 的 stacked 链；Task 15 没有 PR。按 `.github/workflows/publish-image.yml` 查询 GitHub 默认分支返回 HTTP 404，证明该工作流尚未到达默认分支。
 - 结论：当前没有可运行的默认分支 GHCR 发布工作流，不能尝试/宣称 GHCR push、package public 或匿名 pull。下一步是学生审查并明确授权如何顺序合并 stacked PR；Task 14 合并后还需等待默认分支 CI 成功。该结论是流程依赖，不是代码或容器失败。
+
+### 2026-08-10 — Task 15：用户提供反思正文
+
+- 人工输入：用户在对话中提供完整 `REFLECTION.md` 正文；协调会话使用 `apply_patch` 原样写入，未代写、扩写或润色。
+- 客观核验：中文汉字计数 `1583`，全部非空白字符计数 `2852`；`backend/tests/unit/test_release_docs.py` 为 `1 passed`，`git diff --check` 无输出。中文“字”口径下符合 1500–2500；若课程平台按非空白字符计数，学生须自行判断和修改。
