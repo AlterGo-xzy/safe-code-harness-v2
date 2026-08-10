@@ -345,3 +345,15 @@
 - 审查结论：独立 spec/traceability 与文档/质量审查的初审汇总为 C/I/M=`0/0/1`。唯一 Minor 是根 `PLAN.md` 的 Task 14 Step 5、完成记录和修复记录仍保留 PR #14 建立前的陈旧状态；没有产品、测试、凭据、许可证或安全边界 finding。
 - 修复与复审：只用 `apply_patch` 修改 `PLAN.md`，记录 Task 14 审查/修复已通过、branch 已推送、stacked draft PR #14 已创建且 branch/worktree 保留；外部 GitHub/GitLab CI 和 GHCR public/匿名 pull-run仍未验证。`git diff --check` 无输出，提交 `93f3415 docs: align task 14 completion history`；限定复审 C/I/M=`0/0/0`。
 - 当前边界：Task 15 本地实现和审查已闭环，提交链为 `9acb2ae`、`60528ae`、`84a10b4`、`93f3415`。没有 push、Task 15 PR 或 `finishing-a-development-branch`；NJU remote、认证/TLS 公网 URL、GitHub/GitLab 最终实跑、GHCR public/匿名 pull-run 和学生本人反思仍未完成，因此 Task 15 整体状态保持未完成。
+
+### 2026-08-10 — Task 15：NJU Git 推送与流水线读取尝试
+
+- 人工授权与推送前验证：用户提供并授权使用 `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git`。协调会话确认当前 worktree 干净、`git diff --check HEAD` 无输出，并重新运行 backend `169 passed, 1 warning`、三份稳定 JSON demo、frontend `10 files/48 tests`、production build 与真实 Chromium E2E `2 passed`。
+- 外部动作与结果：本地新增 `nju` remote 后执行非强制 `git push --set-upstream nju codex/t15-release-evidence`；远程创建同名分支并设为上游，未覆盖已有分支。Git 输出提供了新建 merge request 的 URL，但没有创建 MR。
+- 外部阻断：对 GitLab REST pipeline endpoint 的匿名只读请求返回 Anubis “Making sure you're not a bot” 人机验证页面，而非 pipeline JSON，故没有可复核的 GitLab CI 结果。没有尝试绕过该保护，也未宣称 pipeline 成功。GitHub CI、GHCR public/匿名 pull-run、认证 TLS 公网部署、学生反思正文、Task 15 PR 和分支收尾仍待完成。
+
+### 2026-08-10 — Task 15：GitLab `File` CI 失败修复
+
+- 外部失败证据与根因：用户提供 GitLab `unit-test` 日志，`src/api/workspaces.test.ts` 三项均在 `new File(...)` 处以 `ReferenceError: File is not defined` 失败。配置核对显示 Vitest 强制 `environment: node`，而 GitLab `python:3.12-bookworm` 通过 apt 安装系统 Node；本机 Node 24 有 `File`，因此不能把本地绿误写为 CI 兼容。
+- TDD：先新增 `frontend/src/test/file-polyfill.test.ts`，在 File-free target 导入缺失模块得到预期 RED；最小实现 `file-polyfill.ts` 仅在 `File` 缺失时从 Node `node:buffer` 安装构造器，并由 setup 调用。focused GREEN `1 passed`。首次 build RED 为缺少 `node:buffer` 类型声明；检查 `npm ls @types/node --all` 为 empty 后，仅新增精确 dev dependency `@types/node@20.17.57`，build 随后 GREEN。
+- 完整本地验证：backend `169 passed, 1 warning`（既有弃用 warning）、三 demo、frontend `11 files/49 tests`、build、Chromium E2E `2 passed`。下一步是提交并推送这项最小修复，获取 GitLab 的真实复跑状态；未改 Harness/上传业务或凭据边界。

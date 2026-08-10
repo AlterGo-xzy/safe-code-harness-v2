@@ -1,1 +1,3 @@
-export {};
+import { installFilePolyfill } from "./file-polyfill";
+
+installFilePolyfill(globalThis);

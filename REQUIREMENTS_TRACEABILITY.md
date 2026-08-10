@@ -25,12 +25,12 @@
 | G-4.3 | `PLAN.md`：细任务、文件、要点、失败测试、依赖/并行 | 已完成并验证 | `PLAN.md` 已由 `writing-plans` 生成并在任务 1-4 记录实际 RED/GREEN、审查与提交。 |
 | G-4.4 | `SPEC_PROCESS.md`：关键问题、至少三轮节选、采纳/拒绝、反思 | 已完成并验证 | `SPEC_PROCESS.md` 的五次迭代、四轮节选、采纳/拒绝与 brainstorming 反思。 |
 | G-4.5 | 不同类型陌生 agent 的冷启动，且只给 SPEC+PLAN | 已完成并验证 | Claude Code `2.1.220` 非 `--resume` 启动，仅 Fetch `SPEC.md` 与 `PLAN.md` 两个 raw URL，发现四项规约缺口后暂停；原始转录、工具轨迹、修订前后 diff 见 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md` 与 commit `ecbc418`。 |
-| G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-15 本地） | 任务 1-14 均有独立 worktree/stacked draft PR；任务 15 位于独立 worktree且本地审查已通过，但尚未 push/建 PR。 |
+| G-4.6-1 | 每个独立模块一个 worktree/PR | 部分完成（任务 1-15 本地） | 任务 1-14 均有独立 worktree/stacked draft PR；任务 15 位于独立 worktree且已推送至 NJU Git，但尚未建 PR 或完成分支收尾。 |
 | G-4.6-2 | 每 task 一个新鲜 subagent | 部分完成（任务 1-15 本地） | `AGENT_LOG.md` 记录任务 1-14 的 fresh implementer/reviewer/fix agent；Task 15 fresh implementer 为 `/root/t15_implementer`，独立两阶段审查及限定复审均已执行。 |
 | G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-15 本地） | 任务 1-14 的 RED/GREEN 已记录；Task 15 发布契约为 `1 failed`→`1 passed`，并用现有 Task 14 安全契约的回归 RED 驱动双语修复。 |
 | G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 已完成并验证（任务 1-15 本地阶段） | Task 15 两阶段初审总计 C/I/M=`0/0/1`，唯一 PLAN 历史 Minor 由 `93f3415` 修复，限定复审 `0/0/0`；没有未关闭本地 finding。 |
 | G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 部分完成（任务 1-15 本地） | 任务 1-14 均按该 skill 保留 branch/worktree 并建立 draft PR；Task 15 两阶段审查已通过，但外部门槛和分支收尾仍未完成。 |
-| G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 部分完成（任务 1-15 本地） | 公开仓库和任务 1-14 stacked draft PR（含 PR #14）已存在；Task 15 本地提交 `9acb2ae`/`60528ae`/`84a10b4`/`93f3415`，110 commits 扫描排除两处合成 fixture 后未分类候选为 0；Task 15 尚未 push/PR，最终合并/外部同步后须复扫。 |
+| G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 部分完成（任务 1-15 本地） | 公开仓库和任务 1-14 stacked draft PR（含 PR #14）已存在；Task 15 本地提交 `9acb2ae`/`60528ae`/`84a10b4`/`93f3415`/`1215581` 已推送到 NJU Git，110 commits 扫描排除两处合成 fixture 后未分类候选为 0；Task 15 GitHub push/PR、最终合并/外部同步后仍须复扫。 |
 | G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 部分完成（任务 1-15 本地） | 任务 1-14 PR 与任务 1-15 日志记录 subagent、人工调整及旧代码边界；Task 15 PR 尚未创建。 |
 | G-4.7-3 | PLAN 持续标注完成与 commit hash | 部分完成（任务 1-15 本地） | `PLAN.md` 已回填任务 15 本地提交、RED/GREEN、回归、初审 `0/0/1`、`93f3415` 修复和限定复审 `0/0/0`；PR/外部 URL 后继续更新。 |
 | G-4.7-4 | 维护 `AGENT_LOG.md` | 部分完成（任务 1-15 本地） | 日志已追加任务 1-15 的时间、agent、验证、审查、修复、人工动作和教训；Task 15 外部结果与收尾仍待追加。 |
@@ -38,8 +38,8 @@
 | G-4.9 | AGENT_LOG 包含时间、task、skill、prompt、输出、人工干预、教训 | 部分完成（任务 1-15 本地） | D0 及任务 1-15 本地日志包含上述字段和本地审查闭环；外部核验与分支收尾后继续更新。 |
 | G-4.10 | README 分发与 key 配置，CI 对应构建 | 部分完成（任务 14-15 本地） | 中文 README、Docker/GHCR workflow 与本地 loopback build/run/API/WebUI/key 边界已实现并记录；公开 GHCR pull/run 仍待外部发布和 package public 设置。 |
 | G-4.11 | 服务端项目提供截止前可访问 WebUI、说明部署与 CI/CD | 部分完成（仅文档架构） | README 已说明认证/TLS 网关、容器与平台 Secret Manager 架构；没有托管账户和真实 HTTPS URL，公网可访问性仍是外部阻断。 |
-| G-5-1 | 同一个 NJU Git 链接提交所有交付 | 外部阻断 | 等待用户提供 NJU Git 远程地址；推送后记录 URL/commit。 |
-| G-5-2 | `.gitlab-ci.yml` 有名为 `unit-test` 的 job，最后 CI/CD 为 pass | 部分完成（任务 14 配置） | `.gitlab-ci.yml` 已有顶层精确 `unit-test`，运行 backend、demos、frontend unit/build；GitLab 外部 pipeline 尚未触发，最后一次 pass 证据仍待 Task 15。 |
+| G-5-1 | 同一个 NJU Git 链接提交所有交付 | 部分完成 | 用户提供的 NJU Git `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git` 已可访问；2026-08-10 已推送 `codex/t15-release-evidence`（HEAD 当时为 `1215581`）并设上游。最终合并、Task 15 PR 与其余外部证据仍待。 |
+| G-5-2 | `.gitlab-ci.yml` 有名为 `unit-test` 的 job，最后 CI/CD 为 pass | 部分完成（任务 14 配置） | `.gitlab-ci.yml` 已有顶层精确 `unit-test`，运行 backend、demos、frontend unit/build；Task 15 首个 GitLab job 已真实暴露 Bookworm Node 缺少全局 `File`，三项 workspace 测试失败。TDD polyfill/类型依赖修复已在本地获 frontend `49 passed` 和 build，通过本次新推送后仍须记录 GitLab 最后一次 pass。 |
 | G-5-3 | `REFLECTION.md` 为学生本人 1500-2500 字 | 外部阻断 | `REFLECTION.md` 目前只有本人写作门禁和提纲，没有 AI 生成正文；必须由学生独立完成 1500-2500 字，AI 如润色须标注。 |
 | G-5-4 | 线上 WebUI URL | 外部阻断 | 尚无认证/TLS 托管平台与已部署 URL；取得真实 URL 后检查首页、审批边界和无 key 回显。 |
 | G-6 | 学术规范：个人手写核心处注释、第三方许可证、反思不可 AI 代写 | 部分完成 | `LICENSE`、`THIRD_PARTY_NOTICES.md` 和 README 许可证索引已完成；学生本人反思及最终人工学术规范复核仍未完成。 |
