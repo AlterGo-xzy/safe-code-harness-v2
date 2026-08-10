@@ -549,6 +549,10 @@ it("renders a blocked rule decision in the run timeline", () => {
 
 用户继续选择普通 merge 到 `main`、保留 branch/worktree。PR #4–#9 依次合并为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`、`a2abb83`；合并前实际任务测试为 51/58/77/89/100/114 passed（#8、#9 分别有 1 条既有 TestClient 弃用 warning）。#9 在独立 worktree 合入 `origin/main` 时仅解决 `AGENT_LOG.md` 历史记录冲突，未修改 task 功能源码；合并结果完整 backend `114 passed, 1 warning`、diff/marker scan clean，fresh 独立审查 C/I/M=`0/0/0`。main 当前覆盖 Task 1–9；#10 仍需按同一门槛完成受控集成和复审，Task14 CI workflow 仍未进入 main。
 
+### 2026-08-10 — 已授权 stacked PR 集成续记：#10
+
+Task10 与 Task9 的共享 factory 冲突经 test-first 组合修复：RED 为未解析 marker 的 `SyntaxError`，GREEN focused `1 passed, 1 warning`、完整 backend `146 passed, 1 warning`、diff/marker/credential scan clean。fresh review C/I/M=`0/0/0`；PR #10 已 retarget main、ready、GitHub `CLEAN` 后普通 merge `696214d`。保留 branch/worktree；下一个 #11 仍须重新验证、复审和真实 PR 状态回读。
+
 ## 任务 12：审批、Planner 与 ZIP 上传界面（策略扩展延后）
 
 **工作区与 PR：** `codex/t12-settings-approval-ui` / `.worktrees/t12-settings-approval-ui`；已创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留 worktree 等待审查。

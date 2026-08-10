@@ -155,3 +155,7 @@ Task 14 已完成本地 CI/容器实现、验证与审查，并已推送 `codex/
 ## 2026-08-10 PR 集成进度：#4–#9 已合并（优先）
 
 用户已继续授权顺序普通 merge，并保留所有 branch/worktree。PR #4、#5、#6、#7、#8、#9 已分别合并到 `main`，merge commits 为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`、`a2abb83`；合并前的任务回归分别为 `51`、`58`、`77`、`89`、`100` 和 `114 passed`（后两者各有 1 条既有 TestClient 弃用 warning）。#9 因其旧基线与 main 的文档历史产生冲突，先在其独立 worktree 将 `origin/main` 合入，仅人工处理 `AGENT_LOG.md` 历史记录、未改任务功能源码；合并结果完整 backend 为 `114 passed, 1 warning`，`git diff --check` 与冲突标记扫描均 clean，独立只读审查 C/I/M=`0/0/0` 后才 merge。当前 `main` 已包含任务 1–9；PR #10 仍为 open/draft 且 `DIRTY`，下一步是在其 worktree 做同等受控集成、验证和独立审查。Task 14 workflow 尚未到达 main，故仍不存在 main CI 结果。
+
+## 2026-08-10 PR 集成进度：#10 已合并（优先）
+
+PR #10 已在其专属 worktree 对 `origin/main` 做受控 merge。冲突仅为两份过程文档和共享 `api/main.py`；新真实 API regression 在未解析状态为预期 `SyntaxError` RED，最小 factory 组合后 focused `1 passed, 1 warning`、完整 backend `146 passed, 1 warning`，diff/marker/高置信凭据候选为 0。fresh reviewer C/I/M=`0/0/0` 后，PR retarget main、ready、GitHub 回读 `CLEAN`，并于 `2026-08-10T11:46:12Z` 普通 merge 为 `696214d`。branch/worktree 依用户指令保留。main 当前覆盖 Task 1–10；下一条 #11 仍需同等门槛。Task14 workflow 尚未到达 main。

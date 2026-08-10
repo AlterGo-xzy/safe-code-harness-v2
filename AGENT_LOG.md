@@ -396,3 +396,9 @@
 - 证据：#4–#8 分别在任务回归 51/58/77/89/100 passed 后合并为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`；#8 的 warning 是既有 TestClient 弃用提示。
 - #9 人工干预与验证：在 `D:\safe-code-harness-v2\.worktrees\t09-planner-credentials` 执行 `git merge origin/main --no-commit --no-ff`，冲突仅为 `AGENT_LOG.md` 历史追加；人工仅保留双方账本记录，未编辑 Planner/凭据或其它功能源码。merge-result 的 `python -m pytest backend/tests --basetemp .pytest-tmp\merge-resolution -q` 为 `114 passed, 1 warning`，diff check/冲突标记/凭据候选检查均 clean。fresh reviewer `/root/t09_merge_reviewer` 只读复审 C/I/M=`0/0/0`，确认 key 不回传、异常链 fail-closed；之后 GitHub API 回读 #9 merged commit `a2abb83`。
 - 后续：main 现含 Task 1–9。#10 仍是 draft/`DIRTY`，先在其独立 worktree 重现并处理集成，再跑完整回归、diff/secret checks 和 fresh review；Task14 workflow 尚未到达 main，故不等待或伪称 main CI。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#10
+
+- 诊断与 TDD：在 Task10 专属 worktree 以 `git merge origin/main --no-commit --no-ff` 重现两份过程文档和 `api/main.py` 冲突；根因为 Task9/10 都追加 app factory。新 cross-route test 在 marker 状态 RED 为 `SyntaxError`；仅组合已有 Planner `SecretStore` 注入、WorkspaceRegistry 和 config/runs/workspaces routers 后 GREEN `1 passed, 1 warning`。
+- 完整验证与审查：完整 backend `146 passed, 1 warning`（既有 TestClient deprecation），diff、marker、凭据候选均为 0。fresh `/root/t10_merge_reviewer` 只读审查 `6681ed1` C/I/M=`0/0/0`，确认密钥 fail-closed/redaction 与 ZIP 预校验均保留。
+- 外部结果：`6eb7721` 推送后，PR #10 retarget `main`、mark ready，API 回读 `CLEAN`；普通 merge 成功，GitHub 回读 merge commit `696214d594257c1693eccd311e4fa9ae4861d869`、时间 `2026-08-10T11:46:12Z`。按用户指令未删除 branch/worktree。Task14 CI workflow 仍未抵达 main。

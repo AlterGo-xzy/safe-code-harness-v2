@@ -129,8 +129,10 @@ PowerShell 环境中 `rg.exe` 曾出现“拒绝访问”；优先使用 `git gr
 
 Task 13 已推送，并创建目标为 `codex/t12-settings-approval-ui` 的 [draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)。保留本 worktree 和分支处理审查反馈；后续从 Task 14 开始，不得把 CI、分发、部署或策略扩展写成已完成。
 
-## 2026-08-10 PR 集成当前状态（优先）
+## 2026-08-10 PR 集成历史快照（已被下方 #10 更新取代）
 
 用户授权普通 merge 并保留所有 branch/worktree。PR #1–#9 已合并到 `main`；#4–#9 merge commits 是 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`、`a2abb83`，其任务回归依次为 51/58/77/89/100/114 passed（#8/#9 各有 1 条既有 TestClient 弃用 warning）。#9 的 `DIRTY` 已被根因定位为过程文档历史冲突：在其专属 worktree 只人工合并日志，完整 backend `114 passed, 1 warning`、diff/marker/secret 检查 clean 且 fresh independent review C/I/M=`0/0/0` 后才 merge。
+
+**最新更新：** PR #10 已完成受控整合，并已 GitHub 普通 merge `696214d`（`2026-08-10T11:46:12Z`）；test-first RED 为未解析 marker 的 `SyntaxError`，GREEN focused `1 passed, 1 warning`、完整 backend `146 passed, 1 warning`、diff/marker/secret clean，fresh review C/I/M=`0/0/0`。main 当前含 Task1–10。下一步为 PR #11：在其专属 worktree 对当前 main 做受控集成、完整 frontend/backend 验证和 fresh review。#11–#14、Task15 PR/收尾、main 上 Task14 CI、GHCR public/匿名 pull/run仍未完成；Railway 仍仅为无真实 key 的 HTTPS Mock 站，反思正文为用户本人提供的 1583 汉字版本。
 
 下一步是 PR #10：它仍是 draft/`DIRTY`，必须在 `D:\safe-code-harness-v2\.worktrees\t10-workspace-upload` 先 `fetch origin`、以 `origin/main` 做受控 merge，逐文件确认冲突，完整 backend 回归、diff/凭据扫描并 fresh review 后才可 merge。#10–#14、Task15 PR/收尾、Task14 workflow 在 main 的真实 CI、GHCR public/匿名 pull-run均未完成。Railway 仍仅为无真实 key 的 HTTPS Mock 站；反思正文是用户本人提供的 1583 汉字版本，agent 未代写。
