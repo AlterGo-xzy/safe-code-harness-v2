@@ -545,6 +545,10 @@ it("renders a blocked rule decision in the run timeline", () => {
 
 **完成记录：** Task 1 提交 `893f01a`、`63749f5`：初始 `runs` 模块缺失 RED，边界初始 GREEN 4/4；在任务 8 固定安全 DTO 后，审查发现两个 Important（异常原文泄露、读取原始 `summary`/`failure`），先有 3/6 RED 回归，修复后 focused/full GREEN 6/6。Task 2 提交 `0dcdca9`：`App`/`RunTimeline` 缺失 RED，focused GREEN 6/6、全套 GREEN 12/12。前端只读调用任务 8 的两个 GET 路由，严格投影列表四字段和时间线安全 DTO 五字段；未读取或迁入旧前端，未实现写 API、审批、配置、上传、凭据或 localStorage。Open Design 只有不可复现的历史记录：记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 0.18.1 并做过 SHA-256 校验，但本地没有安装包、资产 URL 或精确摘要，不能算作当前已验证证据，绝不猜测摘要；任务只采用记录中的技能/设计系统、真实文件产出和可审计原则，未加入运行时依赖。两阶段审查最终 Critical 0、Important 0；CSS 有 `44rem` 单列断点、`min-width: 0`、`overflow-wrap: anywhere`，但没有窄屏浏览器测试，320px 证据明确留给任务 13。最终审查修复提交 `33b5ff0`：依赖 RED 为缺 lockfile 导致 `npm ci` exit 1，行为 RED 为 focused 3 files/9 tests 中 3 failed；新增 lockfile v3 并精确声明 Testing Library/jsdom 依赖，卡片可访问名称加入场景/状态/UTC 更新时间，详情以 id 绑定当前选择并覆盖乱序响应，时间显式标注 UTC。GREEN 为 focused 9/9；clean `npm ci` 成功，完整前端 4 files/15 tests passed，build 通过，credential candidate 0，staged diff check 无输出。设计和 UI 只承诺安全四字段卡片/五字段时间线，绝不恢复原始事件文本。按用户选择已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)，保留分支/worktree 等待审查。
 
+### 2026-08-10 — 已授权 stacked PR 集成续记：#4–#9
+
+用户继续选择普通 merge 到 `main`、保留 branch/worktree。PR #4–#9 依次合并为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`、`a2abb83`；合并前实际任务测试为 51/58/77/89/100/114 passed（#8、#9 分别有 1 条既有 TestClient 弃用 warning）。#9 在独立 worktree 合入 `origin/main` 时仅解决 `AGENT_LOG.md` 历史记录冲突，未修改 task 功能源码；合并结果完整 backend `114 passed, 1 warning`、diff/marker scan clean，fresh 独立审查 C/I/M=`0/0/0`。main 当前覆盖 Task 1–9；#10 仍需按同一门槛完成受控集成和复审，Task14 CI workflow 仍未进入 main。
+
 ## 任务 12：审批、Planner 与 ZIP 上传界面（策略扩展延后）
 
 **工作区与 PR：** `codex/t12-settings-approval-ui` / `.worktrees/t12-settings-approval-ui`；已创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留 worktree 等待审查。

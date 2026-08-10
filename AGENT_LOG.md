@@ -389,3 +389,10 @@
 - 决策：用户授权对已审查 task 逐一 retarget `main`、mark ready、普通 merge，保留全部 branch/worktree；不使用 squash/rebase/删除。
 - 证据：#1 在实际 worktree `scripts/test.ps1` 为 1 passed 后合并 `1fc6f4c`；#2 为 7 passed 后合并 `a1c95ad`；#3 的旧入口首次因系统 pytest temp `C:\Users\Admin\AppData\Local\Temp\pytest-of-Admin` 的 `WinError 5` 得到 18 passed/8 errors，诊断为环境目录权限而非产品失败，使用 worktree `.pytest-tmp\merge-t3` 后为 26 passed，再合并 `6006700`。
 - 外部边界：三个 PR 均由 GitHub API 回读为 MERGED。Task 14 workflow 尚未在 main，`gh run list --branch main` 返回空数组；这不构成绿色或红色 CI 结论。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#4–#9
+
+- 决策与技能：用户持续授权 `finishing-a-development-branch` 的普通 merge 路径，明确保留已有 branch/worktree；协调会话使用 `systematic-debugging` 查明 #9 的 `DIRTY` 为堆叠基线文档冲突，使用 `verification-before-completion` 和 `requesting-code-review` 作为合并门槛。
+- 证据：#4–#8 分别在任务回归 51/58/77/89/100 passed 后合并为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`；#8 的 warning 是既有 TestClient 弃用提示。
+- #9 人工干预与验证：在 `D:\safe-code-harness-v2\.worktrees\t09-planner-credentials` 执行 `git merge origin/main --no-commit --no-ff`，冲突仅为 `AGENT_LOG.md` 历史追加；人工仅保留双方账本记录，未编辑 Planner/凭据或其它功能源码。merge-result 的 `python -m pytest backend/tests --basetemp .pytest-tmp\merge-resolution -q` 为 `114 passed, 1 warning`，diff check/冲突标记/凭据候选检查均 clean。fresh reviewer `/root/t09_merge_reviewer` 只读复审 C/I/M=`0/0/0`，确认 key 不回传、异常链 fail-closed；之后 GitHub API 回读 #9 merged commit `a2abb83`。
+- 后续：main 现含 Task 1–9。#10 仍是 draft/`DIRTY`，先在其独立 worktree 重现并处理集成，再跑完整回归、diff/secret checks 和 fresh review；Task14 workflow 尚未到达 main，故不等待或伪称 main CI。
