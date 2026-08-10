@@ -1,0 +1,78 @@
+:root {
+  color: #1f2937;
+  background: #f4f6f8;
+  font-family: Inter, "Noto Sans SC", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; min-width: 0; }
+
+button { font: inherit; }
+
+button:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.app-shell { max-width: 80rem; margin: 0 auto; padding: 1.5rem; }
+
+.app-header { margin-bottom: 1.25rem; }
+
+.app-header h1 { margin: 0; font-size: clamp(1.5rem, 4vw, 2rem); }
+
+.app-header p { margin: .5rem 0 0; color: #4b5563; }
+
+.workbench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, .9fr); gap: 1rem; }
+
+.panel {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: .75rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 8%);
+}
+
+.panel h2 { margin-top: 0; font-size: 1.125rem; }
+
+.run-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .75rem; }
+
+.run-card {
+  display: grid;
+  gap: .35rem;
+  min-width: 0;
+  padding: .875rem;
+  overflow-wrap: anywhere;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  border: 1px solid #cbd5e1;
+  border-radius: .5rem;
+  background: #f8fafc;
+}
+
+.run-card[aria-pressed="true"] { border-color: #1d4ed8; background: #eff6ff; }
+
+.run-card__label, .run-event__meta { color: #4b5563; font-size: .875rem; }
+
+.run-timeline { display: grid; gap: .75rem; margin: 0; padding: 0; list-style: none; }
+
+.run-event { min-width: 0; padding: .875rem; overflow-wrap: anywhere; border-left: .25rem solid #64748b; background: #f8fafc; }
+
+.run-event--block { border-left-color: #b91c1c; }
+
+.run-event--warning { border-left-color: #b45309; }
+
+.run-event p { margin: .5rem 0 0; }
+
+.run-event__meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; }
+
+.state-message { margin: 0; padding: 1rem; overflow-wrap: anywhere; border-radius: .5rem; background: #fff; }
+
+.state-message--error { color: #991b1b; background: #fef2f2; }
+
+@media (max-width: 44rem) {
+  .app-shell { padding: 1rem; }
+  .workbench { grid-template-columns: 1fr; }
+}
