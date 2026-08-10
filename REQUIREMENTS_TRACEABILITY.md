@@ -39,7 +39,7 @@
 | G-4.10 | README 分发与 key 配置，CI 对应构建 | 部分完成（任务 14-15 本地） | 中文 README、Docker/GHCR workflow 与本地 loopback build/run/API/WebUI/key 边界已实现并记录；公开 GHCR pull/run 仍待外部发布和 package public 设置。 |
 | G-4.11 | 服务端项目提供截止前可访问 WebUI、说明部署与 CI/CD | 部分完成（仅文档架构） | README 已说明认证/TLS 网关、容器与平台 Secret Manager 架构；没有托管账户和真实 HTTPS URL，公网可访问性仍是外部阻断。 |
 | G-5-1 | 同一个 NJU Git 链接提交所有交付 | 部分完成 | 用户提供的 NJU Git `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git` 已可访问；2026-08-10 已推送 `codex/t15-release-evidence`（HEAD 当时为 `1215581`）并设上游。最终合并、Task 15 PR 与其余外部证据仍待。 |
-| G-5-2 | `.gitlab-ci.yml` 有名为 `unit-test` 的 job，最后 CI/CD 为 pass | 部分完成（任务 14 配置） | `.gitlab-ci.yml` 已有顶层精确 `unit-test`，运行 backend、demos、frontend unit/build；Task 15 首个 GitLab job 已真实暴露 Bookworm Node 缺少全局 `File`，三项 workspace 测试失败。TDD polyfill/类型依赖修复已在本地获 frontend `49 passed` 和 build，通过本次新推送后仍须记录 GitLab 最后一次 pass。 |
+| G-5-2 | `.gitlab-ci.yml` 有名为 `unit-test` 的 job，最后 CI/CD 为 pass | 部分完成（任务 14 配置） | `.gitlab-ci.yml` 已有顶层精确 `unit-test`，运行 backend、demos、frontend unit/build；Task 15 首个 GitLab job 已真实暴露 Bookworm Node 缺少全局 `File`，三项 workspace 测试失败。TDD polyfill/类型依赖修复提交 `749199a` 已推送，本地 frontend `49 passed` 和 build；仍须记录 GitLab 复跑的最后一次 pass。 |
 | G-5-3 | `REFLECTION.md` 为学生本人 1500-2500 字 | 外部阻断 | `REFLECTION.md` 目前只有本人写作门禁和提纲，没有 AI 生成正文；必须由学生独立完成 1500-2500 字，AI 如润色须标注。 |
 | G-5-4 | 线上 WebUI URL | 外部阻断 | 尚无认证/TLS 托管平台与已部署 URL；取得真实 URL 后检查首页、审批边界和无 key 回显。 |
 | G-6 | 学术规范：个人手写核心处注释、第三方许可证、反思不可 AI 代写 | 部分完成 | `LICENSE`、`THIRD_PARTY_NOTICES.md` 和 README 许可证索引已完成；学生本人反思及最终人工学术规范复核仍未完成。 |

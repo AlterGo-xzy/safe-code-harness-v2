@@ -357,3 +357,4 @@
 - 外部失败证据与根因：用户提供 GitLab `unit-test` 日志，`src/api/workspaces.test.ts` 三项均在 `new File(...)` 处以 `ReferenceError: File is not defined` 失败。配置核对显示 Vitest 强制 `environment: node`，而 GitLab `python:3.12-bookworm` 通过 apt 安装系统 Node；本机 Node 24 有 `File`，因此不能把本地绿误写为 CI 兼容。
 - TDD：先新增 `frontend/src/test/file-polyfill.test.ts`，在 File-free target 导入缺失模块得到预期 RED；最小实现 `file-polyfill.ts` 仅在 `File` 缺失时从 Node `node:buffer` 安装构造器，并由 setup 调用。focused GREEN `1 passed`。首次 build RED 为缺少 `node:buffer` 类型声明；检查 `npm ls @types/node --all` 为 empty 后，仅新增精确 dev dependency `@types/node@20.17.57`，build 随后 GREEN。
 - 完整本地验证：backend `169 passed, 1 warning`（既有弃用 warning）、三 demo、frontend `11 files/49 tests`、build、Chromium E2E `2 passed`。下一步是提交并推送这项最小修复，获取 GitLab 的真实复跑状态；未改 Harness/上传业务或凭据边界。
+- 推送：提交 `749199a fix: support GitLab Node File tests` 已推送至 `nju/codex/t15-release-evidence`，GitLab 已接收更新并给出 merge request 创建 URL。`glab` 未安装，匿名 REST API 仍被 Anubis 拦截；等待用户网页登录 GitLab 查看并提供该复跑的真实 pipeline 状态。
