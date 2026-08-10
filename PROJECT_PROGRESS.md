@@ -6,6 +6,14 @@
 
 ## 当前真实状态
 
+## 2026-08-10 最终交付外部证据更新（优先于下方历史快照）
+
+- GitHub 已按普通 merge 顺序集成 PR #1–#15；最新 `main` 为 PR #15 的 merge commit `c633003a06ad8073852f9125e3e195635f159bbb`。#15 是唯一一次合并后的 CI 修复：Planner 初始异步配置未完成前禁用保存/清除，避免空值覆盖；先有 focused RED，最小修复后独立审查 C/I/M=`0/0/0`。
+- GitHub `main` CI [run 31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 已成功：backend、三份确定性机制演示、frontend unit/build、Chromium E2E 与 Docker build 均通过。此前 `ffb8544` 的 main CI 因 Planner 竞态失败，不能删除该失败历史；它已由 #15 的实际 CI 绿色关闭。
+- CI 成功后，GHCR 发布 [run 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功。使用空 Docker 配置（未登录）实际拉取 `ghcr.io/altergo-xzy/safe-code-harness-v2:sha-c633003a06ad8073852f9125e3e195635f159bbb`，digest 为 `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`；临时容器仅绑定 `127.0.0.1:18001`，就绪后 `/` 和 `/api/runs` 均为 HTTP 200，随后已停止。因此公开 OCI 分发和匿名 pull/run 已有真实证据。
+- Railway `https://safe-code-harness-v2-production.up.railway.app` 仍仅是无真实 key、无敏感工作区的 HTTPS Mock 演示站；Railway HTTPS 不等于应用认证。真实 key/敏感上传仍必须在认证网关与 TLS 安全边界补齐后才可开放。
+- Task 15 仍剩交付收尾而非运行时代码：把本次最终外部证据的文档提交推送并建立/合并 Task 15 PR；将最终 `main` 同步到同一 NJU Git；学生本人在提交前确认反思篇幅口径与内容归属。不得把这些待办写成已经完成。
+
 - 最终仓库：`https://github.com/AlterGo-xzy/safe-code-harness-v2`，公开。
 - 主分支最新已推送的流程准备提交：`5dd5da3 chore: prepare isolated task worktrees`。
 - 冷启动门禁：已完成。Claude Code `2.1.220` 在非 `--resume` 新会话中只 Fetch `SPEC.md` 和 `PLAN.md`，提出四项规约缺口并停止；证据在 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md`，修订提交 `ecbc418`、隔离核验 `107bda3`、门禁回填 `3195ae8`。

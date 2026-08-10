@@ -2,6 +2,14 @@
 
 本日志只记录实际发生的过程，不补写或虚构历史证据。
 
+## 2026-08-10 T15：主分支 CI 修复、公开 GHCR 与最终交付证据
+
+- 技能与原因：`systematic-debugging` 定位 main `ffb8544` 的 GitHub CI 失败；`test-driven-development` 先增加 Planner 初始加载中的按钮禁用 RED；`requesting-code-review` 对最小修复做独立只读审查。纯文档整合按用户指示不重复运行全量测试。
+- 修复：`PlannerSettings` 将统一 disabled 条件改为 `loading || action !== null`，避免初始 GET 未返回时 PUT 发送空 `baseUrl`/`model`。focused RED 后 GREEN；本地 frontend `49 passed`、build、E2E `2 passed`、backend `169 passed, 1 warning`；review C/I/M=`0/0/0`。
+- 外部结果：PR #15 的 `5936d5b` 普通 merge 为 main `c633003a06ad8073852f9125e3e195635f159bbb`。GitHub CI [31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 成功运行 backend、demos、frontend、build、Chromium E2E、Docker build；后续 [GHCR publish 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功。
+- 匿名 OCI 验证：空 Docker 配置实际 pull SHA tag，digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`。临时容器仅映射 `127.0.0.1:18001`，condition polling 后 `/` 和 `/api/runs` 为 HTTP 200，再停止容器。首次即时请求发生在服务就绪前，后续不是重试掩盖失败而是条件就绪验证。
+- 未完成：Railway 仍是无认证、无真实 key 的 Mock 站；Task15 还需推送证据回填、建立/处理 Task15 PR、最终 main 同步 NJU Git，以及学生本人提交前复核反思口径。
+
 ## 2026-08-03 D0：规格阶段
 
 - 触发技能：`using-superpowers`、`brainstorming`、GitHub 工作流指引。

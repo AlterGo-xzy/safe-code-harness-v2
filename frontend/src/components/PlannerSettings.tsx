@@ -73,7 +73,7 @@ export function PlannerSettings() {
     }
   }
 
-  const disabled = action !== null;
+  const disabled = loading || action !== null;
   const suffix = displaySuffix(settings?.maskedSuffix ?? null);
 
   return (
