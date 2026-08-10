@@ -1,6 +1,6 @@
 # SafeCodeHarness v2 进度与完整目标
 
-更新时间：2026-08-04
+更新时间：2026-08-08
 
 本文件是下一次对话的唯一 handoff 入口。先读本文件，再读 `AGENTS.md`（若后续新增）、`PLAN.md`、`REQUIREMENTS_TRACEABILITY.md` 和 `AGENT_LOG.md`；每次编辑前运行 `git status --short`，保留未说明的用户改动。
 
@@ -13,7 +13,7 @@
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
 - 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
-- 当前源码范围：任务 1-7 的 Harness 核心及任务 8 的受治理运行/审批 API 已完成并经审查；尚未开始凭据、上传、前端、CI、容器或部署。
+- 当前源码范围：任务 1-8 的 Harness 核心与运行/审批 API、任务 9 的离线安全 Planner 配置均已完成并经审查；上传、前端、CI、容器与部署尚未开始。任务 9 不配置真实 API key，后续由前端通过受保护接口录入。
 
 ## 不可突破的执行纪律
 
@@ -121,4 +121,5 @@
 5. 任务 5 已在 `codex/t05-tools` / `D:\safe-code-harness-v2\.worktrees\t05-tools` 完成：`2795539` 新增受 `PathSandbox` 和 `CommandGuard` 约束的显式工具分派；所有测试先 RED，独立审查无 Critical/Important，协调会话一键测试为 `58 passed`。已创建目标为 `codex/t04-command-approval` 的 [stacked draft PR #5](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/5)，保留该分支/worktree 等待审查。
 6. 任务 6 已在 `codex/t06-feedback-memory` / `D:\safe-code-harness-v2\.worktrees\t06-feedback-memory` 完成：`cc5b974` 与 `6b9676b` 实现并加固确定性反馈和有界脱敏记忆；两项 Important 经失败回归与 scoped re-review 修复，一键测试为 `77 passed`。已创建目标为 `codex/t05-tools` 的 [stacked draft PR #6](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/6)，保留分支/worktree 等待审查。
 7. 任务 7 已在 `codex/t07-agent-loop` / `D:\safe-code-harness-v2\.worktrees\t07-agent-loop` 完成：自实现循环的审批与恢复边界经两轮 Critical 修复和 scoped re-review；完整 backend/tests 为 `89 passed`。已创建目标为 `codex/t06-feedback-memory` 的 [stacked draft PR #7](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/7)，保留分支/worktree 等待审查。
-8. 后续从任务 8 的 FastAPI 运行与审批 API 继续；持续即时更新过程记录。
+8. 任务 8 已在 `codex/t08-api-runs` 完成：`974d73b` 增加运行/审批 API，`7afa279` 修复 TestClient 直接依赖声明；独立复审通过，完整 backend `96 passed`、一键 unit `88 passed`。已创建目标为 `codex/t07-agent-loop` 的 [stacked draft PR #8](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/8)，保留分支/worktree 等待审查。
+9. 任务 9 已在 `codex/t09-planner-credentials` 完成：`3074085` 增加仅 Windows Credential Manager 的 Planner 凭据存储、掩码配置 API 与可注入传输的 OpenAI-compatible LLM；`51eb9c8` 修复异常链潜在泄露。未配置、读取、输出或使用真实 key，未访问网络。独立复审最终 PASS；协调会话完整 backend `110 passed`、一键 unit `96 passed`。已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)，保留分支/worktree 等待审查。下一步为任务 10 的安全 zip 上传与工作区注册。
