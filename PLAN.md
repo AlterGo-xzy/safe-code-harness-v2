@@ -300,7 +300,7 @@ def test_failed_tests_change_the_next_mock_action() -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：新增 `finish`、达到最大步数、解析失败、规则阻止、审批拒绝和工具失败后的下一动作测试；运行同一命令，预期全绿且 Mock 序列确定。
 - [ ] **步骤 5：两阶段审查与提交**：先对照 SPEC 的“模型仅决策、代码治理执行”边界，再检查状态转换与事件顺序；提交 `git commit -m "feat: implement governed agent loop"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** fresh implementer `/root/t07_implementer` 完成 `2ceb6b1`，审查修复为 `e018822`、`328baaf`。RED 为缺少 `agent_loop`；旧项目仅在 RED 后参考 `core\agent_loop.py` 和相关测试的单步循环/事件概念，未迁入框架、API、planner 或凭据。初始完整 backend 为 `83 passed`。独立审查发现命令/写入审批绕过、pending 无法安全恢复（Critical）及工具失败结构化可观察性（Important）；两轮均先新增失败回归，最终 scoped re-review PASS。协调会话新鲜验证：`scripts/test.ps1` unit `88 passed`，显式 `pytest backend/tests`（含 integration）`89 passed in 0.12s`，`git diff --check 124b7f6..HEAD` 无输出；PR 收尾另行记录。
 
 ## 任务 8：FastAPI 运行与审批 API
 

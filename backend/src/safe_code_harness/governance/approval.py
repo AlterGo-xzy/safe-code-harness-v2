@@ -36,6 +36,12 @@ class ApprovalStore:
     def reject(self, approval_id: str) -> Approval:
         return self._transition(approval_id, "rejected")
 
+    def get(self, approval_id: str) -> Approval:
+        approval = self._requests.get(approval_id)
+        if approval is None:
+            raise ApprovalStateError("approval request not found")
+        return approval
+
     def _transition(self, approval_id: str, status: ApprovalStatus) -> Approval:
         approval = self._requests.get(approval_id)
         if approval is None:
