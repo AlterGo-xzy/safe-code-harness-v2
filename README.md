@@ -130,7 +130,7 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
                               -> 进程内 key / 平台 Secret Manager
 ```
 
-应用本身没有身份认证。Docker/Compose 示例因此只绑定 `127.0.0.1`；不得把未加认证的审批、Planner 配置或 ZIP 上传 API 直接暴露到局域网或公网。Render、Railway、Fly.io 或等效平台只有在提供认证与 TLS 网关后才可使用。
+应用本身没有身份认证（the application does not implement authentication；public deployment requires an authentication and TLS gateway）。Docker/Compose 示例因此只绑定 `127.0.0.1`；不得把未加认证的审批、Planner 配置或 ZIP 上传 API 直接暴露到局域网或公网。Render、Railway、Fly.io 或等效平台只有在提供认证与 TLS 网关后才可使用。
 
 截至 2026-08-10，GitHub/GitLab 绿色流水线、GHCR 公开拉取、公开 HTTPS URL 和南京大学 Git 远程均未在本地任务中得到真实外部结果，不能写成已完成。
 
