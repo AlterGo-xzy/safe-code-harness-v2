@@ -13,7 +13,7 @@
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
 - 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
-- 当前源码范围：任务 1-8 的 Harness 核心与运行/审批 API、任务 9 的离线安全 Planner 配置均已完成并经审查；上传、前端、CI、容器与部署尚未开始。任务 9 不配置真实 API key，后续由前端通过受保护接口录入。
+- 当前源码范围：任务 1-8 的 Harness 核心与运行/审批 API、任务 9 的离线安全 Planner 配置、任务 10 的安全 ZIP 上传和隔离工作区均已完成并经审查；前端、CI、容器与部署尚未开始。任务 9 不配置真实 API key，后续仅通过受保护接口录入。
 
 ## 不可突破的执行纪律
 
@@ -123,3 +123,7 @@
 7. 任务 7 已在 `codex/t07-agent-loop` / `D:\safe-code-harness-v2\.worktrees\t07-agent-loop` 完成：自实现循环的审批与恢复边界经两轮 Critical 修复和 scoped re-review；完整 backend/tests 为 `89 passed`。已创建目标为 `codex/t06-feedback-memory` 的 [stacked draft PR #7](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/7)，保留分支/worktree 等待审查。
 8. 任务 8 已在 `codex/t08-api-runs` 完成：`974d73b` 增加运行/审批 API，`7afa279` 修复 TestClient 直接依赖声明；独立复审通过，完整 backend `96 passed`、一键 unit `88 passed`。已创建目标为 `codex/t07-agent-loop` 的 [stacked draft PR #8](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/8)，保留分支/worktree 等待审查。
 9. 任务 9 已在 `codex/t09-planner-credentials` 完成：`3074085` 增加仅 Windows Credential Manager 的 Planner 凭据存储、掩码配置 API 与可注入传输的 OpenAI-compatible LLM；`51eb9c8` 修复异常链潜在泄露。未配置、读取、输出或使用真实 key，未访问网络。独立复审最终 PASS；协调会话完整 backend `110 passed`、一键 unit `96 passed`。已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)，保留分支/worktree 等待审查。下一步为任务 10 的安全 zip 上传与工作区注册。
+
+## 2026-08-10 PR #10 与 main 的受控集成（审查待进行）
+
+PR #10 的 `DIRTY` 已在 `codex/t10-workspace-upload` 重现为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py` 三处冲突。根因是 Task 9 与 Task 10 都向同一 app factory 添加独立状态/路由。协调会话先新增真实 API 回归，当前冲突标记下预期 RED 为 `SyntaxError`；最小组合同时保留可注入 `SecretStore` 的 Planner、`WorkspaceRegistry` 和三条 routers。focused GREEN `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，冲突标记/diff/高置信凭据候选均为 0。fresh 只读 reviewer `/root/t10_merge_reviewer` 对 `6681ed1` 的 C/I/M=`0/0/0`，确认未丢弃路由/state，Task 9 fail-closed/redaction 和 Task 10 ZIP 预校验均保持；现仅待推送并按用户授权普通 merge。
