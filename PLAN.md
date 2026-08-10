@@ -250,7 +250,7 @@ def test_unknown_action_does_not_execute_any_tool() -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：补充工作区外路径、禁用工具、超时和命令护栏测试；运行 `python -m pytest backend/tests/unit/test_dispatcher.py backend/tests/unit/test_file_tools.py backend/tests/unit/test_test_tools.py -q`，预期全绿且不联网。
 - [ ] **步骤 5：两阶段审查与提交**：先确认工具层没有自行绕过规则或审批，再审查子进程参数、错误结构和资源释放；提交 `git commit -m "feat: add governed tool dispatcher"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** 实现 subagent `/root/t05_implementer` 在 stacked 分支 `codex/t05-tools` 完成，提交 `2795539`。按用户授权，RED 后仅参考旧项目 `D:\2026_summer_project\backend\src\safe_code_harness\tools\file_tools.py`、`test_tools.py`、`shell_tools.py`、`dispatcher.py` 与 `tests\unit\test_tool_dispatcher.py`；人工适配为当前 `Action`、`PathSandbox`、`CommandGuard` 和显式 `ToolResult`，未迁入 AgentLoop、API、planner、凭据、反馈或旧 memory。RED：三个 focused 测试按预期报 `ModuleNotFoundError: safe_code_harness.tools`；GREEN：focused `7 passed`、完整 backend `58 passed`。独立 reviewer `/root/t05_reviewer` 审查批准，无 Critical/Important；一个 Minor（安全 shell 的 argv/timeout 及审批短路回归）已登记于 SDD ledger，留待后续测试加固。协调会话从 worktree 根目录运行 `scripts/test.ps1`，为 `58 passed in 0.10s`；`git diff --check 716d246..HEAD` 无输出。凭据形态扫描唯一命中为既有假 token fixture，不是密钥。按既有选项 2，已推送并创建目标为 `codex/t04-command-approval` 的 [stacked draft PR #5](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/5)，保留分支/worktree 等待审查。
 
 ## 任务 6：确定性反馈与有界运行记忆
 
