@@ -111,25 +111,112 @@ docker run --rm -p 127.0.0.1:8000:8000 ghcr.io/altergo-xzy/safe-code-harness-v2:
 
 ## Planner key 安全配置
 
-### 可选：仅本机的真实 Planner 运行
+### 可选扩展：仅本机真实 Planner 模式
 
-默认运行模式仍为离线 Mock。若要在本机让已配置的 OpenAI-compatible Planner 实际驱动 Harness，必须先在 PowerShell 显式启用：
+#### 作用与范围
+
+SafeCodeHarness 默认使用确定性的 Mock LLM，因此离线测试、机制演示、浏览器审批闭环和 Railway 演示站都不需要真实 API key。
+
+本扩展增加“本地真实 Planner”模式：用户在自己的 Windows 电脑上配置一个 OpenAI-compatible API 后，Planner 可以实际向该服务请求一次 JSON 动作建议，再交由 SafeCodeHarness 自己实现的 AgentLoop、治理规则、审批状态机和工具分派器执行。
+
+该扩展具有以下边界：
+
+- 仅位于独立分支 `codex/extension-local-real-planner`。
+- 不属于当前 `main`、GitHub 发布镜像或 Railway Mock 演示站。
+- 尚未合并、未部署；删除该分支即可完整回退，不影响已交付项目。
+- Planner 只负责提出动作建议，不直接拥有写文件、运行测试或执行命令的权限。
+- 默认仍为 Mock；真实模式必须由用户显式开启，且绝不会自动降级到 Mock。
+
+#### 获取扩展分支
+
+```powershell
+git clone --branch codex/extension-local-real-planner --single-branch https://github.com/AlterGo-xzy/safe-code-harness-v2.git
+Set-Location safe-code-harness-v2
+```
+
+如果已经克隆项目：
+
+```powershell
+git fetch origin
+git switch codex/extension-local-real-planner
+```
+
+#### 本机启动
+
+本扩展面向原生 Windows 本机使用。需要 Python 3.12+、Node.js/npm，以及一个浏览器。首次安装依赖：
+
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .\backend
+npm.cmd --prefix frontend ci --ignore-scripts
+```
+
+启动后端前，显式开启真实 Planner 功能：
 
 ```powershell
 $env:SAFE_CODE_HARNESS_ENABLE_REAL_PLANNER = "1"
+.\.venv\Scripts\python.exe -m uvicorn safe_code_harness.api.main:app --app-dir backend/src --host 127.0.0.1 --port 8000
 ```
 
-随后在 WebUI 中依次上传本地项目 ZIP、保存 Planner 地址/模型/key，并在“创建运行”选择“本地真实 Planner”。真实模式没有自动降级：缺少该开关、工作区或 key 时会拒绝创建；模型提出的 `write_file`、`run_tests`、`run_command` 仍必须先经本地审批，路径仍受工作区沙箱约束。
+另开一个 PowerShell 窗口启动前端：
 
-镜像内置 `SAFE_CODE_HARNESS_DEPLOYMENT=mock`，因此即使误设真实 Planner 开关，Docker/Railway Mock 容器也会拒绝真实模式。公网认证和多用户密钥隔离仍是独立的后续扩展。
+```powershell
+Set-Location safe-code-harness-v2
+npm.cmd --prefix frontend run dev
+```
 
-默认 Mock LLM 完全不需要 key。
+然后访问 Vite 输出的本地地址，通常为 <http://127.0.0.1:5173>。
 
-Windows 原生运行时，可在 WebUI 的 Planner 设置中通过密码输入框录入、更新或清除可选 key；后端只把它写入 Windows Credential Manager，GET API 和界面只显示是否已配置及掩码，不回显明文。非 Windows 原生环境没有 Credential Manager 适配器时拒绝持久化，不降级到明文文件。
+#### 使用步骤
 
-Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在仅本机访问的 WebUI 密码输入框中录入，容器重启后丢失。托管部署如需可重启配置，应通过托管平台的 Secret Manager 设置 `SAFE_CODE_HARNESS_PLANNER_API_KEY`；不要把真实值写入 `docker run` 命令、shell history、Compose YAML、Docker build argument、仓库文件或 `.env`。环境注入仍可能被宿主机或容器高权限主体读取，因此生产托管必须同时限制平台权限并启用 HTTPS。
+1. 在 WebUI 中上传一个不包含敏感信息的本地项目 ZIP。
+2. 打开 Planner 设置，填写 OpenAI-compatible 服务的 Base URL、模型名和 API key。
+3. 点击保存。Windows 原生运行时，key 由后端写入 Windows Credential Manager；界面和 GET API 只显示已配置状态及掩码，不会回显明文。
+4. 在“创建运行”区域选择“本地真实 Planner”。
+5. 输入任务描述并创建运行。
+6. 当运行进入待审批状态时，检查事件时间线和建议动作。
+7. 仅在确认安全后点击“批准”；写文件、运行测试和执行命令都需要单独审批。
 
-仓库的 `.gitignore` 与 `.dockerignore` 排除根目录和嵌套的 dotenv 文件；它们是最后一道防误提交措施，不会把 `.env` 变成安全存储。
+真实模式要求同时满足以下条件：
+
+- 环境变量 `SAFE_CODE_HARNESS_ENABLE_REAL_PLANNER=1` 已设置；
+- 已配置 Planner API key；
+- 已上传并选择有效工作区；
+- 创建运行时明确选择“本地真实 Planner”。
+
+缺少任一条件时，服务会拒绝创建真实运行，而不会在用户不知情的情况下改用 Mock。
+
+#### 安全边界
+
+即使使用真实 Planner，以下安全控制仍由 SafeCodeHarness 本身执行：
+
+- LLM 只能提出一条受 JSON 协议约束的动作建议。
+- 文件操作受 PathSandbox 限制，只能作用于上传后的隔离工作区。
+- `write_file`、`run_tests` 和 `run_command` 必须经过人工审批。
+- 命令仍经过 RuntimePolicy 和 CommandGuard 检查。
+- Planner key 不会返回给前端、写入日志、嵌入运行事件或发送到工具调用参数中。
+- 没有 API key 时，不会发出外部 Planner 请求。
+
+请勿在聊天、Issue、终端命令、`.env`、Compose 文件、Docker build 参数或仓库文件中粘贴真实 key。首次试用应使用无敏感文件、权限和额度都受限的专用测试 key；在批准任何动作前，应先检查任务描述、建议动作、目标文件路径和事件时间线。
+
+#### Docker、Railway 与公网限制
+
+本扩展故意不支持在当前 Docker/Railway 部署中启用真实 Planner。镜像内置 `SAFE_CODE_HARNESS_DEPLOYMENT=mock`，因此即使容器环境中错误设置了 `SAFE_CODE_HARNESS_ENABLE_REAL_PLANNER=1`，真实模式仍会被拒绝。Railway 地址仅用于无真实 key、无敏感工作区的 Mock 演示。
+
+当前应用没有用户认证、租户隔离或生产级审计存储。因此不得把未认证的 Planner 配置、ZIP 上传、审批或真实 key 直接暴露到局域网或公网。若未来需要公网真实使用，必须先增加独立的认证与 TLS 网关、平台 Secret Manager 和多用户密钥隔离；在这些能力完成前，真实 Planner 模式仅应在受信任的本机环境使用。
+
+#### 回退方式
+
+该功能位于独立分支，不影响 `main`。如不再需要：
+
+```powershell
+git switch main
+git branch -D codex/extension-local-real-planner
+```
+
+如已删除本地分支但保留远程分支，可按需再次检出；如确认不再保留，也可在 GitHub 删除对应远程分支。
+
+默认 Mock LLM 完全不需要 key。仓库的 `.gitignore` 与 `.dockerignore` 排除根目录和嵌套的 dotenv 文件；它们是最后一道防误提交措施，不会把 `.env` 变成安全存储。
 
 ## CI/CD 与部署架构
 

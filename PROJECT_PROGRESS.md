@@ -13,6 +13,7 @@
 - Docker/Railway 镜像内置 `SAFE_CODE_HARNESS_DEPLOYMENT=mock`，故即使误设真实开关仍拒绝真实模式。当前 Railway URL 继续保持无 key 的 Mock 演示，不得录入真实 key。
 - 已验证：focused 后端覆盖禁用、容器 mock 锁定、缺 key 与真实模式审批/工作区写入；完整 backend 为 `174 passed, 1 warning`。前端新增创建运行入口，unit `53 passed`、production build 通过。Docker multi-stage 镜像实际构建成功；以真实开关启动该镜像后，`POST /api/runs` 的真实模式仍返回 `403`，证明镜像的 mock 锁定生效。没有配置真实 key、没有发送实际外部 API 请求，也没有部署扩展。
 - 扩展已本地提交（以本分支当前 `HEAD` 为准），尚未 push、PR、merge 或部署；若用户决定试用，先在本机设置开关并通过 Planner 面板录入自己的 key，再上传无敏感内容的 ZIP 并手工选择真实模式。出现任何问题可直接丢弃该分支/worktree，已交付 main 不受影响。
+- README 已补为面向分支下载者的完整使用指南：独立分支获取、本机依赖与双服务启动、WebUI 配置和审批步骤、开关/key/工作区门槛、安全边界、Docker/Railway 公网限制及回退命令均已写明；本次仅修改文档，未重跑代码测试。
 
 ## 2026-08-10 最终交付外部证据更新（优先于下方历史快照）
 
