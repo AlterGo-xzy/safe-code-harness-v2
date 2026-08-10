@@ -74,3 +74,35 @@
 - 实际动作：在创建任一 worktree 前，最小新增 `.gitignore` 的 `.worktrees/` 与 `.superpowers/` 两项，并调整 PLAN 任务 1：该任务在隔离 worktree 中扩展已有 `.gitignore`，而不是声称新建它。
 - 边界：此提交不创建 `backend/`、`frontend/` 或任何 Harness 源码，不执行任务 1 的测试，也不替代该任务的 TDD 过程。
 - 学到的教训：忽略 worktree 目录必须先于 `git worktree add`，否则隔离目录可能被误纳入版本控制；该基础操作也要在日志和计划中如实说明。
+
+## 2026-08-04 T1：工程基座与离线测试入口
+
+- worktree/分支：`D:\\safe-code-harness-v2\\.worktrees\\t01-foundation` / `codex/t01-foundation`，基线 `5dd5da3`。
+- 实现 subagent：`Arendt`（新鲜 session）；读取任务简报并仅在该 worktree 工作。实际提交 `cc81e31 chore: establish offline test foundation`，创建后端包元数据、src layout、测试导入脚手架、版本契约测试、Windows `scripts/test.ps1`，并扩展忽略规则；没有使用旧仓库源码或高层 agent framework。
+- TDD 证据：生产包不存在时，focused pytest 实际得到 `ModuleNotFoundError: safe_code_harness`；加入最小 `__version__` 后 focused pytest、editable install、独立导入和 `scripts/test.ps1` 均通过，当前完整 backend 测试为 `1 passed`。
+- 两阶段审查：新鲜 reviewer `Mencius` 先作 spec 合规、再作代码质量审查，结论均为批准，无 Critical/Important/Minor；其只读审查基线 `5dd5da3..cc81e31`。主协调会话独立执行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check` 无输出。
+- 人工干预：协调会话仅回填 PLAN/AGENT_LOG 的实际证据，没有修改任务功能文件。
+- 学到的教训：即使最小包基座也要同时验证 pytest 导入路径和独立 editable-install 导入，任一单独通过都不足以证明 src layout 可用。
+
+## 2026-08-04 T1：PR 创建外部阻断
+
+- 实际动作：分支 `codex/t01-foundation` 已成功推送至 `origin`。尝试通过 GitHub 连接器为 `AlterGo-xzy/safe-code-harness-v2` 创建 draft PR，返回 `403 Resource not accessible by integration`。
+- 交叉核对：`gh auth status` 显示本机活动账户 `AlterGo-xzy` 的 token 无效，并要求执行 `gh auth login -h github.com`；Git push 的传输凭据不能替代该 token。
+- 当前状态：TDD、代码审查和独立测试均完成，但课程要求的“每个 worktree 一个 PR”尚未满足。等待学生完成 GitHub CLI 重新认证或通过网页创建 PR；在真实 PR URL/编号回填前，不进入任务 2。
+- 学到的教训：分支已 push 不等于 PR 已建立；Git 传输认证、GitHub CLI token 和连接器权限需分别验证。
+
+## 2026-08-04 T1：认证复核与新对话 handoff
+
+- 用户声明已完成登录后，协调会话在当前分支重新运行 `scripts/test.ps1`，结果为 `1 passed in 0.01s`；随后 `gh auth status` 仍返回 `AlterGo-xzy` token invalid。该声明未被写成认证通过。
+- 用户决策：允许复用此前完成的代码以减少重复工作，并要求完成当前 task 后维护可供新对话直接读取的进度与目标文件，目标必须覆盖两份正式要求的每一项。
+- 实际动作：新增 `PROJECT_PROGRESS.md`，记录真实分支/commit/PR 阻断、严格的旧代码迁入边界、通用要求和 A 赛道要求逐项目标，以及下一步顺序。
+- 学到的教训：handoff 文档必须把“已验证”“外部阻断”“后续目标”分开写；用户口头状态与命令实际输出冲突时以可复跑输出为准。
+
+## 2026-08-04 T1：GitHub CLI 认证成功与分支收尾
+
+- 触发技能：`superpowers:verification-before-completion`、`superpowers:finishing-a-development-branch`。
+- 关键 context：用户完成 GitHub CLI 登录后，主协调会话重新运行 `gh auth status`，得到账户 `AlterGo-xzy` 已登录，token scopes 包含 `repo` 与 `workflow`。用户此前明确选择收尾选项 2“推送并创建 PR”。
+- 实际动作：创建前执行 `scripts/test.ps1`，结果为 `1 passed in 0.01s`；执行 `git diff --check origin/main...HEAD` 无输出；使用 `gh pr create --draft --base main --head codex/t01-foundation` 创建 [PR #1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)。
+- 分支决定：依照选项 2 保留 `codex/t01-foundation` 与 `.worktrees/t01-foundation`，用于处理 PR 审查反馈；不合并、不删除。此前 connector 403 与失效 token 的日志保留为历史事实，不再构成阻断。
+- 人工干预：用户完成并授权 GitHub CLI 登录；主协调只回填真实 PR 与新鲜验证记录，未修改任务 1 功能代码。
+- 学到的教训：GitHub connector、Git 传输和 `gh` 是独立认证面；PR URL、测试输出和分支收尾决定都应在同一流程节点即时写入过程文档。
