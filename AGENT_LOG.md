@@ -360,3 +360,9 @@
 - 推送：提交 `749199a fix: support GitLab Node File tests` 已推送至 `nju/codex/t15-release-evidence`，GitLab 已接收更新并给出 merge request 创建 URL。`glab` 未安装，匿名 REST API 仍被 Anubis 拦截；等待用户网页登录 GitLab 查看并提供该复跑的真实 pipeline 状态。
 - 外部结果：用户提供 GitLab pipeline 页面截图，记录初始失败 job #610227 / pipeline #319719（`1215581`），以及修复后的通过 job #610231 / pipeline #319723（`749199a`）和 job #610232 / pipeline #319724（`87b432d`）。这满足 GitLab `unit-test` 的最后通过记录；不因此推断 GitHub CI、GHCR 或部署已完成。
 - GitHub 外部结果：协调会话使用已认证 `gh` 查询 [Actions run 31373926124](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31373926124)，结论 `success`；test job 成功执行 backend tests、demos、frontend tests、build、Playwright Chromium E2E，docker-build job 也成功。该 run 的 head 为 `87b432d`；不因此推断 GHCR 发布或公开性已完成。
+
+### 2026-08-10 — Task 15：Railway Mock 演示站范围确认
+
+- 人工决策：用户确认保留 Railway URL `https://safe-code-harness-v2-production.up.railway.app`，但不购买域名、不配置认证网关；后续认证生产部署作为扩展。
+- 外部证据与边界：用户提供的浏览器截图显示工作台首页“暂无运行记录”。该状态符合空的运行列表；它不是实际 Harness 操作或真实 key 的证据。应用没有内建认证，故演示站必须保持 Mock LLM、无真实 Planner key、无敏感工作区上传；不得把 URL 写成安全生产部署完成。
+- 文档动作：同步 README、进度、计划、追踪表和 handoff；将“可访问 WebUI URL”标为 Mock 演示范围已验证，而认证/TLS 安全边界保留为后续扩展。未修改 Harness、CI、Docker 或部署配置，未读取/输出/配置任何凭据。

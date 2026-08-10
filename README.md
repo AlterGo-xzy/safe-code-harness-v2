@@ -132,7 +132,7 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 
 应用本身没有身份认证（the application does not implement authentication；public deployment requires an authentication and TLS gateway）。Docker/Compose 示例因此只绑定 `127.0.0.1`；不得把未加认证的审批、Planner 配置或 ZIP 上传 API 直接暴露到局域网或公网。Render、Railway、Fly.io 或等效平台只有在提供认证与 TLS 网关后才可使用。
 
-截至 2026-08-10，GitHub/GitLab 绿色流水线、GHCR 公开拉取、公开 HTTPS URL 和南京大学 Git 远程均未在本地任务中得到真实外部结果，不能写成已完成。
+截至 2026-08-10，用户已在 Railway 部署一个 HTTPS Mock 演示站：`https://safe-code-harness-v2-production.up.railway.app`；用户提供的浏览器截图显示首页返回“暂无运行记录”。该站没有应用认证，且未配置真实 Planner key，因此它仅是无凭据、无敏感工作区的演示证据，不能替代下述认证/TLS 安全架构，也不能写成安全生产部署完成。GitHub/GitLab 绿色流水线和南京大学 Git 远程已有外部证据；GHCR 公开拉取仍未验证。
 
 ## 目录结构
 
@@ -157,7 +157,7 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 
 - GHCR package 尚未实际设为 public，匿名 pull/run 未验证；当前可重复分发证据是本地 Docker build/run。
 - GitHub Actions 和 GitLab CI 配置已在本地审查，但尚无最终默认分支/课程 GitLab 的绿色外部运行记录。
-- 尚无可访问的公开 HTTPS WebUI URL，也没有经验证的认证网关配置。
+- Railway HTTPS Mock 演示站已可访问，但没有认证网关；不得录入真实 Planner key、上传敏感工作区或把它写成安全生产部署。认证边界作为后续扩展。
 - 尚未提供南京大学 Git 仓库远程地址，因此没有完成同仓库同步和 NJU pipeline。
 - 镜像只验证了当前 Docker Engine 选择的架构；没有 multi-architecture manifest 或独立新机器验证。
 - Windows Credential Manager 只适用于原生 Windows 后端；Linux 容器的进程内 key 重启即失。
@@ -173,7 +173,7 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 - [ ] GitHub Actions 最终 CI 成功，记录 run URL、commit SHA 和日期；
 - [ ] NJU Git 远程可访问且 GitLab `unit-test` 成功，记录项目与 pipeline URL；
 - [ ] GHCR package 为 public，未登录环境 `docker pull`/run 成功；
-- [ ] 公网 HTTPS WebUI 经认证网关可访问，并验证首页、审批边界和无 key 回显；
+- [x] Railway HTTPS Mock 演示站可访问（用户截图验证首页）；它未满足认证网关边界，真实 key/敏感工作区与生产使用仍为后续扩展；
 - [ ] 学生本人完成 `REFLECTION.md` 1500–2500 字；
 - [ ] 最终历史凭据扫描通过且人工复核没有真实 key。
 

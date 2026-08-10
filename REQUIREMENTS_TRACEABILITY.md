@@ -37,11 +37,11 @@
 | G-4.8 | 一键测试、GitHub Actions push 测试、容器构建 | 已完成并验证 | `Makefile test` 使用仓库 venv；GitHub push/PR 测试+E2E+Docker job 已实现，GHCR publish 依赖成功的默认分支 push CI。本地 Docker loopback build/healthy 通过；Task 15 GitHub Actions [run 31373926124](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31373926124) 的 test（backend、demos、frontend、Chromium E2E）和 docker-build job 均通过。 |
 | G-4.9 | AGENT_LOG 包含时间、task、skill、prompt、输出、人工干预、教训 | 部分完成（任务 1-15 本地） | D0 及任务 1-15 本地日志包含上述字段和本地审查闭环；外部核验与分支收尾后继续更新。 |
 | G-4.10 | README 分发与 key 配置，CI 对应构建 | 部分完成（任务 14-15 本地） | 中文 README、Docker/GHCR workflow 与本地 loopback build/run/API/WebUI/key 边界已实现并记录；公开 GHCR pull/run 仍待外部发布和 package public 设置。 |
-| G-4.11 | 服务端项目提供截止前可访问 WebUI、说明部署与 CI/CD | 部分完成（仅文档架构） | README 已说明认证/TLS 网关、容器与平台 Secret Manager 架构；没有托管账户和真实 HTTPS URL，公网可访问性仍是外部阻断。 |
+| G-4.11 | 服务端项目提供截止前可访问 WebUI、说明部署与 CI/CD | 部分完成（Mock 演示已验证） | 用户确认 Railway `https://safe-code-harness-v2-production.up.railway.app` 已部署，浏览器截图显示首页“暂无运行记录”；README 说明部署/CI/CD。该公共 HTTPS 站没有应用认证且未配置真实 Planner key，只能作为无敏感数据的 Mock 演示；认证/TLS 安全生产边界列为后续扩展。 |
 | G-5-1 | 同一个 NJU Git 链接提交所有交付 | 部分完成 | 用户提供的 NJU Git `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git` 已可访问；2026-08-10 已推送 `codex/t15-release-evidence`（HEAD 当时为 `1215581`）并设上游。最终合并、Task 15 PR 与其余外部证据仍待。 |
 | G-5-2 | `.gitlab-ci.yml` 有名为 `unit-test` 的 job，最后 CI/CD 为 pass | 已完成并验证 | `.gitlab-ci.yml` 有顶层精确 `unit-test`，运行 backend、demos、frontend unit/build。初始 job #610227（pipeline #319719）因 Bookworm Node 缺少全局 `File` 失败；TDD 修复 `749199a` 后，用户提供的 GitLab 页面确认 job #610231（pipeline #319723，`749199a`）及 job #610232（pipeline #319724，`87b432d`）均为通过。 |
 | G-5-3 | `REFLECTION.md` 为学生本人 1500-2500 字 | 外部阻断 | `REFLECTION.md` 目前只有本人写作门禁和提纲，没有 AI 生成正文；必须由学生独立完成 1500-2500 字，AI 如润色须标注。 |
-| G-5-4 | 线上 WebUI URL | 外部阻断 | 尚无认证/TLS 托管平台与已部署 URL；取得真实 URL 后检查首页、审批边界和无 key 回显。 |
+| G-5-4 | 线上 WebUI URL | 已完成并验证（Mock 演示范围） | 用户确认 Railway URL `https://safe-code-harness-v2-production.up.railway.app`，并提供首页空状态截图。它满足可访问 WebUI URL 的演示证据；无认证、无真实 key、不得上传敏感工作区，安全生产部署是后续扩展。 |
 | G-6 | 学术规范：个人手写核心处注释、第三方许可证、反思不可 AI 代写 | 部分完成 | `LICENSE`、`THIRD_PARTY_NOTICES.md` 和 README 许可证索引已完成；学生本人反思及最终人工学术规范复核仍未完成。 |
 
 ## A 赛道要求
