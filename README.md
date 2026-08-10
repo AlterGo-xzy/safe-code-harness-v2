@@ -132,7 +132,7 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 
 应用本身没有身份认证（the application does not implement authentication；public deployment requires an authentication and TLS gateway）。Docker/Compose 示例因此只绑定 `127.0.0.1`；不得把未加认证的审批、Planner 配置或 ZIP 上传 API 直接暴露到局域网或公网。Render、Railway、Fly.io 或等效平台只有在提供认证与 TLS 网关后才可使用。
 
-截至 2026-08-10，用户已在 Railway 部署一个 HTTPS Mock 演示站：`https://safe-code-harness-v2-production.up.railway.app`；用户提供的浏览器截图显示首页返回“暂无运行记录”。该站没有应用认证，且未配置真实 Planner key，因此它仅是无凭据、无敏感工作区的演示证据，不能替代下述认证/TLS 安全架构，也不能写成安全生产部署完成。GitHub/GitLab 绿色流水线和南京大学 Git 远程已有外部证据；GHCR 公开拉取仍未验证。
+截至 2026-08-10，用户已在 Railway 部署一个 HTTPS Mock 演示站：`https://safe-code-harness-v2-production.up.railway.app`；用户提供的浏览器截图显示首页返回“暂无运行记录”，协调会话对根地址的只读 HTTP 请求也得到 `200`。该站没有应用认证，且未配置真实 Planner key，因此它仅是无凭据、无敏感工作区的演示证据，不能替代下述认证/TLS 安全架构，也不能写成安全生产部署完成。GitHub/GitLab 绿色流水线和南京大学 Git 远程已有外部证据；GHCR 公开拉取仍未验证。
 
 ## 目录结构
 

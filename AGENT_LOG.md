@@ -366,3 +366,10 @@
 - 人工决策：用户确认保留 Railway URL `https://safe-code-harness-v2-production.up.railway.app`，但不购买域名、不配置认证网关；后续认证生产部署作为扩展。
 - 外部证据与边界：用户提供的浏览器截图显示工作台首页“暂无运行记录”。该状态符合空的运行列表；它不是实际 Harness 操作或真实 key 的证据。应用没有内建认证，故演示站必须保持 Mock LLM、无真实 Planner key、无敏感工作区上传；不得把 URL 写成安全生产部署完成。
 - 文档动作：同步 README、进度、计划、追踪表和 handoff；将“可访问 WebUI URL”标为 Mock 演示范围已验证，而认证/TLS 安全边界保留为后续扩展。未修改 Harness、CI、Docker 或部署配置，未读取/输出/配置任何凭据。
+
+### 2026-08-10 — Task 15：Railway/GitHub/GHCR 外部只读核验
+
+- 推送：用户授权后，`6aa5274 docs: scope Railway as mock demonstration` 已推送到 GitHub `origin/codex/t15-release-evidence` 和 NJU `nju/codex/t15-release-evidence`；未创建 PR、未合并。
+- Railway：对 `https://safe-code-harness-v2-production.up.railway.app` 的只读 HTTP 根请求得到 `200`。响应为 SPA 静态文档，未包含运行时中文空状态文字；空状态仍仅以用户浏览器截图作为证据。
+- GitHub/GHCR：GitHub Actions run `31379732809`（head `6aa5274`）在观察时为 `in_progress`；`gh run watch` 在 55 秒窗口超时，未取得结论。`gh api /users/AlterGo-xzy/packages?package_type=container` 返回 403，明确要求 `read:packages` scope；未尝试改变 token scope、查询私有值、登录/登出 Docker，不能由此推断 GHCR 是否存在或公开。
+- 后续同轮结果：用 `gh run view` 读取同一 run 的最终 JSON，结论为 `success`；`test` job 的 backend tests、demos、frontend tests、build、Playwright Chromium E2E 均成功，`docker-build` job 也成功。该结果证明 push CI 与容器构建，不证明 GHCR 已发布或允许匿名拉取。
