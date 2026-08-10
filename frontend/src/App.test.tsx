@@ -4,8 +4,10 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { App } from "./App";
+import { decideApproval } from "./api/approvals";
 import { getRun, listRuns } from "./api/runs";
 
+vi.mock("./api/approvals", () => ({ decideApproval: vi.fn() }));
 vi.mock("./api/runs", () => ({
   getRun: vi.fn(),
   listRuns: vi.fn(),
@@ -13,6 +15,7 @@ vi.mock("./api/runs", () => ({
 
 const mockedGetRun = vi.mocked(getRun);
 const mockedListRuns = vi.mocked(listRuns);
+const mockedDecideApproval = vi.mocked(decideApproval);
 
 const pendingWrite = {
   id: "r-1",
@@ -63,6 +66,7 @@ describe("App", () => {
       id: "r-1",
       scenario: "pending_write",
       status: "waiting_approval",
+      approvalId: null,
       events: [{
         type: "approval",
         level: "warning",
@@ -74,6 +78,7 @@ describe("App", () => {
       id: "r-2",
       scenario: "review_patch",
       status: "completed",
+      approvalId: null,
       events: [{
         type: "rule_decision",
         level: "block",
@@ -98,6 +103,7 @@ describe("App", () => {
       id: "r-stale",
       scenario: "stale_scenario",
       status: "completed",
+      approvalId: null,
       events: [{
         type: "rule_decision",
         level: "block",
@@ -136,6 +142,7 @@ describe("App", () => {
         id: "r-2",
         scenario: "review_patch",
         status: "completed",
+        approvalId: null,
         events: [{
           type: "rule_decision",
           level: "info",
@@ -152,6 +159,7 @@ describe("App", () => {
         id: "r-1",
         scenario: "pending_write",
         status: "waiting_approval",
+        approvalId: null,
         events: [{
           type: "approval",
           level: "warning",
@@ -164,5 +172,100 @@ describe("App", () => {
 
     expect(screen.getByText("selected_detail")).toBeInTheDocument();
     expect(screen.queryByText("late_stale_detail")).not.toBeInTheDocument();
+  });
+
+  it("renders approval controls only for a selected waiting-approval detail with an approval ID", async () => {
+    mockedListRuns.mockResolvedValue([pendingWrite]);
+    mockedGetRun.mockResolvedValue({
+      id: "r-1",
+      scenario: "pending_write",
+      status: "completed",
+      approvalId: "approval-1",
+      events: [],
+    });
+
+    render(<App />);
+
+    await waitFor(() => expect(mockedGetRun).toHaveBeenCalledWith("r-1"));
+    expect(screen.queryByRole("button", { name: "批准" })).not.toBeInTheDocument();
+  });
+
+  it("reloads the selected run detail after a successful approval decision", async () => {
+    mockedListRuns.mockResolvedValue([pendingWrite]);
+    mockedDecideApproval.mockResolvedValue();
+    mockedGetRun
+      .mockResolvedValueOnce({
+        id: "r-1",
+        scenario: "pending_write",
+        status: "waiting_approval",
+        approvalId: "approval-1",
+        events: [],
+      })
+      .mockResolvedValueOnce({
+        id: "r-1",
+        scenario: "pending_write",
+        status: "completed",
+        approvalId: null,
+        events: [{
+          type: "approval",
+          level: "info",
+          displayStatus: "已批准",
+          summaryCode: "approval_resolved",
+          createdAt: "2026-08-08T10:01:00Z",
+        }],
+      });
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "批准" }));
+
+    await waitFor(() => expect(mockedGetRun).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText("approval_resolved")).toBeInTheDocument();
+  });
+
+  it("keeps a newly selected detail when an earlier approval finishes late", async () => {
+    const reviewRun = {
+      id: "r-2",
+      scenario: "review_patch",
+      status: "completed",
+      updatedAt: "2026-08-08T10:10:00Z",
+    };
+    let resolveApproval!: () => void;
+    let resolveReviewRun!: (detail: Awaited<ReturnType<typeof getRun>>) => void;
+    const approval = new Promise<void>((resolve) => { resolveApproval = resolve; });
+    const reviewDetail = new Promise<Awaited<ReturnType<typeof getRun>>>((resolve) => { resolveReviewRun = resolve; });
+
+    mockedListRuns.mockResolvedValue([pendingWrite, reviewRun]);
+    mockedDecideApproval.mockReturnValue(approval);
+    mockedGetRun.mockImplementation((runId) => runId === "r-1" ? Promise.resolve({
+      id: "r-1",
+      scenario: "pending_write",
+      status: "waiting_approval",
+      approvalId: "approval-1",
+      events: [],
+    }) : reviewDetail);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole("button", { name: "批准" }));
+    fireEvent.click(screen.getByRole("button", { name: /运行 review_patch/ }));
+    await waitFor(() => expect(mockedGetRun).toHaveBeenLastCalledWith("r-2"));
+
+    await act(async () => { resolveApproval(); });
+    await act(async () => {
+      resolveReviewRun({
+        id: "r-2",
+        scenario: "review_patch",
+        status: "completed",
+        approvalId: null,
+        events: [{
+          type: "rule_decision",
+          level: "info",
+          displayStatus: "已完成",
+          summaryCode: "selected_after_late_approval",
+          createdAt: "2026-08-08T10:10:00Z",
+        }],
+      });
+    });
+
+    expect(await screen.findByText("selected_after_late_approval")).toBeInTheDocument();
   });
 });

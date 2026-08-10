@@ -18,6 +18,7 @@ export type RunDetail = {
   scenario: string;
   status: string;
   events: RunEvent[];
+  approvalId: string | null;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -65,11 +66,15 @@ function toDetail(value: unknown): RunDetail {
   if (!isRecord(value) || !Array.isArray(value.events)) {
     throw new Error(message);
   }
+  const status = readString(value, "status", message);
   return {
     id: readString(value, "id", message),
     scenario: readString(value, "scenario", message),
-    status: readString(value, "status", message),
+    status,
     events: value.events.map(toEvent),
+    approvalId: status === "waiting_approval" && typeof value.approval_id === "string"
+      ? value.approval_id
+      : null,
   };
 }
 

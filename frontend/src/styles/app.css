@@ -25,6 +25,8 @@ button:focus-visible {
 
 .workbench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, .9fr); gap: 1rem; }
 
+.control-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+
 .panel {
   min-width: 0;
   padding: 1rem;
@@ -72,7 +74,25 @@ button:focus-visible {
 
 .state-message--error { color: #991b1b; background: #fef2f2; }
 
+.approval-panel { display: grid; gap: .75rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #d1d5db; }
+
+.approval-panel h3, .approval-panel p { margin: 0; }
+
+.settings-form { display: grid; gap: .75rem; }
+
+.settings-form label { display: grid; gap: .35rem; font-weight: 600; }
+
+.settings-form input { min-width: 0; padding: .5rem; font: inherit; border: 1px solid #94a3b8; border-radius: .375rem; }
+
+.settings-form input:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+
+.panel-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+.panel-actions button { padding: .5rem .75rem; border: 1px solid #1d4ed8; border-radius: .375rem; color: #fff; background: #2563eb; cursor: pointer; }
+
+.panel-actions button:disabled { cursor: wait; opacity: .65; }
+
 @media (max-width: 44rem) {
   .app-shell { padding: 1rem; }
-  .workbench { grid-template-columns: 1fr; }
+  .workbench, .control-grid { grid-template-columns: 1fr; }
 }
