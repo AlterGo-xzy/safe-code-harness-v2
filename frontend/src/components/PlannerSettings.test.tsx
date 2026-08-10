@@ -39,11 +39,20 @@ describe("PlannerSettings", () => {
     expect(screen.queryByText("正在加载 Planner 配置…")).not.toBeInTheDocument();
   });
 
+  it("disables Planner controls until the initial configuration is loaded", () => {
+    mockedGetPlanner.mockReturnValue(new Promise(() => {}));
+    render(<PlannerSettings />);
+
+    expect(screen.getByRole("button", { name: "保存 Planner 配置" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "清除 Planner 配置" })).toBeDisabled();
+  });
+
   it("does not render or retain a Planner key after save", async () => {
     mockedGetPlanner.mockResolvedValue(configuredPlanner);
     mockedSavePlanner.mockResolvedValue(configuredPlanner);
     render(<PlannerSettings />);
 
+    await screen.findByDisplayValue("https://example.test/v1");
     fireEvent.change(await screen.findByLabelText("API 密钥"), { target: { value: "secret-value" } });
     fireEvent.click(screen.getByRole("button", { name: "保存 Planner 配置" }));
 
@@ -77,7 +86,7 @@ describe("PlannerSettings", () => {
     expect(screen.queryByText("private-clear-error")).not.toBeInTheDocument();
   });
 
-  it("keeps a saved Planner configuration when the initial load resolves late", async () => {
+  it("saves a Planner configuration after the initial load completes", async () => {
     let resolveInitialLoad!: (settings: typeof configuredPlanner) => void;
     const initialLoad = new Promise<typeof configuredPlanner>((resolve) => { resolveInitialLoad = resolve; });
     const savedPlanner = {
@@ -90,12 +99,11 @@ describe("PlannerSettings", () => {
     mockedSavePlanner.mockResolvedValue(savedPlanner);
     render(<PlannerSettings />);
 
+    await act(async () => { resolveInitialLoad(configuredPlanner); });
     fireEvent.change(screen.getByLabelText("Planner 地址"), { target: { value: savedPlanner.baseUrl } });
     fireEvent.change(screen.getByLabelText("模型"), { target: { value: savedPlanner.model } });
     fireEvent.click(screen.getByRole("button", { name: "保存 Planner 配置" }));
     await waitFor(() => expect(mockedSavePlanner).toHaveBeenCalledOnce());
-
-    await act(async () => { resolveInitialLoad(configuredPlanner); });
 
     expect(screen.getByDisplayValue(savedPlanner.baseUrl)).toBeInTheDocument();
     expect(screen.getByDisplayValue(savedPlanner.model)).toBeInTheDocument();
