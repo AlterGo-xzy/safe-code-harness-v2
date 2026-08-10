@@ -2,6 +2,11 @@
 
 本日志只记录实际发生的过程，不补写或虚构历史证据。
 
+## 2026-08-10 T15：最终分支收尾
+
+- 外部收尾：最终证据 PR #16 的 GitHub CI（test、docker-build）与 Railway 自动部署均成功；普通 merge 产生 `d56516fbc077563f0013090a8e515a4e9f15503f`。随后 fetch GitHub `origin/main` 并以非 force fast-forward 推送到 NJU Git `main`，结果 `5dd5da3..d56516f`。
+- 状态：Task 15 的 README/许可证/反思原样保存/CI/OCI/公网 Mock 演示与同一 NJU Git 提交要求均有证据。Railway 的认证 + TLS 真实 key 部署仍是用户明确延后的扩展，不是已交付功能。
+
 ## 2026-08-10 T15：主分支 CI 修复、公开 GHCR 与最终交付证据
 
 - 技能与原因：`systematic-debugging` 定位 main `ffb8544` 的 GitHub CI 失败；`test-driven-development` 先增加 Planner 初始加载中的按钮禁用 RED；`requesting-code-review` 对最小修复做独立只读审查。纯文档整合按用户指示不重复运行全量测试。

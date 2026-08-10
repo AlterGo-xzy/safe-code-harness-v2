@@ -12,7 +12,7 @@
 - GitHub `main` CI [run 31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 已成功：backend、三份确定性机制演示、frontend unit/build、Chromium E2E 与 Docker build 均通过。此前 `ffb8544` 的 main CI 因 Planner 竞态失败，不能删除该失败历史；它已由 #15 的实际 CI 绿色关闭。
 - CI 成功后，GHCR 发布 [run 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功。使用空 Docker 配置（未登录）实际拉取 `ghcr.io/altergo-xzy/safe-code-harness-v2:sha-c633003a06ad8073852f9125e3e195635f159bbb`，digest 为 `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`；临时容器仅绑定 `127.0.0.1:18001`，就绪后 `/` 和 `/api/runs` 均为 HTTP 200，随后已停止。因此公开 OCI 分发和匿名 pull/run 已有真实证据。
 - Railway `https://safe-code-harness-v2-production.up.railway.app` 仍仅是无真实 key、无敏感工作区的 HTTPS Mock 演示站；Railway HTTPS 不等于应用认证。真实 key/敏感上传仍必须在认证网关与 TLS 安全边界补齐后才可开放。
-- Task 15 仍剩交付收尾而非运行时代码：把本次最终外部证据的文档提交推送并建立/合并 Task 15 PR；将最终 `main` 同步到同一 NJU Git；学生本人在提交前确认反思篇幅口径与内容归属。不得把这些待办写成已经完成。
+- Task 15 收尾已完成：最终证据 PR #16 已 merge 为 `d56516fbc077563f0013090a8e515a4e9f15503f`，同一提交已快进推送至 NJU Git 的 `main`。用户提供的反思正文按中文汉字计数为 `1583`，已原样保存；提交前的篇幅口径复核仍由学生本人负责。当前不再有本项目必做实现/交付阻断；仅余“认证 + TLS 后承载真实 key”的 Railway 生产部署扩展。
 
 - 最终仓库：`https://github.com/AlterGo-xzy/safe-code-harness-v2`，公开。
 - 主分支最新已推送的流程准备提交：`5dd5da3 chore: prepare isolated task worktrees`。
