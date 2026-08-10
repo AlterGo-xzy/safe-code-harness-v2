@@ -6,7 +6,7 @@
 
 GitHub PR #1–#15 已全部普通 merge；最新 main 是 `c633003a06ad8073852f9125e3e195635f159bbb`。该提交的 [GitHub CI 31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 成功执行 backend、三份机制 demo、frontend unit/build、Chromium E2E 和 Docker build。成功 CI 触发的 [GHCR publish 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功；使用空 Docker 配置匿名拉取 `ghcr.io/altergo-xzy/safe-code-harness-v2:sha-c633003a06ad8073852f9125e3e195635f159bbb`（digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`），临时 loopback 容器的 `/` 与 `/api/runs` 皆 HTTP 200。因此 GHCR 已不是未验证项。
 
-Railway URL 保持 HTTPS Mock 演示站：不配置真实 key、不上传敏感工作区；没有应用认证，真实 key 的生产部署仍是延后扩展。Task 15 余项仅为收尾：提交本次证据回填、建立/处理 Task 15 PR、把最终 main 同步到同一 NJU Git，以及学生本人提交前复核反思篇幅口径。下方任何“PR #1–#14 draft”“GHCR 未验证”文字均为历史快照。
+Railway URL 保持 HTTPS Mock 演示站：不配置真实 key、不上传敏感工作区；没有应用认证，真实 key 的生产部署仍是延后扩展。Task 15 的最终证据 PR #16 已 merge `d56516fbc077563f0013090a8e515a4e9f15503f`，同一 `main` 已快进同步到 NJU Git。用户提供的反思正文按中文汉字统计为 `1583` 并已原样保存；提交前的口径复核仍由学生本人负责。下方任何“PR #1–#14 draft”“GHCR 未验证”文字均为历史快照。
 
 任务 1-14 已形成 stacked draft PR #1-#14；Task 15 位于独立 `codex/t15-release-evidence` worktree，本地发布资料、测试、证据与两阶段审查已经闭环。提交链为 `9acb2ae`、`60528ae`、`84a10b4`、`93f3415`；初审总计 C/I/M=`0/0/1`，唯一 Task 14 PLAN 历史 Minor 经 `93f3415` 修复后，限定复审为 `0/0/0`。本地结果为 backend `169 passed, 1 warning`、三份稳定 JSON demo、frontend `48 passed`、build 和真实 Chromium E2E `2 passed`。
 
