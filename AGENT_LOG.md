@@ -330,3 +330,12 @@
 ### 2026-08-10 — Task 14：分支收尾
 
 - 按课程“每个独立模块一个 PR”和 `finishing-a-development-branch` 选项 2，已推送 `codex/t14-ci-distribution` 并创建目标为 `codex/t13-demos-e2e` 的 [draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 worktree 等待审查；外部 CI/GHCR/匿名拉取和任务 15 仍未完成。
+
+### 2026-08-10 — Task 15：本地发布资料与证据实现（待两阶段审查）
+
+- 执行者与范围：fresh implementer `/root/t15_implementer` 在隔离的 `codex/t15-release-evidence` worktree 使用 `executing-plans`、`using-git-worktrees`、`test-driven-development` 与 `systematic-debugging`。只实现任务 15 的本地发布资料/测试/记录；未读取或复用旧项目代码，未改 Harness、Task 14 CI/Docker 配置或延后策略功能，未使用真实 key，未 push/建 PR/finish。
+- TDD RED/GREEN：先新增 `backend/tests/unit/test_release_docs.py`，再运行 `.\.venv\Scripts\python.exe -m pytest backend\tests\unit\test_release_docs.py -q`；RED 为 `1 failed`，前两项 `docker pull`/`Credential Manager` 已满足，精确缺少“已知限制”。随后中文重写 README 并新增 MIT `LICENSE`、`THIRD_PARTY_NOTICES.md`、PR 模板、只含学生本人写作门禁/提纲的 `REFLECTION.md` 占位；focused GREEN `1 passed`，提交 `9acb2ae docs: add reproducible release documentation`。
+- 回归调试：首次完整 backend 为 `1 failed, 168 passed, 1 warning`，现有 Task 14 测试证明中文重写遗漏精确英文安全契约 `does not implement authentication` / `authentication and TLS gateway`。先复现 focused RED 并对比最近 README diff；第一次只恢复首个短语后相邻断言仍 RED，随后完整读取测试函数，以单一双语句恢复两个固定契约。focused `2 passed`、完整 backend 恢复 GREEN；提交 `60528ae docs: preserve distribution security contract`。这两句保留的是无认证/公网网关安全边界，不是翻译装饰。
+- 完整本地验证：新 worktree 自建被忽略 `.venv` 并安装 `backend[dev]`；clean `npm.cmd ci --ignore-scripts` 安装 179 packages，仍报告 5 个既有上游风险（3 moderate、1 high、1 critical）和 `whatwg-encoding` deprecation，未运行 `--force`。最终 backend `169 passed, 1 warning`（既有 Starlette/TestClient 弃用）、三份稳定 JSON demo、frontend `10 files/48 tests`、production build、真实 Chromium E2E `2 passed`；E2E 前后 8000 listener 均为 0。本机无 GNU Make，未虚称执行 `make test`，其 backend/frontend 实际 target 均通过。
+- 凭据与许可证证据：对已跟踪文件和 `git log -p --all` 的 110 个本地可见提交扫描高置信 OpenAI/GitHub/私钥形态；2 个候选只位于 `test_memory.py` 和 `test_rules.py`，脱敏上下文证明它们是验证脱敏/阻断的固定合成 fixture。排除这两处后 tracked/history 未分类候选均为 0；没有输出候选值。第三方直接依赖许可证来自本地 Python distribution metadata 与已提交 npm lockfile；任务 15 本地源码采用 MIT。
+- 外部阻断与下一步：没有 NJU Git 远程地址、托管平台/认证 TLS gateway、GHCR public 设置或学生反思正文；stacked PR 尚未合并，GitHub/GitLab 最终 CI、GHCR 未登录 pull/run、公开 HTTPS URL 均没有真实结果，故不尝试也不宣称。下一步必须 fresh read-only reviewer 先做 SPEC/课程 traceability 审查，再做文档/质量审查；修复所有 Critical 后才可由协调会话继续外部核验或分支收尾。

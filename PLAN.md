@@ -214,7 +214,7 @@ def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
 **文件：** 新建 `README.md`、`LICENSE`、`THIRD_PARTY_NOTICES.md`、`.github/pull_request_template.md`；更新 `SPEC_PROCESS.md`、`AGENT_LOG.md`、`REQUIREMENTS_TRACEABILITY.md`、`PLAN.md`。学生本人负责新建或保留 `REFLECTION.md`，agent 不代写正文。
 **外部交付：** 部署至 Render/Railway/Fly.io 等，记录公开 URL；将仓库同步到南京大学 GitLab；所有任务 PR 按 `finishing-a-development-branch` 决定 merge/保留/丢弃；最终主分支通过 CI。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 ```python
 def test_readme_contains_reproducible_run_and_key_safety_instructions() -> None:
@@ -224,12 +224,12 @@ def test_readme_contains_reproducible_run_and_key_safety_instructions() -> None:
     assert "已知限制" in readme
 ```
 
-- [ ] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/unit/test_release_docs.py -q`，预期 README 或断言尚不满足。
-- [ ] **步骤 3：最小实现**：README 说明获取、`docker pull/run`、本地开发、`make test`、演示、Windows 凭据配置/更新/清除、目标平台、已知限制、部署架构和 CI/CD；PR 模板要求 subagent/human/TDD/审查记录；列出第三方许可证。
-- [ ] **步骤 4：确认绿色结果与外部核验**：运行该文档测试与 `make test`；检查 GitHub 与 GitLab 最终绿色流水线、GHCR 未登录 pull 后运行、部署 URL 的 UI/审批/Mock 演示、NJU Git 仓库可访问、`git log --all` 无真实凭据。将真实 URL、日期、commit、PR、命令和结果写入追踪表与日志。
+- [x] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/unit/test_release_docs.py -q`，预期 README 或断言尚不满足。
+- [x] **步骤 3：最小实现**：README 说明获取、`docker pull/run`、本地开发、`make test`、演示、Windows 凭据配置/更新/清除、目标平台、已知限制、部署架构和 CI/CD；PR 模板要求 subagent/human/TDD/审查记录；列出第三方许可证。
+- [ ] **步骤 4：确认绿色结果与外部核验**：本地文档测试、`make test` 的 Windows 等价目标、演示、build、E2E 和历史扫描已完成；GitHub/GitLab 最终绿色流水线、GHCR 未登录 pull/run、公开部署 URL 与 NJU Git 可访问性仍需真实外部结果。将真实 URL、日期、commit、PR、命令和结果写入追踪表与日志。
 - [ ] **步骤 5：最终两阶段审查、分支收尾与提交**：先逐条复核 SPEC/课程 traceability，再通过 `superpowers:requesting-code-review` 完成代码质量审查；所有 Critical 修复后触发 `superpowers:finishing-a-development-branch`，按其真实建议合并或保留 PR。提交 `git commit -m "docs: record verified release evidence"`，不伪造不可验证的外部结果。
 
-**完成记录：** 真实红绿命令、审查结论、合并/保留决定、hash、PR、CI、GHCR、部署及 NJU Git 证据。
+**完成记录（本地实现，尚未完成外部交付或最终审查）：** fresh implementer `/root/t15_implementer` 在 `codex/t15-release-evidence` 只执行任务 15 本地范围，未读取旧项目代码、未使用真实 key、未 push/建 PR。RED：`.\.venv\Scripts\python.exe -m pytest backend\tests\unit\test_release_docs.py -q` 为 `1 failed`，精确缺少 README 的“已知限制”。GREEN：同命令为 `1 passed`；发布文档、MIT `LICENSE`、第三方声明、PR 模板、仅含本人写作门禁/提纲的 `REFLECTION.md` 占位提交为 `9acb2ae`。完整回归首次发现 README 中文重写删除 Task 14 两个英文无认证契约；现有回归先 RED，经根因复现后以 `60528ae` 恢复双语固定契约。最终本地结果：backend `169 passed, 1 warning`（既有 TestClient 弃用）、三份稳定 JSON demo、frontend `48 passed`、build、Chromium E2E `2 passed`；本机无 GNU Make，未虚称运行 `make test`，实际两个 target 均通过。`git log -p --all` 扫描 110 个可见提交得到 2 个高置信候选，均为 `test_memory.py`/`test_rules.py` 的专用合成 fixture；排除后 tracked/history 未分类候选均为 0。GitHub/GitLab CI、GHCR public/匿名 pull-run、认证 TLS 公网部署、NJU Git 远程、学生 1500-2500 字反思、两阶段审查与分支收尾均未完成；不得把本地实现写成 Task 15 完成。
 
 ## 计划自审
 
