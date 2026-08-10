@@ -13,6 +13,7 @@
 - 已用空 Docker 配置（未登录）实际拉取 `ghcr.io/altergo-xzy/safe-code-harness-v2:sha-c633003a06ad8073852f9125e3e195635f159bbb`，digest 为 `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`；临时容器仅绑定 `127.0.0.1:18001`，就绪后 `/` 和 `/api/runs` 均为 HTTP 200，随后已停止。因此公开 OCI 分发和匿名 pull/run 已有真实证据。
 - Railway `https://safe-code-harness-v2-production.up.railway.app` 仍仅是无真实 key、无敏感工作区的 HTTPS Mock 演示站；Railway HTTPS 不等于应用认证。真实 key/敏感上传仍必须在认证网关与 TLS 安全边界补齐后才可开放。
 - Task 15 收尾已完成：PR #16、#17 的交接与关闭记录均已 merge；同一最终 main 已快进推送至 NJU Git。用户截图确认 NJU GitLab `main` 的 `a205a231` pipeline `#319806` / `unit-test` job `#610513` 通过。用户提供的反思正文按中文汉字计数为 `1583`，已原样保存；“认证 + TLS 后承载真实 key”的 Railway 生产部署仍是延后扩展，而非本项目必做项。
+- 文档补正提交 `be2329e` 已推送 GitHub/NJU，并建立 [draft PR #18](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/18)：它只记录最终 GitLab 证据、职责链和交接状态，不改 Harness、测试、CI、Docker 或部署配置；因此 `a205a231` 仍是最后完整运行时验证基线，PR #18 合并前不得把它写成新的运行时验证。
 
 - 最终仓库：`https://github.com/AlterGo-xzy/safe-code-harness-v2`，公开。
 - 主分支最新已推送的流程准备提交：`5dd5da3 chore: prepare isolated task worktrees`。

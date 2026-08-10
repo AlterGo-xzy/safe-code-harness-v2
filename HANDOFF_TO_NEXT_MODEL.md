@@ -8,6 +8,8 @@ GitHub PR #1–#17 已全部普通 merge；最后一次完整运行时验证的 
 
 Railway URL 保持 HTTPS Mock 演示站：不配置真实 key、不上传敏感工作区；没有应用认证，真实 key 的生产部署仍是延后扩展。Task 15 的最终证据/关闭 PR #16、#17 均已 merge；用户提供的反思正文按中文汉字统计为 `1583` 并已原样保存。用户截图确认 NJU GitLab `main` 的 `a205a231` pipeline `#319806` / `unit-test` job `#610513` 已通过。下方任何“PR #1–#14 draft”“GHCR 未验证”文字均为历史快照。
 
+文档证据补正提交 `be2329e` 位于已推送的 `codex/t15-release-evidence`，并有 [draft PR #18](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/18)。该 PR 只改 README、进度、追踪、计划、handoff 和日志；未改运行时代码、测试、CI、Docker 或部署配置。接手者应先处理/合并该 PR，再以 `git rev-parse origin/main` 取得实际最新文档 SHA；它不替代 `a205a231` 的完整运行时验证证据。
+
 任务 1–15 已完成各自的 worktree、TDD、审查和普通 merge；Task 15 的本地提交链为 `9acb2ae`、`60528ae`、`84a10b4`、`93f3415`，并通过最终集成 PR #15–#17 抵达上述验证基线。初审总计 C/I/M=`0/0/1`，唯一 Task 14 PLAN 历史 Minor 经 `93f3415` 修复后，限定复审为 `0/0/0`。本地运行时结果为 backend `169 passed, 1 warning`、三份稳定 JSON demo、frontend `49 passed`、build 和真实 Chromium E2E `2 passed`。
 
 **Task 15 的课程交付证据已闭环（Mock 部署范围）。** 用户提供的 GitLab 页面确认最终基线的 job #610513（pipeline #319806，`a205a231`）通过；此前 File-free TDD 修复 `749199a` 的 GitLab 复跑也已通过。GitHub 最终 CI、GHCR 匿名 pull/run、NJU main 同步、学生提供的 1583 汉字反思正文和 Railway HTTPS Mock 均已有记录。Railway 没有应用认证且未配置真实 Planner key，故不得录入真实 key 或上传敏感工作区；认证生产部署只可列为后续扩展。下方 Task 13 细节保留为历史证据；与本节冲突的旧“当前状态”均以本节和 `PROJECT_PROGRESS.md` 为准。
