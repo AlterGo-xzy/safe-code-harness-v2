@@ -99,6 +99,10 @@ Railway Mock 演示站继续保持无真实 key/敏感工作区；认证生产�
 
 用户现已在对话提供正文；协调会话仅原样写入 `REFLECTION.md`，未生成或润色。统计中文汉字为 `1583`，非空白字符为 `2852`。中文汉字计数符合 1500–2500 目标；若课程系统按所有非空白字符计数，学生须亲自决定是否缩短。不得由后续 agent 代写或改写其内容。
 
+## 2026-08-10 已授权的 PR 集成进度
+
+用户授权按顺序将审查通过的 draft PR 合并到 `main`，且不删除 branch/worktree。PR #1/#2/#3 已合并（`1fc6f4c`、`a1c95ad`、`6006700`），各自合并前一键/完整任务测试为 1/7/26 passed。Task 3 首次仅受 Windows 系统 pytest temp `WinError 5` 影响，改用本 worktree 忽略 `.pytest-tmp\merge-t3` 后通过，未改产品代码。继续前必须对下一个 PR 重跑其任务测试和 diff check；Task 14 前 main 没有 CI workflow，因此不能伪造 main CI 门槛。
+
 - 每个实现 task：独立 `codex/tNN-*` branch/worktree、新鲜 implementer、TDD（先 RED）、最小实现、spec/security review、quality review、真实记录、`finishing-a-development-branch`。
 - 不提交 key、`.env`、虚拟环境、`node_modules`、`dist`、浏览器产物、测试缓存或 `.superpowers` 账本；不输出真实凭据或服务器/临时绝对路径。
 - Harness 必须保持自实现主循环和确定性治理；不得引入 LangChain/AutoGen/CrewAI/LlamaIndex agent runner 或把宿主 agent/skill 当产品功能。

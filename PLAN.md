@@ -241,6 +241,10 @@ def test_readme_contains_reproducible_run_and_key_safety_instructions() -> None:
 
 用户提供的正文已原样写入 `REFLECTION.md`，协调会话没有生成或润色内容。统计中文汉字 `1583`、非空白字符 `2852`；前者符合 1500–2500 字目标，后者可能因英文术语/代码标记而超过，须按课程平台的实际统计口径由学生人工确认。文档测试 `1 passed`。
 
+### 2026-08-10 PR #1–#3 集成记录
+
+用户明确授权顺序合并、保留 branch/worktree。#1/#2/#3 已分别普通合并至 `main`（`1fc6f4c`、`a1c95ad`、`6006700`）；合并前实测为 1/7/26 passed。Task 3 的旧一键入口因 Windows 系统 pytest temp 权限产生 `WinError 5`，固定使用 worktree-local `--basetemp .pytest-tmp\merge-t3` 后 26 passed；无功能修复。Task 14 的 CI workflow 尚未在 main，故暂无 main CI 可等待。
+
 - [ ] **SPEC 覆盖：** 任务 2、5、6、7 覆盖 Harness 六维和 A 项目自主主循环；任务 3、4、7、8、12、13 覆盖深度治理与 HITL；任务 9 覆盖凭据威胁模型；任务 10 覆盖租户/工作区边界；任务 11、12 覆盖 Open Design WebUI；任务 13 覆盖三类机制演示；任务 14、15 覆盖一键测试、CI、分发、公共部署与提交证据。
 - [ ] **流程覆盖：** 已完成 brainstorming；本计划由 writing-plans 产出；任务 0 是强制的不同类型 agent 冷启动门槛；任务 1-15 逐个使用 worktree、fresh subagent、TDD、两阶段审查、PR；任务 15 使用 requesting-code-review 与 finishing-a-development-branch。
 - [ ] **执行前门槛：** 在 `PLAN.md` 本次提交并由用户确认后，先做任务 0；未把任务 0 的完整证据与修订提交前，禁止创建任何 `backend/` 或 `frontend/` 实现文件。

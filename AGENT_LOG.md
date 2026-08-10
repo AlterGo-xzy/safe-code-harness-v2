@@ -383,3 +383,9 @@
 
 - 人工输入：用户在对话中提供完整 `REFLECTION.md` 正文；协调会话使用 `apply_patch` 原样写入，未代写、扩写或润色。
 - 客观核验：中文汉字计数 `1583`，全部非空白字符计数 `2852`；`backend/tests/unit/test_release_docs.py` 为 `1 passed`，`git diff --check` 无输出。中文“字”口径下符合 1500–2500；若课程平台按非空白字符计数，学生须自行判断和修改。
+
+### 2026-08-10 — 已授权 stacked PR 集成：#1–#3
+
+- 决策：用户授权对已审查 task 逐一 retarget `main`、mark ready、普通 merge，保留全部 branch/worktree；不使用 squash/rebase/删除。
+- 证据：#1 在实际 worktree `scripts/test.ps1` 为 1 passed 后合并 `1fc6f4c`；#2 为 7 passed 后合并 `a1c95ad`；#3 的旧入口首次因系统 pytest temp `C:\Users\Admin\AppData\Local\Temp\pytest-of-Admin` 的 `WinError 5` 得到 18 passed/8 errors，诊断为环境目录权限而非产品失败，使用 worktree `.pytest-tmp\merge-t3` 后为 26 passed，再合并 `6006700`。
+- 外部边界：三个 PR 均由 GitHub API 回读为 MERGED。Task 14 workflow 尚未在 main，`gh run list --branch main` 返回空数组；这不构成绿色或红色 CI 结论。

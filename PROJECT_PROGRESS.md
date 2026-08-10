@@ -147,3 +147,7 @@ Task 14 已完成本地 CI/容器实现、验证与审查，并已推送 `codex/
 ## 2026-08-10 Task 15：学生提供反思正文（优先）
 
 用户在对话中提供了 `REFLECTION.md` 正文，协调会话仅原样写入，未代写或扩写。客观篇幅统计为中文汉字 `1583`（落在要求的 1500–2500 范围）和所有非空白字符 `2852`；若课程平台采用后者而非中文“字”口径，学生须自行决定是否缩短，agent 不应替代其改写。发布文档契约测试为 `1 passed`。本条优先于上段“反思仍待”的历史状态。
+
+## 2026-08-10 PR 集成进度：#1–#3 已合并
+
+用户授权按顺序集成并保留分支/worktree。PR #1、#2、#3 分别已普通 merge 至 `main`，merge commits 为 `1fc6f4c`、`a1c95ad`、`6006700`。合并前的实际测试分别为 Task 1 `1 passed`、Task 2 `7 passed`、Task 3 `26 passed`；Task 3 首次通过其旧 `scripts/test.ps1` 运行时误用系统 pytest 临时目录，出现 `WinError 5`，以 worktree `.pytest-tmp\merge-t3` 重跑获得 26 passed，未改源码/测试。`main` 在 Task 14 前尚不含 CI workflow，故此阶段不存在可等待的 main CI；这不是 CI 失败。
