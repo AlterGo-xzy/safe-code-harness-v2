@@ -2,6 +2,14 @@
 
 本日志只记录实际发生的过程，不补写或虚构历史证据。
 
+## 2026-08-10 T15：主分支 CI 修复、公开 GHCR 与最终交付证据
+
+- 技能与原因：`systematic-debugging` 定位 main `ffb8544` 的 GitHub CI 失败；`test-driven-development` 先增加 Planner 初始加载中的按钮禁用 RED；`requesting-code-review` 对最小修复做独立只读审查。纯文档整合按用户指示不重复运行全量测试。
+- 修复：`PlannerSettings` 将统一 disabled 条件改为 `loading || action !== null`，避免初始 GET 未返回时 PUT 发送空 `baseUrl`/`model`。focused RED 后 GREEN；本地 frontend `49 passed`、build、E2E `2 passed`、backend `169 passed, 1 warning`；review C/I/M=`0/0/0`。
+- 外部结果：PR #15 的 `5936d5b` 普通 merge 为 main `c633003a06ad8073852f9125e3e195635f159bbb`。GitHub CI [31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 成功运行 backend、demos、frontend、build、Chromium E2E、Docker build；后续 [GHCR publish 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功。
+- 匿名 OCI 验证：空 Docker 配置实际 pull SHA tag，digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`。临时容器仅映射 `127.0.0.1:18001`，condition polling 后 `/` 和 `/api/runs` 为 HTTP 200，再停止容器。首次即时请求发生在服务就绪前，后续不是重试掩盖失败而是条件就绪验证。
+- 未完成：Railway 仍是无认证、无真实 key 的 Mock 站；Task15 还需推送证据回填、建立/处理 Task15 PR、最终 main 同步 NJU Git，以及学生本人提交前复核反思口径。
+
 ## 2026-08-03 D0：规格阶段
 
 - 触发技能：`using-superpowers`、`brainstorming`、GitHub 工作流指引。
@@ -187,15 +195,6 @@
 - 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
 - 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
 
-### 上游历史记录（合并保留）
-
-## 2026-08-08 T10：安全 ZIP 上传与隔离工作区
-
-- 分支/worktree：`codex/t10-workspace-upload` / `D:\\safe-code-harness-v2\\.worktrees\\t10-workspace-upload`，基线 `2de48a2`。实现 `/root/t10_implementer` 先 RED，后仅参考旧 `routes_workspace.py:75-118` 的 ZipInfo/symlink 概念，未复制旧跳过敏感文件或异常回显行为。
-- 提交 `698e4dc`、`b546c89`、`d15a4fd`：全量预校验并拒绝 ZIP Slip、ADS、NUL、UNC、Windows 设备名、重复条目、symlink、敏感/缓存目录、成员与大小上限；仅当前上传创建的目录可被清理，UUID 碰撞保留旧工作区；API 固定 path-free 400。
-- 审查：首审 1 Critical/3 Important、scoped review 1 Important，均先有失败回归后修复；最终 PASS，无 C/I/M。协调验证完整 backend `127 passed`、脚本 unit `113 passed`，各有既有 TestClient 弃用 warning。下一步按收尾 skill 建立独立 draft PR。
-- 分支收尾：沿用 `finishing-a-development-branch` 选项 2，推送 `codex/t10-workspace-upload` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #10](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/10)。保留 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
-
 ## 2026-08-08 T9：凭据存储与 OpenAI-compatible Planner
 
 - worktree/分支：`D:\safe-code-harness-v2\.worktrees\t09-planner-credentials` / `codex/t09-planner-credentials`，基线 `2de48a2`。触发技能：`using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`systematic-debugging`、`verification-before-completion`；SDD 简报明确禁止真实 key、网络调用和明文/磁盘回退。
@@ -205,9 +204,6 @@
 - 两阶段审查：首轮拒绝并报告上述 Important；scoped re-review 核对 set/get/clear 与 GET/PUT/DELETE 的 traceback/503 均不含 fixture key，且无 key 时传输调用为零，结论 PASS、无 C/I/M。协调会话独立运行完整 backend `110 passed, 1 warning`，运行 `scripts/test.ps1` unit `96 passed`；唯一 warning 为既有 Starlette/TestClient 对 httpx 的弃用提示。
 - 人工干预与教训：协调会话未编辑功能源码，只调度审查、运行独立验证并回填证据。接口“不回显”不足以保证安全；异常 cause、traceback 和错误日志也必须被视为凭据数据流并有失败回归。
 - 分支收尾：依照用户在前序任务持续采用的 `finishing-a-development-branch` 选项 2，推送 `codex/t09-planner-credentials` 并建立目标为 `codex/t08-api-runs` 的 [draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)。保留该 branch/worktree 等待审查；上游 stacked PR 合并后依次调整 base 为 `main`。
-### 上游历史记录（合并保留）
-- 任务 11 发现前端所需列表契约与实际 Task 8 不一致；用户确认不伪造数据、以 Task 8 修正补充真实只读 API。fresh implementer `/root/t08_runlist_implementer` 在 RED（405/缺 scenario）后提交 `afd42ae`；列表严格白名单四个摘要字段且稳定排序，详情补安全元数据。独立 reviewer `/root/t08_runlist_reviewer` PASS，无 C/I/M；协调完整 backend `99 passed`、脚本 `88 passed`，仅既有 TestClient warning。未使用旧代码、网络或真实凭据；已更新现有 draft PR #8。
-- 任务 11 API 边界审查发现详情事件原文不可安全透传；用户确认以服务端固定 DTO 取代。fresh implementer `/root/t08_timeline_implementer` 在 RED 后提交 `6fd3237`，详情时间线仅含 `type`、`created_at`、`level`、`display_status`、`summary_code`，固定中文映射且未知事件 fail-closed。独立审查代码 PASS；缺少 SDD 报告的 Minor 已补齐并 scoped 确认。协调完整 backend `100 passed`、脚本 `88 passed`，仅既有 TestClient warning；更新现有 draft PR #8。
 
 ## 2026-08-09 T11：受治理运行工作台的复核与过程证据
 
@@ -342,13 +338,80 @@
 ### 2026-08-10 — Task 14：分支收尾
 
 - 按课程“每个独立模块一个 PR”和 `finishing-a-development-branch` 选项 2，已推送 `codex/t14-ci-distribution` 并创建目标为 `codex/t13-demos-e2e` 的 [draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 worktree 等待审查；外部 CI/GHCR/匿名拉取和任务 15 仍未完成。
-### 上游集成历史（合并保留）
-### 上游历史记录（合并保留）
-### 2026-08-10 — 上游 Task 9–10 集成历史（保留）
 
-### 2026-08-10 — PR #10/main 集成（已完成，历史记录）
+### 2026-08-10 — Task 15：本地发布资料与证据实现（实施阶段记录）
 
-- 技能与诊断：协调会话依 `systematic-debugging` 在本 worktree 执行 `git merge origin/main --no-commit --no-ff`，重现三处冲突；读双方版本后确认 `main.py` 是同一工厂的独立追加，而非业务规则冲突。使用 `test-driven-development` 先新增跨路由真实 API regression。
-- RED/GREEN：新测试在未解析标记时以 `SyntaxError: <<<<<<< HEAD` collection error 失败；仅合并 `SecretStore`、`PlannerConfiguration`、`WorkspaceRegistry` 与已有 router 注册后，focused `1 passed, 1 warning`。断言可注入 fake Windows secret store 下 Planner GET 为 200/`configured=false`，且同一 app 的坏 ZIP 上传为不带路径的固定 400。
-- 验证：完整 `pytest backend/tests --basetemp .pytest-tmp\t10-main-integration -q` 为 `146 passed, 1 warning`；warning 是既有 TestClient deprecation。staged diff check、tracked marker scan 和本次差异高置信凭据形态计数均为 0。
-- 后续事实：fresh reviewer `/root/t10_merge_reviewer` C/I/M=`0/0/0` 后 PR #10 已普通 merge `696214d`；PR #11 已在相同门槛后普通 merge `622c472`。两者未删除 branch/worktree。
+- 执行者与范围：fresh implementer `/root/t15_implementer` 在隔离的 `codex/t15-release-evidence` worktree 使用 `executing-plans`、`using-git-worktrees`、`test-driven-development` 与 `systematic-debugging`。只实现任务 15 的本地发布资料/测试/记录；未读取或复用旧项目代码，未改 Harness、Task 14 CI/Docker 配置或延后策略功能，未使用真实 key，未 push/建 PR/finish。
+- TDD RED/GREEN：先新增 `backend/tests/unit/test_release_docs.py`，再运行 `.\.venv\Scripts\python.exe -m pytest backend\tests\unit\test_release_docs.py -q`；RED 为 `1 failed`，前两项 `docker pull`/`Credential Manager` 已满足，精确缺少“已知限制”。随后中文重写 README 并新增 MIT `LICENSE`、`THIRD_PARTY_NOTICES.md`、PR 模板、只含学生本人写作门禁/提纲的 `REFLECTION.md` 占位；focused GREEN `1 passed`，提交 `9acb2ae docs: add reproducible release documentation`。
+- 回归调试：首次完整 backend 为 `1 failed, 168 passed, 1 warning`，现有 Task 14 测试证明中文重写遗漏精确英文安全契约 `does not implement authentication` / `authentication and TLS gateway`。先复现 focused RED 并对比最近 README diff；第一次只恢复首个短语后相邻断言仍 RED，随后完整读取测试函数，以单一双语句恢复两个固定契约。focused `2 passed`、完整 backend 恢复 GREEN；提交 `60528ae docs: preserve distribution security contract`。这两句保留的是无认证/公网网关安全边界，不是翻译装饰。
+- 完整本地验证：新 worktree 自建被忽略 `.venv` 并安装 `backend[dev]`；clean `npm.cmd ci --ignore-scripts` 安装 179 packages，仍报告 5 个既有上游风险（3 moderate、1 high、1 critical）和 `whatwg-encoding` deprecation，未运行 `--force`。最终 backend `169 passed, 1 warning`（既有 Starlette/TestClient 弃用）、三份稳定 JSON demo、frontend `10 files/48 tests`、production build、真实 Chromium E2E `2 passed`；E2E 前后 8000 listener 均为 0。本机无 GNU Make，未虚称执行 `make test`，其 backend/frontend 实际 target 均通过。
+- 凭据与许可证证据：对已跟踪文件和 `git log -p --all` 的 110 个本地可见提交扫描高置信 OpenAI/GitHub/私钥形态；2 个候选只位于 `test_memory.py` 和 `test_rules.py`，脱敏上下文证明它们是验证脱敏/阻断的固定合成 fixture。排除这两处后 tracked/history 未分类候选均为 0；没有输出候选值。第三方直接依赖许可证来自本地 Python distribution metadata 与已提交 npm lockfile；任务 15 本地源码采用 MIT。
+- 外部阻断与下一步：没有 NJU Git 远程地址、托管平台/认证 TLS gateway、GHCR public 设置或学生反思正文；stacked PR 尚未合并，GitHub/GitLab 最终 CI、GHCR 未登录 pull/run、公开 HTTPS URL 均没有真实结果，故不尝试也不宣称。下一步必须 fresh read-only reviewer 先做 SPEC/课程 traceability 审查，再做文档/质量审查；修复所有 Critical 后才可由协调会话继续外部核验或分支收尾。
+
+### 2026-08-10 — Task 15：本地两阶段审查闭环
+
+- 审查结论：独立 spec/traceability 与文档/质量审查的初审汇总为 C/I/M=`0/0/1`。唯一 Minor 是根 `PLAN.md` 的 Task 14 Step 5、完成记录和修复记录仍保留 PR #14 建立前的陈旧状态；没有产品、测试、凭据、许可证或安全边界 finding。
+- 修复与复审：只用 `apply_patch` 修改 `PLAN.md`，记录 Task 14 审查/修复已通过、branch 已推送、stacked draft PR #14 已创建且 branch/worktree 保留；外部 GitHub/GitLab CI 和 GHCR public/匿名 pull-run仍未验证。`git diff --check` 无输出，提交 `93f3415 docs: align task 14 completion history`；限定复审 C/I/M=`0/0/0`。
+- 当前边界：Task 15 本地实现和审查已闭环，提交链为 `9acb2ae`、`60528ae`、`84a10b4`、`93f3415`。没有 push、Task 15 PR 或 `finishing-a-development-branch`；NJU remote、认证/TLS 公网 URL、GitHub/GitLab 最终实跑、GHCR public/匿名 pull-run 和学生本人反思仍未完成，因此 Task 15 整体状态保持未完成。
+
+### 2026-08-10 — Task 15：NJU Git 推送与流水线读取尝试
+
+- 人工授权与推送前验证：用户提供并授权使用 `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git`。协调会话确认当前 worktree 干净、`git diff --check HEAD` 无输出，并重新运行 backend `169 passed, 1 warning`、三份稳定 JSON demo、frontend `10 files/48 tests`、production build 与真实 Chromium E2E `2 passed`。
+- 外部动作与结果：本地新增 `nju` remote 后执行非强制 `git push --set-upstream nju codex/t15-release-evidence`；远程创建同名分支并设为上游，未覆盖已有分支。Git 输出提供了新建 merge request 的 URL，但没有创建 MR。
+- 外部阻断：对 GitLab REST pipeline endpoint 的匿名只读请求返回 Anubis “Making sure you're not a bot” 人机验证页面，而非 pipeline JSON，故没有可复核的 GitLab CI 结果。没有尝试绕过该保护，也未宣称 pipeline 成功。GitHub CI、GHCR public/匿名 pull-run、认证 TLS 公网部署、学生反思正文、Task 15 PR 和分支收尾仍待完成。
+
+### 2026-08-10 — Task 15：GitLab `File` CI 失败修复
+
+- 外部失败证据与根因：用户提供 GitLab `unit-test` 日志，`src/api/workspaces.test.ts` 三项均在 `new File(...)` 处以 `ReferenceError: File is not defined` 失败。配置核对显示 Vitest 强制 `environment: node`，而 GitLab `python:3.12-bookworm` 通过 apt 安装系统 Node；本机 Node 24 有 `File`，因此不能把本地绿误写为 CI 兼容。
+- TDD：先新增 `frontend/src/test/file-polyfill.test.ts`，在 File-free target 导入缺失模块得到预期 RED；最小实现 `file-polyfill.ts` 仅在 `File` 缺失时从 Node `node:buffer` 安装构造器，并由 setup 调用。focused GREEN `1 passed`。首次 build RED 为缺少 `node:buffer` 类型声明；检查 `npm ls @types/node --all` 为 empty 后，仅新增精确 dev dependency `@types/node@20.17.57`，build 随后 GREEN。
+- 完整本地验证：backend `169 passed, 1 warning`（既有弃用 warning）、三 demo、frontend `11 files/49 tests`、build、Chromium E2E `2 passed`。下一步是提交并推送这项最小修复，获取 GitLab 的真实复跑状态；未改 Harness/上传业务或凭据边界。
+- 推送：提交 `749199a fix: support GitLab Node File tests` 已推送至 `nju/codex/t15-release-evidence`，GitLab 已接收更新并给出 merge request 创建 URL。`glab` 未安装，匿名 REST API 仍被 Anubis 拦截；等待用户网页登录 GitLab 查看并提供该复跑的真实 pipeline 状态。
+- 外部结果：用户提供 GitLab pipeline 页面截图，记录初始失败 job #610227 / pipeline #319719（`1215581`），以及修复后的通过 job #610231 / pipeline #319723（`749199a`）和 job #610232 / pipeline #319724（`87b432d`）。这满足 GitLab `unit-test` 的最后通过记录；不因此推断 GitHub CI、GHCR 或部署已完成。
+- GitHub 外部结果：协调会话使用已认证 `gh` 查询 [Actions run 31373926124](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31373926124)，结论 `success`；test job 成功执行 backend tests、demos、frontend tests、build、Playwright Chromium E2E，docker-build job 也成功。该 run 的 head 为 `87b432d`；不因此推断 GHCR 发布或公开性已完成。
+
+### 2026-08-10 — Task 15：Railway Mock 演示站范围确认
+
+- 人工决策：用户确认保留 Railway URL `https://safe-code-harness-v2-production.up.railway.app`，但不购买域名、不配置认证网关；后续认证生产部署作为扩展。
+- 外部证据与边界：用户提供的浏览器截图显示工作台首页“暂无运行记录”。该状态符合空的运行列表；它不是实际 Harness 操作或真实 key 的证据。应用没有内建认证，故演示站必须保持 Mock LLM、无真实 Planner key、无敏感工作区上传；不得把 URL 写成安全生产部署完成。
+- 文档动作：同步 README、进度、计划、追踪表和 handoff；将“可访问 WebUI URL”标为 Mock 演示范围已验证，而认证/TLS 安全边界保留为后续扩展。未修改 Harness、CI、Docker 或部署配置，未读取/输出/配置任何凭据。
+
+### 2026-08-10 — Task 15：Railway/GitHub/GHCR 外部只读核验
+
+- 推送：用户授权后，`6aa5274 docs: scope Railway as mock demonstration` 已推送到 GitHub `origin/codex/t15-release-evidence` 和 NJU `nju/codex/t15-release-evidence`；未创建 PR、未合并。
+- Railway：对 `https://safe-code-harness-v2-production.up.railway.app` 的只读 HTTP 根请求得到 `200`。响应为 SPA 静态文档，未包含运行时中文空状态文字；空状态仍仅以用户浏览器截图作为证据。
+- GitHub/GHCR：GitHub Actions run `31379732809`（head `6aa5274`）在观察时为 `in_progress`；`gh run watch` 在 55 秒窗口超时，未取得结论。`gh api /users/AlterGo-xzy/packages?package_type=container` 返回 403，明确要求 `read:packages` scope；未尝试改变 token scope、查询私有值、登录/登出 Docker，不能由此推断 GHCR 是否存在或公开。
+- 后续同轮结果：用 `gh run view` 读取同一 run 的最终 JSON，结论为 `success`；`test` job 的 backend tests、demos、frontend tests、build、Playwright Chromium E2E 均成功，`docker-build` job 也成功。该结果证明 push CI 与容器构建，不证明 GHCR 已发布或允许匿名拉取。
+
+### 2026-08-10 — Task 15：发布前置依赖只读盘点
+
+- 只读结果：`gh pr list` 显示 PR #1-#14 全部为 draft，形成从 #1 的 `main` 到 #14 的 stacked 链；Task 15 没有 PR。按 `.github/workflows/publish-image.yml` 查询 GitHub 默认分支返回 HTTP 404，证明该工作流尚未到达默认分支。
+- 结论：当前没有可运行的默认分支 GHCR 发布工作流，不能尝试/宣称 GHCR push、package public 或匿名 pull。下一步是学生审查并明确授权如何顺序合并 stacked PR；Task 14 合并后还需等待默认分支 CI 成功。该结论是流程依赖，不是代码或容器失败。
+
+### 2026-08-10 — Task 15：用户提供反思正文
+
+- 人工输入：用户在对话中提供完整 `REFLECTION.md` 正文；协调会话使用 `apply_patch` 原样写入，未代写、扩写或润色。
+- 客观核验：中文汉字计数 `1583`，全部非空白字符计数 `2852`；`backend/tests/unit/test_release_docs.py` 为 `1 passed`，`git diff --check` 无输出。中文“字”口径下符合 1500–2500；若课程平台按非空白字符计数，学生须自行判断和修改。
+
+### 2026-08-10 — 已授权 stacked PR 集成：#1–#3
+
+- 决策：用户授权对已审查 task 逐一 retarget `main`、mark ready、普通 merge，保留全部 branch/worktree；不使用 squash/rebase/删除。
+- 证据：#1 在实际 worktree `scripts/test.ps1` 为 1 passed 后合并 `1fc6f4c`；#2 为 7 passed 后合并 `a1c95ad`；#3 的旧入口首次因系统 pytest temp `C:\Users\Admin\AppData\Local\Temp\pytest-of-Admin` 的 `WinError 5` 得到 18 passed/8 errors，诊断为环境目录权限而非产品失败，使用 worktree `.pytest-tmp\merge-t3` 后为 26 passed，再合并 `6006700`。
+- 外部边界：三个 PR 均由 GitHub API 回读为 MERGED。Task 14 workflow 尚未在 main，`gh run list --branch main` 返回空数组；这不构成绿色或红色 CI 结论。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#4–#9
+
+- 决策与技能：用户持续授权 `finishing-a-development-branch` 的普通 merge 路径，明确保留已有 branch/worktree；协调会话使用 `systematic-debugging` 查明 #9 的 `DIRTY` 为堆叠基线文档冲突，使用 `verification-before-completion` 和 `requesting-code-review` 作为合并门槛。
+- 证据：#4–#8 分别在任务回归 51/58/77/89/100 passed 后合并为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`；#8 的 warning 是既有 TestClient 弃用提示。
+- #9 人工干预与验证：在 `D:\safe-code-harness-v2\.worktrees\t09-planner-credentials` 执行 `git merge origin/main --no-commit --no-ff`，冲突仅为 `AGENT_LOG.md` 历史追加；人工仅保留双方账本记录，未编辑 Planner/凭据或其它功能源码。merge-result 的 `python -m pytest backend/tests --basetemp .pytest-tmp\merge-resolution -q` 为 `114 passed, 1 warning`，diff check/冲突标记/凭据候选检查均 clean。fresh reviewer `/root/t09_merge_reviewer` 只读复审 C/I/M=`0/0/0`，确认 key 不回传、异常链 fail-closed；之后 GitHub API 回读 #9 merged commit `a2abb83`。
+- 后续：main 现含 Task 1–9。#10 仍是 draft/`DIRTY`，先在其独立 worktree 重现并处理集成，再跑完整回归、diff/secret checks 和 fresh review；Task14 workflow 尚未到达 main，故不等待或伪称 main CI。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#10
+
+- 诊断与 TDD：在 Task10 专属 worktree 以 `git merge origin/main --no-commit --no-ff` 重现两份过程文档和 `api/main.py` 冲突；根因为 Task9/10 都追加 app factory。新 cross-route test 在 marker 状态 RED 为 `SyntaxError`；仅组合已有 Planner `SecretStore` 注入、WorkspaceRegistry 和 config/runs/workspaces routers 后 GREEN `1 passed, 1 warning`。
+- 完整验证与审查：完整 backend `146 passed, 1 warning`（既有 TestClient deprecation），diff、marker、凭据候选均为 0。fresh `/root/t10_merge_reviewer` 只读审查 `6681ed1` C/I/M=`0/0/0`，确认密钥 fail-closed/redaction 与 ZIP 预校验均保留。
+- 外部结果：`6eb7721` 推送后，PR #10 retarget `main`、mark ready，API 回读 `CLEAN`；普通 merge 成功，GitHub 回读 merge commit `696214d594257c1693eccd311e4fa9ae4861d869`、时间 `2026-08-10T11:46:12Z`。按用户指令未删除 branch/worktree。Task14 CI workflow 仍未抵达 main。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#11
+
+- Task11 与 current main 的冲突仅是历史过程文档；保留双方记录后运行时源自动合并。完整 backend 以 Task15 venv 加 `PYTHONPATH` 指向 Task11 当前源码，得到 `146 passed, 1 warning`；frontend 为 4 files/15 tests、build 成功，diff/marker/凭据候选均为 0。
+- fresh reviewer `/root/t11_merge_reviewer` C/I/M=`0/0/0`，确认只读 DTO UI、无写 API/localStorage/凭据，以及 Task9/10 安全边界未变。PR #11 retarget/ready/CLEAN 后普通 merge `622c47270985e33ecaa3ba64b2f1a0fa082f0bbf`（`2026-08-10T11:58:36Z`）；未删除 branch/worktree。

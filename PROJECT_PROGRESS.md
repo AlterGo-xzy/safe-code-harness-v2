@@ -6,19 +6,24 @@
 
 ## 当前真实状态
 
+## 2026-08-10 最终交付外部证据更新（优先于下方历史快照）
+
+- GitHub 已按普通 merge 顺序集成 PR #1–#15；最新 `main` 为 PR #15 的 merge commit `c633003a06ad8073852f9125e3e195635f159bbb`。#15 是唯一一次合并后的 CI 修复：Planner 初始异步配置未完成前禁用保存/清除，避免空值覆盖；先有 focused RED，最小修复后独立审查 C/I/M=`0/0/0`。
+- GitHub `main` CI [run 31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 已成功：backend、三份确定性机制演示、frontend unit/build、Chromium E2E 与 Docker build 均通过。此前 `ffb8544` 的 main CI 因 Planner 竞态失败，不能删除该失败历史；它已由 #15 的实际 CI 绿色关闭。
+- CI 成功后，GHCR 发布 [run 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功。使用空 Docker 配置（未登录）实际拉取 `ghcr.io/altergo-xzy/safe-code-harness-v2:sha-c633003a06ad8073852f9125e3e195635f159bbb`，digest 为 `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`；临时容器仅绑定 `127.0.0.1:18001`，就绪后 `/` 和 `/api/runs` 均为 HTTP 200，随后已停止。因此公开 OCI 分发和匿名 pull/run 已有真实证据。
+- Railway `https://safe-code-harness-v2-production.up.railway.app` 仍仅是无真实 key、无敏感工作区的 HTTPS Mock 演示站；Railway HTTPS 不等于应用认证。真实 key/敏感上传仍必须在认证网关与 TLS 安全边界补齐后才可开放。
+- Task 15 仍剩交付收尾而非运行时代码：把本次最终外部证据的文档提交推送并建立/合并 Task 15 PR；将最终 `main` 同步到同一 NJU Git；学生本人在提交前确认反思篇幅口径与内容归属。不得把这些待办写成已经完成。
+
 - 最终仓库：`https://github.com/AlterGo-xzy/safe-code-harness-v2`，公开。
-- 主分支当前已验证 merge commit：`622c472`（PR #11）；Task12 正在将其整合。
+- 主分支最新已推送的流程准备提交：`5dd5da3 chore: prepare isolated task worktrees`。
 - 冷启动门禁：已完成。Claude Code `2.1.220` 在非 `--resume` 新会话中只 Fetch `SPEC.md` 和 `PLAN.md`，提出四项规约缺口并停止；证据在 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md`，修订提交 `ecbc418`、隔离核验 `107bda3`、门禁回填 `3195ae8`。
 - 任务 1 分支/worktree：`codex/t01-foundation` / `D:\safe-code-harness-v2\.worktrees\t01-foundation`。
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
 - 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
 - 当前源码范围：任务 1-8 的 Harness 核心与受治理运行/审批 API、任务 9 的离线安全 Planner 配置、任务 10 的安全 ZIP 上传和隔离工作区均已完成并经审查；任务 13 Task 1 已把三组真实 API 合并到同一 app factory，Task 2 的三份离线稳定 JSON 机制演示已通过三轮 scoped review，Task 3 的真实 FastAPI/Vite/Chromium 批准闭环及 320x720 视口修复也已完成初始两阶段/scoped 审查。最终全分支凭据隔离修复、复审与收尾已完成，`codex/t13-demos-e2e` 已推送并创建 [stacked draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)。任务 11 已完成只读中文运行工作台，任务 12 已在其前端基线完成审批决定、Planner 配置和 ZIP 上传的安全 UI。Task 9 的 Windows Credential Manager-only 生产存储不配置真实 API key；用户批准的策略扩展继续延后。详细续开发指令见 `HANDOFF_TO_NEXT_MODEL.md`。
-- **任务 14 当前状态（优先）：** fresh implementer `/root/t14_implementer` 在 `codex/t14-ci-distribution` / `D:\safe-code-harness-v2\.worktrees\t14-ci-distribution` 严格先 RED 后实现 CI/OCI 分发，初始源码提交 `0f2b35f`。独立 reviewer 初审为 C/I/M `0/3/3`；fix `1434a64` 先得到四个精确行为 RED，再改为仓库 venv、成功默认分支 push CI 的 `workflow_run`/被测 SHA、loopback-only Docker/Compose、根与嵌套 dotenv 规则及明确无认证/TLS gateway 边界。focused `9 passed`，完整 backend `168 passed, 1 warning`、frontend `48 passed`、build、三 demo、Chromium E2E `2 passed`；Docker 实测 `published_port=127.0.0.1:8000`、healthy、runs API/WebUI 200。本机无 GNU Make，未虚称 `make test`，其两个实际 target 命令均通过。scoped spec/security 与质量 re-review 均已通过；最终全分支 review 为 C/I/M=`0/0/1`，唯一 Minor 是 PLAN/交接/追踪/README 的陈旧状态，本次纯文档修正正在关闭。外部 CI/GHCR、Task 14 分支收尾、push/PR 仍未完成。
-## 上游集成历史（合并保留）
-- 当前源码范围：任务 1-8 的 Harness 核心与受治理运行/审批 API、任务 9 的离线安全 Planner 配置、任务 10 的安全 ZIP 上传和隔离工作区均已完成并经审查；任务 13 Task 1 已把三组真实 API 合并到同一 app factory，Task 2 的三份离线稳定 JSON 机制演示已通过三轮 scoped review，Task 3 的真实 FastAPI/Vite/Chromium 批准闭环及 320x720 视口修复也已完成初始两阶段/scoped 审查。**最终全分支审查随后发现 Playwright 启动生产 `main:app` 会让 Planner 初始 GET 触及 Windows Credential Manager；`7d66d98` 以先 RED 后最小实现增加 E2E 专用、初始为空的进程内 SecretStore 入口，生产 app 未改。修复后 backend `159 passed, 1 warning`、demo `12 passed`、前端 unit `48 passed`、build 和真实 E2E `2 passed`；最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正，待只读文档复核和分支收尾。**任务 11 已完成只读中文运行工作台，任务 12 已在其前端基线完成审批决定、Planner 配置和 ZIP 上传的安全 UI。Task 9 的 Windows Credential Manager-only 生产存储不配置真实 API key；用户批准的策略扩展继续延后。Task 12 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12) 仍开放；Task 13 尚未推送、尚无 PR #13。详细续开发指令见 `HANDOFF_TO_NEXT_MODEL.md`。
-## 上游历史记录（合并保留）
-- 当前源码范围：任务 1-7 的 Harness 核心及任务 8 的受治理运行/审批 API 已完成并经审查；任务 11 已完成只读中文运行工作台，任务 12 已在其前端基线完成审批决定、Planner 配置和 ZIP 上传的安全 UI。最终审查为 Critical 0、Important 0、Minor 6，六项均已用最小测试、Planner 加载反馈和文档一致性修正关闭，完整前端现为 10 files/48 tests。用户批准将策略扩展延后：任务 12 没有策略 API/UI、假保存或 workspace 切换。任务 1/2 均未读取、复制或咨询旧项目源码；旧路径只在设计中作为未来扩展调查入口，不是实现指导。任务 12 已创建目标为任务 11 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留分支/worktree 等待审查；任务 13 的真实 API/浏览器/320px E2E 仍未执行。
+- **任务 14 已收尾：** `codex/t14-ci-distribution` 已推送，并创建目标为 Task 13 的 stacked draft PR [#14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。本地 CI/OCI、loopback 安全边界、Docker healthy/API/WebUI 与审查均完成；GitHub/GitLab 外部 pipeline 和 GHCR public/匿名 pull-run 仍未验证。
+- **任务 15 当前状态（优先）：** fresh implementer `/root/t15_implementer` 在 `codex/t15-release-evidence` / `D:\safe-code-harness-v2\.worktrees\t15-release-evidence` 完成本地发布资料和测试，提交 `9acb2ae`、`60528ae`、`84a10b4`；Task 14 历史文档 Minor 修复为 `93f3415`。发布文档测试先因缺“已知限制”得到 `1 failed`，后为 `1 passed`；README、MIT LICENSE、第三方声明、PR 模板与只含学生本人写作门禁/提纲的 `REFLECTION.md` 占位均已创建。110 个本地可见提交的高置信扫描只有 2 个已分类合成测试 fixture，排除后未分类候选为 0。独立两阶段审查初审总计 C/I/M=`0/0/1`，唯一 Minor 为 Task 14 PLAN 历史状态；`93f3415` 修复后的限定复审为 `0/0/0`。已把 `codex/t15-release-evidence` 推送到 NJU Git `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git`（远程追踪 `nju/codex/t15-release-evidence`）；首个 GitLab `unit-test` 曾因 Bookworm 系统 Node 无全局 `File` 失败，严格 TDD 修复为 `749199a`。用户提供的 GitLab 截图确认复跑均通过：pipeline `#319723` / job `#610231`（`749199a`）和 pipeline `#319724` / job `#610232`（`87b432d`）。GitHub Actions [run 31373926124](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31373926124) 也通过：`test` 与 `docker-build` 两个 job 均成功。本地验证仍为 backend `169 passed, 1 warning`、三 demo、frontend `49 passed`、build、Chromium E2E `2 passed`。用户已确认 Railway HTTPS 地址 `https://safe-code-harness-v2-production.up.railway.app` 为无真实 key 的 Mock 演示站，且浏览器截图显示首页空状态；协调会话随后只读请求根地址得到 HTTP `200`。由于没有认证网关，它不是安全生产部署，真实 key/敏感工作区和认证边界列为后续扩展。文档提交 `6aa5274` 已推送 GitHub/NJU；其 GitHub CI [run `31379732809`](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31379732809) 已通过，`test` 与 `docker-build` 均成功。GHCR 包查询因当前 token 缺 `read:packages` 返回 403。Task 15 整体仍未完成：GHCR public/匿名拉取、学生本人 1500-2500 字反思和分支收尾/PR 仍待完成。
 
 ## 不可突破的执行纪律
 
@@ -142,18 +147,27 @@ Task 13 最终验证为 backend `159 passed, 1 warning`、三份稳定 JSON demo
 ## 2026-08-10 Task 14 分支收尾更新
 
 Task 14 已完成本地 CI/容器实现、验证与审查，并已推送 `codex/t14-ci-distribution`；已创建目标为 `codex/t13-demos-e2e` 的 [stacked draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 branch/worktree 以处理审查反馈。外部 GitHub/GitLab CI、GHCR 发布/公开性/匿名 pull-run 与任务 15 仍未验证或完成。
-## 上游集成历史（合并保留）
-## 上游历史记录（合并保留）
-8. 后续从任务 8 的 FastAPI 运行与审批 API 继续；持续即时更新过程记录。
-9. 任务 11 已在 `codex/t11-workbench-ui` / `D:\safe-code-harness-v2\.worktrees\t11-workbench-ui` 实现只读中文工作台：`893f01a` 建立 typed read-only frontend boundary，`63749f5` 以先失败回归修复两个 Important API 安全边界，`0dcdca9` 完成卡片总览、选中时间线和状态 UI，最终审查修复提交 `33b5ff0`。前端只读调用任务 8 的两个 GET 路由，严格消费列表四字段和时间线固定五字段 DTO，未读取或迁入旧前端，也未加入创建运行、审批、配置、上传、凭据或 localStorage。最终修复新增 lockfile 与声明齐全的测试依赖、完整卡片 accessible name、详情 id/乱序保护和 UTC 标注；clean install 后完整前端 4 files/15 tests passed，build 通过。独立 scoped re-review 为 Critical 0、Important 0、Minor 1；Minor 的两处旧详细计划示例已以文档最小修正关闭，不改变运行时行为或安全边界。Open Design 只有一条不可复现的历史记录：记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地没有安装包、资产 URL 或精确摘要，不能算作当前已验证证据，绝不猜测摘要。CSS 有 `44rem` 单列断点、`min-width: 0` 与 `overflow-wrap: anywhere`；没有窄屏浏览器测试，320px 证据仍为任务 13 未完成项。已按用户选择创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)，保留分支/worktree 等待审查。
-10. 任务 12 已在 `codex/t12-settings-approval-ui` / `D:\safe-code-harness-v2\.worktrees\t12-settings-approval-ui` 完成：`1a9074b` 建立只投影安全字段的审批、Planner 和 ZIP API 边界；`0369c8f` 增加三个治理面板；Task 2 两项 Important 先有失败回归，再由 `b22c56d` 修复当前选择的审批刷新与 Planner 初始加载覆盖。Task 1/2 没有读取、复制或咨询旧项目源码；旧 `ConfigPanel.tsx`、`WorkspaceUploadPanel.tsx` 和 `routes_config.py` 只是未来扩展调查入口，明确不是任务 12 的实现指导。后续最终审查为 Critical 0、Important 0、Minor 6：补齐非字符串 `approval_id`、Planner 三方法 HTTP/网络固定错误、Planner 初始加载、Planner mutation pending 和 ZIP upload pending 回归，并纠正日期、旧项目和状态归属文档。focused RED 为 1 failed/28 passed，证明缺少 Planner 加载提示；其他新增测试直接验证既有安全行为。最小实现后 focused 为 4 files/29 tests，完整前端为 10 files/48 tests，build 通过；六项 Minor 全部关闭。已按要求创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留分支/worktree 等待审查；用户批准的策略扩展和任务 13 的真实 API/浏览器/320px E2E 仍未完成。
-## 历史上游任务 8–10 记录（合并时保留）
 
-## 历史上游任务 8–10 记录（合并时保留）
+## 2026-08-10 Task 15：GHCR 发布前置依赖（优先）
 
-8. 任务 8 已在 `codex/t08-api-runs` 完成：`974d73b` 增加运行/审批 API，`7afa279` 修复 TestClient 直接依赖声明；独立复审通过，完整 backend `96 passed`、一键 unit `88 passed`。已创建目标为 `codex/t07-agent-loop` 的 [stacked draft PR #8](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/8)，保留分支/worktree 等待审查。
-9. 任务 9 已在 `codex/t09-planner-credentials` 完成：`3074085` 增加仅 Windows Credential Manager 的 Planner 凭据存储、掩码配置 API 与可注入传输的 OpenAI-compatible LLM；`51eb9c8` 修复异常链潜在泄露。未配置、读取、输出或使用真实 key，未访问网络。独立复审最终 PASS；协调会话完整 backend `110 passed`、一键 unit `96 passed`。已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)，保留分支/worktree 等待审查。下一步为任务 10 的安全 zip 上传与工作区注册。
+只读 GitHub 盘点确认 PR #1-#14 都仍是 draft，Task 15 尚无 PR；GitHub 对默认分支查询 `publish-image.yml` 返回 404，证明发布 workflow 尚未抵达默认分支。因此 GHCR 发布、package public 与匿名 pull/run 的可验证前提是：先按 stacked 顺序完成审查/合并，让 Task 14 的 workflow 到达默认分支并通过默认分支 CI。此结论不是镜像或代码失败；它不能由当前 Task 15 分支绕过。学生本人 1500-2500 字反思、Task 15 PR/收尾也仍待完成。
 
-## 2026-08-10 PR #10/#11 已合并（历史集成记录）
+## 2026-08-10 Task 15：学生提供反思正文（优先）
 
-PR #10 已在完整 backend `146 passed, 1 warning`、diff/marker/credential scan clean、fresh review C/I/M=`0/0/0` 后普通 merge `696214d`；PR #11 在 backend `146 passed, 1 warning`、frontend 15 tests/build、fresh review C/I/M=`0/0/0` 后普通 merge `622c472`。两者 branch/worktree 均保留；本分支仅待完成 Task12 的同等验证与复审。
+用户在对话中提供了 `REFLECTION.md` 正文，协调会话仅原样写入，未代写或扩写。客观篇幅统计为中文汉字 `1583`（落在要求的 1500–2500 范围）和所有非空白字符 `2852`；若课程平台采用后者而非中文“字”口径，学生须自行决定是否缩短，agent 不应替代其改写。发布文档契约测试为 `1 passed`。本条优先于上段“反思仍待”的历史状态。
+
+## 2026-08-10 PR 集成进度：#1–#3 已合并
+
+用户授权按顺序集成并保留分支/worktree。PR #1、#2、#3 分别已普通 merge 至 `main`，merge commits 为 `1fc6f4c`、`a1c95ad`、`6006700`。合并前的实际测试分别为 Task 1 `1 passed`、Task 2 `7 passed`、Task 3 `26 passed`；Task 3 首次通过其旧 `scripts/test.ps1` 运行时误用系统 pytest 临时目录，出现 `WinError 5`，以 worktree `.pytest-tmp\merge-t3` 重跑获得 26 passed，未改源码/测试。`main` 在 Task 14 前尚不含 CI workflow，故此阶段不存在可等待的 main CI；这不是 CI 失败。
+
+## 2026-08-10 PR 集成进度：#4–#9 已合并（优先）
+
+用户已继续授权顺序普通 merge，并保留所有 branch/worktree。PR #4、#5、#6、#7、#8、#9 已分别合并到 `main`，merge commits 为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`、`a2abb83`；合并前的任务回归分别为 `51`、`58`、`77`、`89`、`100` 和 `114 passed`（后两者各有 1 条既有 TestClient 弃用 warning）。#9 因其旧基线与 main 的文档历史产生冲突，先在其独立 worktree 将 `origin/main` 合入，仅人工处理 `AGENT_LOG.md` 历史记录、未改任务功能源码；合并结果完整 backend 为 `114 passed, 1 warning`，`git diff --check` 与冲突标记扫描均 clean，独立只读审查 C/I/M=`0/0/0` 后才 merge。当前 `main` 已包含任务 1–9；PR #10 仍为 open/draft 且 `DIRTY`，下一步是在其 worktree 做同等受控集成、验证和独立审查。Task 14 workflow 尚未到达 main，故仍不存在 main CI 结果。
+
+## 2026-08-10 PR 集成进度：#10 已合并（优先）
+
+PR #10 已在其专属 worktree 对 `origin/main` 做受控 merge。冲突仅为两份过程文档和共享 `api/main.py`；新真实 API regression 在未解析状态为预期 `SyntaxError` RED，最小 factory 组合后 focused `1 passed, 1 warning`、完整 backend `146 passed, 1 warning`，diff/marker/高置信凭据候选为 0。fresh reviewer C/I/M=`0/0/0` 后，PR retarget main、ready、GitHub 回读 `CLEAN`，并于 `2026-08-10T11:46:12Z` 普通 merge 为 `696214d`。branch/worktree 依用户指令保留。main 当前覆盖 Task 1–10；下一条 #11 仍需同等门槛。Task14 workflow 尚未到达 main。
+
+## 2026-08-10 PR 集成进度：#11 已合并（优先）
+
+PR #11 对 main 的冲突仅为历史文档，运行时代码由 Git 自动组合。完整 backend 以 `PYTHONPATH` 明确指向 Task11 当前源码验证为 `146 passed, 1 warning`；前端 `15 passed`、build 通过，diff/marker/高置信凭据候选为 0。fresh reviewer C/I/M=`0/0/0` 后，PR retarget main、ready、GitHub `CLEAN`，于 `2026-08-10T11:58:36Z` 普通 merge 为 `622c472`；branch/worktree 保留。main 当前覆盖 Task1–11，下一条为 #12。

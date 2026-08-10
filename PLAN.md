@@ -202,11 +202,11 @@ def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
 - [x] **步骤 2：确认红色结果**：`.\.venv\Scripts\python.exe -m pytest backend/tests/unit/test_distribution_config.py -q` 首次得到预期 `FileNotFoundError: .github\\workflows\\publish-image.yml`；扩展契约后为 `7 failed`，均指向缺少分发文件或 `Makefile` target。
 - [x] **步骤 3：最小实现**：`0f2b35f` 配置 Python/Node job、Playwright Chromium/E2E、Docker build；GitHub publish job 使用 `GITHUB_TOKEN` 的 packages 写权限，GitLab job 名固定 `unit-test`。Docker 多阶段构建 WebUI，由镜像内 ASGI 入口把静态输出挂载到 FastAPI；容器 Planner key 仅为进程内存/可选平台 secret 环境注入，不烘焙、不读取 `.env`。
 - [x] **步骤 4：确认绿色结果与重构**：focused `7 passed`；完整 backend `166 passed, 1 warning`、frontend `48 passed`、三 demo、build、Chromium E2E `2 passed`。Windows 无 GNU Make，未运行或虚称 `make test`，但其 backend/frontend 两个真实子命令均通过。`docker build -t safe-code-harness-v2:local .` 实际成功；`docker compose up --build --detach --wait` 达到 healthy，`/api/runs`、Planner 空配置和 WebUI 200 均已探测，镜像配置 baked Planner key 计数 0，随后清理容器/网络。GitHub/GitLab 外部 CI、GHCR push/public pull 与 package visibility 仍须在 push/默认分支发布后验证。
-- [ ] **步骤 5：两阶段审查与提交**：先审查 CI/镜像没有改变离线机制与凭据边界，再审查缓存、端口、健康检查、失败日志和镜像大小；提交 `git commit -m "build: add ci and container distribution"`。
+- [x] **步骤 5：两阶段审查与提交**：已先审查 CI/镜像没有改变离线机制与凭据边界，再审查缓存、端口、健康检查、失败日志和镜像大小；初始提交为 `0f2b35f build: add ci and container distribution`，审查修复为 `1434a64 fix: harden ci distribution boundaries`。
 
-**当前记录：** fresh implementer `/root/t14_implementer` 未读取/复用旧项目，只改任务 14 简报限定文件；源码提交 `0f2b35f build: add ci and container distribution`。RED/GREEN、本地 Docker/Compose/API/WebUI/key 检查如步骤 2-4；`git diff --cached --check` 无输出，高置信凭据候选计数 0。当前待独立 spec/security 审查和代码质量审查；外部 GitHub CI、GitLab CI、GHCR 公开 pull/run、package visibility、分支收尾、push 与 PR 均未完成，不得据本地配置宣称外部通过。
+**完成记录：** fresh implementer `/root/t14_implementer` 未读取/复用旧项目，只改任务 14 简报限定文件；RED/GREEN、本地 Docker/Compose/API/WebUI/key 检查如步骤 2-4，`git diff --cached --check` 无输出，高置信凭据候选计数 0。两阶段审查、修复和最终文档 Minor 均已通过；`codex/t14-ci-distribution` 已推送并创建目标为 `codex/t13-demos-e2e` 的 [stacked draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)，branch/worktree 保留以处理审查反馈。外部 GitHub CI、GitLab CI、GHCR public/package visibility 与未登录 pull/run 仍未验证，不得据本地配置宣称外部通过。
 
-**初审与修复记录：** 独立 reviewer `/root/t14_reviewer` 结论 C/I/M=`0/3/3`，不批准。fix round `1434a64` 对 Make venv、loopback/无认证边界、根/嵌套 dotenv 规则和 GHCR CI 成功门禁先取得 focused `4 failed, 5 passed`，最小修复后 `9 passed`；完整 backend `168 passed, 1 warning`、frontend `48 passed`、三 demo、build、E2E `2 passed`。Docker build/Compose `--wait` 成功，真实端口为 `127.0.0.1:8000`，runs API 与 WebUI 均 200，随后清理容器/网络。随后 scoped spec/security 与质量 re-review 均通过；最终全分支 review 为 C/I/M=`0/0/1`，唯一 Minor 是本段及交接/追踪/README 的陈旧状态措辞，本次纯文档提交正在修正。步骤 5 在该文档 Minor 获只读确认前不勾选；外部 CI/GHCR 与 Task 14 push/PR 仍未完成。
+**初审与修复记录：** 独立 reviewer `/root/t14_reviewer` 结论 C/I/M=`0/3/3`，不批准。fix round `1434a64` 对 Make venv、loopback/无认证边界、根/嵌套 dotenv 规则和 GHCR CI 成功门禁先取得 focused `4 failed, 5 passed`，最小修复后 `9 passed`；完整 backend `168 passed, 1 warning`、frontend `48 passed`、三 demo、build、E2E `2 passed`。Docker build/Compose `--wait` 成功，真实端口为 `127.0.0.1:8000`，runs API 与 WebUI 均 200，随后清理容器/网络。scoped spec/security 与质量 re-review 均通过；最终全分支 review 为 C/I/M=`0/0/1`，唯一文档状态 Minor 已由 `764d61a` 关闭，分支收尾/PR 记录为 `8248b22`。外部 CI/GHCR 仍未验证。
 
 ## 任务 15：发布文档、外部部署与最终交付核验
 
@@ -214,7 +214,7 @@ def test_publish_workflow_targets_ghcr_and_never_reads_dotenv() -> None:
 **文件：** 新建 `README.md`、`LICENSE`、`THIRD_PARTY_NOTICES.md`、`.github/pull_request_template.md`；更新 `SPEC_PROCESS.md`、`AGENT_LOG.md`、`REQUIREMENTS_TRACEABILITY.md`、`PLAN.md`。学生本人负责新建或保留 `REFLECTION.md`，agent 不代写正文。
 **外部交付：** 部署至 Render/Railway/Fly.io 等，记录公开 URL；将仓库同步到南京大学 GitLab；所有任务 PR 按 `finishing-a-development-branch` 决定 merge/保留/丢弃；最终主分支通过 CI。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 ```python
 def test_readme_contains_reproducible_run_and_key_safety_instructions() -> None:
@@ -224,14 +224,30 @@ def test_readme_contains_reproducible_run_and_key_safety_instructions() -> None:
     assert "已知限制" in readme
 ```
 
-- [ ] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/unit/test_release_docs.py -q`，预期 README 或断言尚不满足。
-- [ ] **步骤 3：最小实现**：README 说明获取、`docker pull/run`、本地开发、`make test`、演示、Windows 凭据配置/更新/清除、目标平台、已知限制、部署架构和 CI/CD；PR 模板要求 subagent/human/TDD/审查记录；列出第三方许可证。
-- [ ] **步骤 4：确认绿色结果与外部核验**：运行该文档测试与 `make test`；检查 GitHub 与 GitLab 最终绿色流水线、GHCR 未登录 pull 后运行、部署 URL 的 UI/审批/Mock 演示、NJU Git 仓库可访问、`git log --all` 无真实凭据。将真实 URL、日期、commit、PR、命令和结果写入追踪表与日志。
-- [ ] **步骤 5：最终两阶段审查、分支收尾与提交**：先逐条复核 SPEC/课程 traceability，再通过 `superpowers:requesting-code-review` 完成代码质量审查；所有 Critical 修复后触发 `superpowers:finishing-a-development-branch`，按其真实建议合并或保留 PR。提交 `git commit -m "docs: record verified release evidence"`，不伪造不可验证的外部结果。
+- [x] **步骤 2：确认红色结果**：运行 `python -m pytest backend/tests/unit/test_release_docs.py -q`，预期 README 或断言尚不满足。
+- [x] **步骤 3：最小实现**：README 说明获取、`docker pull/run`、本地开发、`make test`、演示、Windows 凭据配置/更新/清除、目标平台、已知限制、部署架构和 CI/CD；PR 模板要求 subagent/human/TDD/审查记录；列出第三方许可证。
+- [ ] **步骤 4：确认绿色结果与外部核验**：本地文档测试、`make test` 的 Windows 等价目标、演示、build、E2E 和历史扫描已完成；2026-08-10 已将 `codex/t15-release-evidence` 推送到 NJU Git，`git push --set-upstream nju codex/t15-release-evidence` 新建远程分支且未覆盖既有分支。首个 GitLab `unit-test` 实际在 Node 环境的 `File is not defined` 失败，精确影响三项 workspace 上传测试；TDD 以 File-free target 回归 RED，再以 `node:buffer` polyfill 和显式 `@types/node` 最小修复，重新验证 frontend `49 passed`、build、E2E 和 backend `169 passed, 1 warning`。用户提供的 GitLab 页面确认 pipeline `#319723` / job `#610231`（`749199a`）及 pipeline `#319724` / job `#610232`（`87b432d`）均通过；GitHub Actions run `31373926124` 的 test 与 docker-build job 均通过。用户还确认 Railway HTTPS Mock 演示站 `https://safe-code-harness-v2-production.up.railway.app`，截图显示首页空状态；协调会话只读根地址返回 HTTP `200`。不配置真实 key，未认证安全边界明确列为后续扩展，故这不是认证生产部署证据。Railway 范围文档提交 `6aa5274` 已推送 GitHub/NJU；对应 GitHub CI [run `31379732809`](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31379732809) 已通过，`test` 与 `docker-build` 均成功。GHCR 包元数据查询因 `gh` token 缺 `read:packages` 被 403 拒绝，未把它写成 package 不存在或不公开。GHCR 未登录 pull/run 仍需真实外部结果。将真实 URL、日期、commit、PR、命令和结果写入追踪表与日志。
+- [ ] **步骤 5：最终两阶段审查、分支收尾与提交**：本地两阶段审查、GitHub main CI、GHCR publish/匿名 pull-run、GitLab 最后绿和 Railway Mock URL 已有真实证据；本次文档整合后仍须推送、建立并按 `finishing-a-development-branch` 处理 Task 15 PR，同时把最终 main 同步到 NJU Git。认证/TLS 的真实 key 生产部署由用户明确延后，不是本步骤的完成前提，也不能写成已完成。
 
-**完成记录：** 真实红绿命令、审查结论、合并/保留决定、hash、PR、CI、GHCR、部署及 NJU Git 证据。
+**完成记录（本地实现与审查闭环，整体任务尚未完成）：** fresh implementer `/root/t15_implementer` 在 `codex/t15-release-evidence` 只执行任务 15 本地范围，未读取旧项目代码、未使用真实 key。RED：`.\.venv\Scripts\python.exe -m pytest backend\tests\unit\test_release_docs.py -q` 为 `1 failed`，精确缺少 README 的“已知限制”。GREEN：同命令为 `1 passed`；发布文档、MIT `LICENSE`、第三方声明、PR 模板、仅含本人写作门禁/提纲的 `REFLECTION.md` 占位提交为 `9acb2ae`。完整回归首次发现 README 中文重写删除 Task 14 两个英文无认证契约；现有回归先 RED，经根因复现后以 `60528ae` 恢复双语固定契约；本地证据提交为 `84a10b4`。最终本地结果：backend `169 passed, 1 warning`（既有 TestClient 弃用）、三份稳定 JSON demo、frontend `48 passed`、build、Chromium E2E `2 passed`；本机无 GNU Make，未虚称运行 `make test`，实际两个 target 均通过。`git log -p --all` 扫描 110 个可见提交得到 2 个高置信候选，均为 `test_memory.py`/`test_rules.py` 的专用合成 fixture；排除后 tracked/history 未分类候选均为 0。两阶段审查初审总计 C/I/M=`0/0/1`；唯一 Minor 是 Task 14 PLAN Step 5/记录陈旧，`93f3415` 修复后限定复审为 `0/0/0`。2026-08-10 协调会话重新运行 backend `169 passed, 1 warning`、三 demo、frontend `48 passed`、build、Chromium E2E `2 passed`，并将分支推送到 NJU Git；匿名 API 的 Anubis 页面阻断 pipeline 读取。GitHub/GitLab CI 实跑、GHCR public/匿名 pull-run、认证 TLS 公网部署、学生 1500-2500 字反思、分支收尾与 Task 15 PR 均未完成；不得把 NJU 分支推送或本地审查通过写成 Task 15 完成。
 
 ## 计划自审
+
+### 2026-08-10 Task 15 外部交付最终证据（优先）
+
+PR #1–#15 已普通 merge；main `c633003` 的 GitHub CI `31389169084` 成功执行 backend、三份 demos、frontend、build、Chromium E2E 与 Docker build。它触发的 GHCR publish `31389335469` 成功；空 Docker 配置匿名拉取 SHA 镜像（digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`）并在临时 `127.0.0.1:18001` 容器验证 `/`、`/api/runs` 均 200。此前 GHCR `read:packages` token 403 只代表 API 权限不足，已不影响公开匿名拉取的实际结论。Task 15 待完成的是本次文档提交、PR/分支收尾及最终 main 的 NJU 同步；Railway 继续只作为无真实 key 的 Mock 演示站。
+
+### 2026-08-10 Task 15 外部发布依赖更新
+
+`gh pr list` 的只读结果为 PR #1-#14 全部 draft，Task 15 无 PR；对默认分支查询 `.github/workflows/publish-image.yml` 返回 404。故 GHCR 不能在当前 Task 15 分支发布：必须先经用户授权按 stacked 链完成审查/合并，待 Task 14 的发布 workflow 抵达默认分支且默认分支 CI 成功，再验证 package public 与匿名 `docker pull`/run。
+
+### 2026-08-10 Task 15 学生反思正文更新
+
+用户提供的正文已原样写入 `REFLECTION.md`，协调会话没有生成或润色内容。统计中文汉字 `1583`、非空白字符 `2852`；前者符合 1500–2500 字目标，后者可能因英文术语/代码标记而超过，须按课程平台的实际统计口径由学生人工确认。文档测试 `1 passed`。
+
+### 2026-08-10 PR #1–#3 集成记录
+
+用户明确授权顺序合并、保留 branch/worktree。#1/#2/#3 已分别普通合并至 `main`（`1fc6f4c`、`a1c95ad`、`6006700`）；合并前实测为 1/7/26 passed。Task 3 的旧一键入口因 Windows 系统 pytest temp 权限产生 `WinError 5`，固定使用 worktree-local `--basetemp .pytest-tmp\merge-t3` 后 26 passed；无功能修复。Task 14 的 CI workflow 尚未在 main，故暂无 main CI 可等待。
 
 - [ ] **SPEC 覆盖：** 任务 2、5、6、7 覆盖 Harness 六维和 A 项目自主主循环；任务 3、4、7、8、12、13 覆盖深度治理与 HITL；任务 9 覆盖凭据威胁模型；任务 10 覆盖租户/工作区边界；任务 11、12 覆盖 Open Design WebUI；任务 13 覆盖三类机制演示；任务 14、15 覆盖一键测试、CI、分发、公共部署与提交证据。
 - [ ] **流程覆盖：** 已完成 brainstorming；本计划由 writing-plans 产出；任务 0 是强制的不同类型 agent 冷启动门槛；任务 1-15 逐个使用 worktree、fresh subagent、TDD、两阶段审查、PR；任务 15 使用 requesting-code-review 与 finishing-a-development-branch。
@@ -532,6 +548,18 @@ it("renders a blocked rule decision in the run timeline", () => {
 - [x] **步骤 5：两阶段审查与提交**：先审查所有状态来自安全 DTO，再审查键盘焦点、色彩对比、文本溢出与静态响应式规则；没有执行窄屏浏览器测试，该项保持为任务 13 未完成工作；提交 `git commit -m "feat: add governed run workbench"`。
 
 **完成记录：** Task 1 提交 `893f01a`、`63749f5`：初始 `runs` 模块缺失 RED，边界初始 GREEN 4/4；在任务 8 固定安全 DTO 后，审查发现两个 Important（异常原文泄露、读取原始 `summary`/`failure`），先有 3/6 RED 回归，修复后 focused/full GREEN 6/6。Task 2 提交 `0dcdca9`：`App`/`RunTimeline` 缺失 RED，focused GREEN 6/6、全套 GREEN 12/12。前端只读调用任务 8 的两个 GET 路由，严格投影列表四字段和时间线安全 DTO 五字段；未读取或迁入旧前端，未实现写 API、审批、配置、上传、凭据或 localStorage。Open Design 只有不可复现的历史记录：记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 0.18.1 并做过 SHA-256 校验，但本地没有安装包、资产 URL 或精确摘要，不能算作当前已验证证据，绝不猜测摘要；任务只采用记录中的技能/设计系统、真实文件产出和可审计原则，未加入运行时依赖。两阶段审查最终 Critical 0、Important 0；CSS 有 `44rem` 单列断点、`min-width: 0`、`overflow-wrap: anywhere`，但没有窄屏浏览器测试，320px 证据明确留给任务 13。最终审查修复提交 `33b5ff0`：依赖 RED 为缺 lockfile 导致 `npm ci` exit 1，行为 RED 为 focused 3 files/9 tests 中 3 failed；新增 lockfile v3 并精确声明 Testing Library/jsdom 依赖，卡片可访问名称加入场景/状态/UTC 更新时间，详情以 id 绑定当前选择并覆盖乱序响应，时间显式标注 UTC。GREEN 为 focused 9/9；clean `npm ci` 成功，完整前端 4 files/15 tests passed，build 通过，credential candidate 0，staged diff check 无输出。设计和 UI 只承诺安全四字段卡片/五字段时间线，绝不恢复原始事件文本。按用户选择已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)，保留分支/worktree 等待审查。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#4–#9
+
+用户继续选择普通 merge 到 `main`、保留 branch/worktree。PR #4–#9 依次合并为 `c9b1173`、`9568e9f`、`b14a6c8`、`ef9c0a7`、`8468dfe`、`a2abb83`；合并前实际任务测试为 51/58/77/89/100/114 passed（#8、#9 分别有 1 条既有 TestClient 弃用 warning）。#9 在独立 worktree 合入 `origin/main` 时仅解决 `AGENT_LOG.md` 历史记录冲突，未修改 task 功能源码；合并结果完整 backend `114 passed, 1 warning`、diff/marker scan clean，fresh 独立审查 C/I/M=`0/0/0`。main 当前覆盖 Task 1–9；#10 仍需按同一门槛完成受控集成和复审，Task14 CI workflow 仍未进入 main。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#10
+
+Task10 与 Task9 的共享 factory 冲突经 test-first 组合修复：RED 为未解析 marker 的 `SyntaxError`，GREEN focused `1 passed, 1 warning`、完整 backend `146 passed, 1 warning`、diff/marker/credential scan clean。fresh review C/I/M=`0/0/0`；PR #10 已 retarget main、ready、GitHub `CLEAN` 后普通 merge `696214d`。保留 branch/worktree；下一个 #11 仍须重新验证、复审和真实 PR 状态回读。
+
+### 2026-08-10 — 已授权 stacked PR 集成续记：#11
+
+Task11 的冲突只在历史文档；runtime 自动合并。完整 backend `146 passed, 1 warning`、frontend `15 passed`、build、diff/marker/credential scan clean；fresh review C/I/M=`0/0/0`。PR #11 已 retarget main、ready、`CLEAN` 后普通 merge `622c472`，保留 branch/worktree。
 
 ## 任务 12：审批、Planner 与 ZIP 上传界面（策略扩展延后）
 
