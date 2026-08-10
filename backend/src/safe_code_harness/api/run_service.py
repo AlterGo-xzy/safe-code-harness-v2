@@ -1,6 +1,6 @@
-import re
-from dataclasses import asdict, dataclass
-from typing import Literal
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Callable, Literal
 
 from safe_code_harness.core.agent_loop import AgentLoop, RunConfig, RunState
 from safe_code_harness.core.models import Action
@@ -12,12 +12,34 @@ from safe_code_harness.memory.store import MemoryStore
 from safe_code_harness.tools.dispatcher import ToolResult
 
 
-_SECRET_ASSIGNMENT = re.compile(
-    r"\b(?:[A-Za-z_][A-Za-z0-9_]*(?:API_KEY|TOKEN|SECRET|PASSWORD)|api[-_]?key|token|secret|password)"
-    r"\s*[:=]\s*\S+",
-    re.IGNORECASE,
-)
-_SECRET_VALUE = re.compile(r"\b(?:sk-proj-|sk-|ghp_|github_pat_)[A-Za-z0-9_-]+\b")
+_TIMELINE_DISPLAY_STATUS = {
+    "rule_blocked": "规则已阻止操作",
+    "rule_checked": "规则审查已完成",
+    "approval_pending": "等待人工审批",
+    "approval_approved": "审批已通过",
+    "approval_rejected": "审批已拒绝",
+    "tool_succeeded": "工具执行成功",
+    "tool_failed": "工具执行失败",
+    "run_finished": "任务已结束",
+    "unknown_governed_event": "未知受治理事件",
+}
+
+_TIMELINE_SUMMARY_CODES = {
+    key: key
+    for key in _TIMELINE_DISPLAY_STATUS
+}
+
+_TIMELINE_LEVELS = {
+    "rule_blocked": "blocked",
+    "rule_checked": "info",
+    "approval_pending": "warning",
+    "approval_approved": "info",
+    "approval_rejected": "blocked",
+    "tool_succeeded": "info",
+    "tool_failed": "error",
+    "run_finished": "info",
+    "unknown_governed_event": "warning",
+}
 
 
 class RunNotFoundError(ValueError):
@@ -48,14 +70,19 @@ class _ManagedRun:
     approvals: ApprovalStore
     state: RunState
     approval_id: str | None
+    scenario: str
+    created_at: datetime
+    updated_at: datetime
+    creation_order: int
 
 
 class RunService:
     """Keep API run state in-process while delegating all transitions to AgentLoop."""
 
-    def __init__(self) -> None:
+    def __init__(self, clock: Callable[[], datetime] | None = None) -> None:
         self._runs: dict[str, _ManagedRun] = {}
         self._next_run_id = 1
+        self._clock = clock or (lambda: datetime.now(timezone.utc))
 
     def start(self, scenario: Literal["pending_write", "secret_write"]) -> dict[str, object]:
         if scenario not in {"pending_write", "secret_write"}:
@@ -84,24 +111,43 @@ class RunService:
             memory=MemoryStore(run_id=run_id, max_entries=10, max_bytes=4096),
         )
         state = loop.run("perform the deterministic pending write", config)
+        created_at = self._timestamp()
         self._runs[run_id] = _ManagedRun(
             loop=loop,
             config=config,
             approvals=approvals,
             state=state,
             approval_id=state.approval_id,
+            scenario=scenario,
+            created_at=created_at,
+            updated_at=created_at,
+            creation_order=self._next_run_id - 1,
         )
         return self.snapshot(run_id)
+
+    def list_summaries(self) -> list[dict[str, object]]:
+        return [
+            self._summary(run_id, managed)
+            for run_id, managed in sorted(
+                self._runs.items(), key=lambda item: (item[1].created_at, item[1].creation_order)
+            )
+        ]
 
     def snapshot(self, run_id: str) -> dict[str, object]:
         managed = self._get_run(run_id)
         state = managed.state
         return {
             "id": run_id,
+            "scenario": managed.scenario,
             "status": state.status,
+            "created_at": self._timestamp_value(managed.created_at),
+            "updated_at": self._timestamp_value(managed.updated_at),
             "stop_reason": state.stop_reason,
             "approval_id": state.approval_id,
-            "events": [self._event_payload(event) for event in state.events],
+            "events": [
+                self._timeline_payload(event, state.stop_reason, managed.created_at)
+                for event in state.events
+            ],
         }
 
     def decide(
@@ -122,7 +168,16 @@ class RunService:
             raise ApprovalNotPendingError("approval request is not pending") from exc
 
         managed.state = managed.loop.resume(managed.state, managed.config)
+        managed.updated_at = self._timestamp()
         return self.snapshot(run_id)
+
+    def _summary(self, run_id: str, managed: _ManagedRun) -> dict[str, object]:
+        return {
+            "id": run_id,
+            "scenario": managed.scenario,
+            "status": managed.state.status,
+            "updated_at": self._timestamp_value(managed.updated_at),
+        }
 
     def _get_run(self, run_id: str) -> _ManagedRun:
         managed = self._runs.get(run_id)
@@ -130,12 +185,50 @@ class RunService:
             raise RunNotFoundError("run not found")
         return managed
 
+    def _timestamp(self) -> datetime:
+        timestamp = self._clock()
+        if timestamp.tzinfo is None:
+            return timestamp.replace(tzinfo=timezone.utc)
+        return timestamp.astimezone(timezone.utc)
+
     @staticmethod
-    def _event_payload(event: object) -> dict[str, object]:
-        payload = asdict(event)
+    def _timestamp_value(timestamp: datetime) -> str:
+        return timestamp.isoformat()
+
+    @classmethod
+    def _timeline_payload(
+        cls, event: object, stop_reason: str, created_at: datetime
+    ) -> dict[str, str]:
+        mapping_key, event_type = cls._timeline_mapping(event, stop_reason)
         return {
-            key: _SECRET_VALUE.sub("[REDACTED]", _SECRET_ASSIGNMENT.sub("[REDACTED]", value))
-            if isinstance(value, str)
-            else value
-            for key, value in payload.items()
+            "type": event_type,
+            "created_at": cls._timestamp_value(created_at),
+            "level": _TIMELINE_LEVELS[mapping_key],
+            "display_status": _TIMELINE_DISPLAY_STATUS[mapping_key],
+            "summary_code": _TIMELINE_SUMMARY_CODES[mapping_key],
         }
+
+    @staticmethod
+    def _timeline_mapping(event: object, stop_reason: str) -> tuple[str, str]:
+        kind = getattr(event, "kind", None)
+        if kind == "rule_decision":
+            return (
+                ("rule_blocked", "rule_decision")
+                if stop_reason == "rule_blocked"
+                else ("rule_checked", "rule_decision")
+            )
+        if kind == "approval":
+            approval_key = {
+                "waiting_approval": "approval_pending",
+                "approval_rejected": "approval_rejected",
+            }.get(stop_reason, "approval_approved")
+            return approval_key, "approval"
+        if kind == "tool_result":
+            return (
+                ("tool_succeeded", "tool_result")
+                if getattr(event, "ok", None) is True
+                else ("tool_failed", "tool_result")
+            )
+        if kind == "stopped" and stop_reason == "finished":
+            return "run_finished", "finish"
+        return "unknown_governed_event", "unknown"

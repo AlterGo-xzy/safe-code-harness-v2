@@ -324,7 +324,7 @@ def test_pending_write_only_runs_after_explicit_approval(client) -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：补充未知运行、重复审批、拒绝和不可序列化事件测试；运行 `python -m pytest backend/tests/integration/test_runs_api.py -q`，预期全绿。
 - [ ] **步骤 5：两阶段审查与提交**：先审查 API 没有绕过 AgentLoop，再审查状态隔离、错误码和日志脱敏；提交 `git commit -m "feat: expose governed runs through api"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** 初始实现/依赖修正提交为 `974d73b`、`7afa279`、过程记录 `2de48a2`；现为解除任务 11 的真实 API 契约阻断，经用户确认补充只读列表。fresh implementer `/root/t08_runlist_implementer` 先在 `GET /api/runs` 得到 405、详情缺 `scenario` 的 `3 failed` RED，后提交 `afd42ae feat(api): add safe run list summaries`。列表只白名单返回 `id`、`scenario`、`status`、`updated_at`，按创建时序稳定排序；详情补同样安全元数据。独立审查 PASS，无 C/I/M；协调验证完整 backend `99 passed, 1 warning`、脚本 unit `88 passed`，warning 是既有 TestClient 弃用提示。更新既有 draft PR #8，保留分支/worktree。
 
 ## 任务 2：动作协议、运行模型与 Mock LLM
 
@@ -478,7 +478,7 @@ def test_config_response_never_contains_planner_key(client) -> None:
 - [ ] **步骤 4：确认绿色结果与重构**：补充 fake Windows API 调用、非 Windows fail-closed、清除后不可读取、空 URL/模型校验测试；运行同一命令，预期全绿。
 - [ ] **步骤 5：两阶段审查与提交**：先对照 SPEC 威胁模型逐项审查流向，再审查异常消息、日志和响应；提交 `git commit -m "feat: add secure optional planner configuration"`。
 
-**完成记录：** 真实红绿命令、审查结论、hash、PR。
+**完成记录：** 新鲜 implementer `/root/t09_implementer` 在基线 `2de48a2` 完成 `3074085 feat: add secure optional planner configuration`，未使用旧项目代码。用户明确选择暂不配置真实 OpenAI-compatible key；全部验证使用 fixture key、fake Credential Manager / fake transport，未读写真实凭据且未访问网络。初始 RED 运行 `python -m pytest backend/tests/unit/test_secret_store.py backend/tests/unit/test_openai_compatible.py backend/tests/integration/test_config_api.py -q --basetemp .pytest-tmp\\task9-red`，结果 `4 failed, 4 errors`（缺少模块）；最小实现后 focused GREEN 为 `8 passed`。首轮独立安全审查发现异常链会在 traceback 中保留可能含 key 的适配器异常（Important）；修复先加入含 fixture key 的回归，RED 为 `4 failed, 10 passed`，再以六处 `raise ... from None` 隔离底层异常，提交 `51eb9c8 fix: prevent credential exception-chain leaks`。补充无 key 时 fake transport 零调用和空白 key 校验；focused GREEN `14 passed`，scoped re-review PASS，无 C/I/M。协调会话新鲜完整 backend 为 `110 passed, 1 warning`，根目录 `scripts/test.ps1` 为 `96 passed`；warning 是既有 Starlette/TestClient 对 `httpx` 的弃用警告。收尾前 `git diff --check 2de48a2..HEAD` 无输出、已变更文件精确凭据形态扫描为 `0`。依照既有 `finishing-a-development-branch` 选项 2，已推送并建立目标为 `codex/t08-api-runs` 的 [stacked draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)，保留分支/worktree 等待审查。
 
 ## 任务 10：安全项目压缩包上传与工作区注册
 
@@ -547,3 +547,7 @@ it("submits approval without rendering the secret key", async () => {
 - [ ] **步骤 5：两阶段审查与提交**：先审查 UI 不能绕开治理与凭据边界，再审查 loading/disabled/error 状态和无障碍标签；提交 `git commit -m "feat: add approval and configuration controls"`。
 
 **完成记录：** 真实红绿命令、审查结论、hash、PR。
+
+### 2026-08-10 — PR #10/main 集成修复（审查待进行）
+
+在用户授权按顺序普通 merge 后，#10 相对当前 main 的冲突为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 和共享 `api/main.py`。根因是 Task 9 Planner 需要可注入 `SecretStore`/config router，Task 10 需要 `WorkspaceRegistry`/workspace router；不能选择任一侧。先写 `test_app_factory_integration.py`，未解析 main 时得到预期 `SyntaxError` RED；随后仅组合已有 imports/state/router，测试实际获得 Planner 200 的 `configured=false` 和非法 ZIP 固定 400。focused 为 `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，diff/marker/credential scan clean。提交与 merge 必须等待 fresh 独立审查。
