@@ -2,18 +2,10 @@
 
 本日志只记录实际发生的过程，不补写或虚构历史证据。
 
-## 2026-08-10 T15：最终分支收尾
+## 阅读顺序与过程完整性
 
-- 外部收尾：最终证据 PR #16 的 GitHub CI（test、docker-build）与 Railway 自动部署均成功；普通 merge 产生 `d56516fbc077563f0013090a8e515a4e9f15503f`。随后 fetch GitHub `origin/main` 并以非 force fast-forward 推送到 NJU Git `main`，结果 `5dd5da3..d56516f`。
-- 状态：Task 15 的 README/许可证/反思原样保存/CI/OCI/公网 Mock 演示与同一 NJU Git 提交要求均有证据。Railway 的认证 + TLS 真实 key 部署仍是用户明确延后的扩展，不是已交付功能。
-
-## 2026-08-10 T15：主分支 CI 修复、公开 GHCR 与最终交付证据
-
-- 技能与原因：`systematic-debugging` 定位 main `ffb8544` 的 GitHub CI 失败；`test-driven-development` 先增加 Planner 初始加载中的按钮禁用 RED；`requesting-code-review` 对最小修复做独立只读审查。纯文档整合按用户指示不重复运行全量测试。
-- 修复：`PlannerSettings` 将统一 disabled 条件改为 `loading || action !== null`，避免初始 GET 未返回时 PUT 发送空 `baseUrl`/`model`。focused RED 后 GREEN；本地 frontend `49 passed`、build、E2E `2 passed`、backend `169 passed, 1 warning`；review C/I/M=`0/0/0`。
-- 外部结果：PR #15 的 `5936d5b` 普通 merge 为 main `c633003a06ad8073852f9125e3e195635f159bbb`。GitHub CI [31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 成功运行 backend、demos、frontend、build、Chromium E2E、Docker build；后续 [GHCR publish 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功。
-- 匿名 OCI 验证：空 Docker 配置实际 pull SHA tag，digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`。临时容器仅映射 `127.0.0.1:18001`，condition polling 后 `/` 和 `/api/runs` 为 HTTP 200，再停止容器。首次即时请求发生在服务就绪前，后续不是重试掩盖失败而是条件就绪验证。
-- 未完成：Railway 仍是无认证、无真实 key 的 Mock 站；Task15 还需推送证据回填、建立/处理 Task15 PR、最终 main 同步 NJU Git，以及学生本人提交前复核反思口径。
+- 本文件保留每个 task 的原始 RED/GREEN、subagent、审查、人工干预与教训；同一日期的 stack 合并记录在文件末尾补写，避免为了视觉排序而改写历史。当内容冲突时，以每个条目的“当时状态”及其 commit/PR/run ID 为准，并以本文件末尾的“最终交付收尾”作为截至 2026-08-10 的状态汇总。
+- 开发责任链完整保留为：规格/计划由协调会话在用户逐步确认后完成；每个实现 task 在独立 `codex/tNN-*` worktree 中由 fresh implementer 完成；独立 reviewer 先做规格/安全审查，再做质量审查；发现问题的 fix agent 必须先补 RED 回归；协调会话只做用户授权的整合、外部操作、冲突解决和过程回填。各 task 的具体 agent 名称、prompt 范围、测试命令、RED/GREEN、人工操作和复审结论均在对应日期标题下，不以本摘要替代。
 
 ## 2026-08-03 D0：规格阶段
 
@@ -420,3 +412,11 @@
 
 - Task11 与 current main 的冲突仅是历史过程文档；保留双方记录后运行时源自动合并。完整 backend 以 Task15 venv 加 `PYTHONPATH` 指向 Task11 当前源码，得到 `146 passed, 1 warning`；frontend 为 4 files/15 tests、build 成功，diff/marker/凭据候选均为 0。
 - fresh reviewer `/root/t11_merge_reviewer` C/I/M=`0/0/0`，确认只读 DTO UI、无写 API/localStorage/凭据，以及 Task9/10 安全边界未变。PR #11 retarget/ready/CLEAN 后普通 merge `622c47270985e33ecaa3ba64b2f1a0fa082f0bbf`（`2026-08-10T11:58:36Z`）；未删除 branch/worktree。
+
+### 2026-08-10 — 最终交付收尾与外部证据（截至完整运行时验证基线）
+
+- 实施与审查链：任务 1–15 均按独立 worktree、fresh implementer、先 RED 后最小 GREEN、独立 spec/security 与质量审查执行；命令护栏、ZIP、Planner key、真实审批 E2E、CI/容器和 GitLab File 兼容问题的审查 finding 均先转为回归测试后修复。具体 subagent 名称与 scoped review 结论保留在 Task 1–15 条目中；协调会话没有把 reviewer 建议直接当作实现结论。
+- 人工授权与集成：用户逐段授权保留 worktree、顺序普通 merge stacked PR、推送 GitHub/NJU、使用 Railway Mock 以及提供反思正文。GitHub PR #1–#17 均已普通 merge；PR #15–#17 描述已补充协调者、独立 reviewer 与用户授权的责任信息。最后完整运行时验证基线为 `a205a231cf30e09bc3c86c55a394572a5f309029`；它随后以非 force fast-forward 同步至 NJU Git `main`。
+- 运行时与发布证据：GitHub CI [31390746883](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31390746883) 在 `a205a231` 成功运行 backend、三份确定性机制 demo、frontend unit/build、Chromium E2E 和 Docker build；其后 GHCR publish [31390905424](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31390905424) 成功。空 Docker 配置匿名 pull/run `sha-c633003a...` 镜像，loopback 容器的 `/` 与 `/api/runs` 均 HTTP 200；容器随后停止。
+- GitLab 最终证据：用户提供 NJU GitLab `main` 的 pipeline #319806 截图，显示 commit `a205a231`、`unit-test` job #610513 均为通过。这补齐此前 #319723/#319724 对 File polyfill 修复分支的绿色记录；不把截图以外的 GitLab 细节虚构为可 API 读取的结果。
+- 部署与学术边界：Railway `https://safe-code-harness-v2-production.up.railway.app` 是用户确认的 HTTPS Mock 演示站，严禁真实 key 与敏感工作区；它没有应用认证，真实 key 的公网使用必须经过认证和 TLS gateway，作为后续扩展。`REFLECTION.md` 为用户提供的原文，协调会话仅保存；汉字计数 1583。当前条目仅回填过程与证据，未重新运行代码测试，也未把文档变更冒充为运行时验证。

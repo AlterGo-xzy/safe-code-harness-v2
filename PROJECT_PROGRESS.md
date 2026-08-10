@@ -8,11 +8,11 @@
 
 ## 2026-08-10 最终交付外部证据更新（优先于下方历史快照）
 
-- GitHub 已按普通 merge 顺序集成 PR #1–#15；最新 `main` 为 PR #15 的 merge commit `c633003a06ad8073852f9125e3e195635f159bbb`。#15 是唯一一次合并后的 CI 修复：Planner 初始异步配置未完成前禁用保存/清除，避免空值覆盖；先有 focused RED，最小修复后独立审查 C/I/M=`0/0/0`。
-- GitHub `main` CI [run 31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 已成功：backend、三份确定性机制演示、frontend unit/build、Chromium E2E 与 Docker build 均通过。此前 `ffb8544` 的 main CI 因 Planner 竞态失败，不能删除该失败历史；它已由 #15 的实际 CI 绿色关闭。
-- CI 成功后，GHCR 发布 [run 31389335469](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389335469) 成功。使用空 Docker 配置（未登录）实际拉取 `ghcr.io/altergo-xzy/safe-code-harness-v2:sha-c633003a06ad8073852f9125e3e195635f159bbb`，digest 为 `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`；临时容器仅绑定 `127.0.0.1:18001`，就绪后 `/` 和 `/api/runs` 均为 HTTP 200，随后已停止。因此公开 OCI 分发和匿名 pull/run 已有真实证据。
+- GitHub PR #1–#17 均已普通 merge；最后一次完整运行时验证的 GitHub/NJU `main` 基线为 `a205a231cf30e09bc3c86c55a394572a5f309029`。本条之后如仅有文档补正，必须以 `git rev-parse origin/main` 获取实际最新 SHA，且不得把该补正误说成重新执行过完整运行时验证。#15 修复 Planner 初始异步配置未完成时允许保存/清除的竞态，先有 focused RED，最小修复后独立审查 C/I/M=`0/0/0`。
+- 最终 GitHub `main` CI [run 31390746883](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31390746883) 成功：backend、三份确定性机制演示、frontend unit/build、Chromium E2E 与 Docker build 均通过；其后 GHCR [publish 31390905424](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31390905424) 成功。
+- 已用空 Docker 配置（未登录）实际拉取 `ghcr.io/altergo-xzy/safe-code-harness-v2:sha-c633003a06ad8073852f9125e3e195635f159bbb`，digest 为 `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`；临时容器仅绑定 `127.0.0.1:18001`，就绪后 `/` 和 `/api/runs` 均为 HTTP 200，随后已停止。因此公开 OCI 分发和匿名 pull/run 已有真实证据。
 - Railway `https://safe-code-harness-v2-production.up.railway.app` 仍仅是无真实 key、无敏感工作区的 HTTPS Mock 演示站；Railway HTTPS 不等于应用认证。真实 key/敏感上传仍必须在认证网关与 TLS 安全边界补齐后才可开放。
-- Task 15 收尾已完成：最终证据 PR #16 已 merge 为 `d56516fbc077563f0013090a8e515a4e9f15503f`，同一提交已快进推送至 NJU Git 的 `main`。用户提供的反思正文按中文汉字计数为 `1583`，已原样保存；提交前的篇幅口径复核仍由学生本人负责。当前不再有本项目必做实现/交付阻断；仅余“认证 + TLS 后承载真实 key”的 Railway 生产部署扩展。
+- Task 15 收尾已完成：PR #16、#17 的交接与关闭记录均已 merge；同一最终 main 已快进推送至 NJU Git。用户截图确认 NJU GitLab `main` 的 `a205a231` pipeline `#319806` / `unit-test` job `#610513` 通过。用户提供的反思正文按中文汉字计数为 `1583`，已原样保存；“认证 + TLS 后承载真实 key”的 Railway 生产部署仍是延后扩展，而非本项目必做项。
 
 - 最终仓库：`https://github.com/AlterGo-xzy/safe-code-harness-v2`，公开。
 - 主分支最新已推送的流程准备提交：`5dd5da3 chore: prepare isolated task worktrees`。

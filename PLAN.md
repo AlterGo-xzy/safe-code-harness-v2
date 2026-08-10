@@ -235,7 +235,7 @@ def test_readme_contains_reproducible_run_and_key_safety_instructions() -> None:
 
 ### 2026-08-10 Task 15 外部交付最终证据（优先）
 
-PR #1–#15 已普通 merge；main `c633003` 的 GitHub CI `31389169084` 成功执行 backend、三份 demos、frontend、build、Chromium E2E 与 Docker build。它触发的 GHCR publish `31389335469` 成功；空 Docker 配置匿名拉取 SHA 镜像（digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`）并在临时 `127.0.0.1:18001` 容器验证 `/`、`/api/runs` 均 200。此前 GHCR `read:packages` token 403 只代表 API 权限不足，已不影响公开匿名拉取的实际结论。Task 15 待完成的是本次文档提交、PR/分支收尾及最终 main 的 NJU 同步；Railway 继续只作为无真实 key 的 Mock 演示站。
+PR #1–#17 已普通 merge；最后一次完整运行时验证基线 `a205a231` 的 GitHub CI `31390746883` 成功执行 backend、三份 demos、frontend、build、Chromium E2E 与 Docker build，随后 GHCR publish `31390905424` 成功。空 Docker 配置匿名拉取 SHA 镜像（digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`）并在临时 `127.0.0.1:18001` 容器验证 `/`、`/api/runs` 均 200；GitLab pipeline #319806 的 `unit-test` job #610513 也由用户截图确认通过。此前 GHCR `read:packages` token 403 只代表 API 权限不足，已不影响公开匿名拉取的实际结论。Task 15 已完成 PR/分支收尾和 NJU main 同步；Railway 继续只作为无真实 key 的 Mock 演示站。后续仅文档补正时不得把它写成重新运行过完整基线验证。
 
 ### 2026-08-10 Task 15 外部发布依赖更新
 

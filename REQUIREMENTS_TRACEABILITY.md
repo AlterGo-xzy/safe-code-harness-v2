@@ -11,10 +11,10 @@
 | G-3.1-3 | 首次安全录入，支持查看状态、更新、清除，不回显 | 部分完成（任务 9、12、13 Task 1） | Task 9 API 支持掩码状态、更新、清除且无明文/异常链泄露；Task 12 有隐藏输入、初始加载、保存/清除、mutation pending 禁用和固定错误单测。Task 13 Task 1 已验证合并后真实 Planner API 返回固定四字段 DTO；Task 3 浏览器只覆盖审批，不把它误写成 Planner 凭据浏览器验证。 |
 | G-3.1-4 | SPEC 有凭据威胁模型与对策 | 已完成并验证 | `SPEC.md` 8.1。 |
 | G-3.2-1 | 选择分发形态；容器须单条 build/run 且推送公开 registry | 已完成并验证 | `0f2b35f` 提供单条 Docker build/run；main `c633003` CI 的 Docker build 已通过，成功后的 GHCR workflow `31389335469` 已发布。空 Docker 配置实际匿名拉取 SHA tag，digest `sha256:efebd5cc0277b73ddbfbecf00ad843af1c127b3ba31e0395f3de6b46825694d2`，并在 loopback 容器验证 `/`、`/api/runs` 都为 200。 |
-| G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 已完成并验证 | `9acb2ae`/`60528ae`：中文 README 包含源码获取、本地/OCI 运行、未来 GHCR pull/run、Windows Credential Manager、容器进程内存/平台 secret 风险、无认证与公网 authentication/TLS gateway 前提、目录和“已知限制”；未把 GHCR 外部结果写成已完成。 |
+| G-3.2-2 | README 写获取、运行、目标机安全 key 配置、限制 | 已完成并验证 | 中文 README 包含源码获取、本地/OCI 运行、已验证的 GHCR pull/run、Windows Credential Manager、容器进程内存/平台 secret 风险、无认证与公网 authentication/TLS gateway 前提、目录和已知限制。 |
 | G-3.3 | SPEC 说明技术栈、LLM 供应商与理由 | 已完成并验证 | `SPEC.md` 9；可选 Planner 明确为 OpenAI-compatible 单次动作提供方。 |
 | G-3.4-1 | 真实、非玩具项目，至少三个职责清晰模块 | 已完成并验证 | Action/LLM、Governance、Tools、Feedback/Memory、AgentLoop、API/WebUI 均已有职责分离的实现与离线测试；任务 13 又以真实本地 API/浏览器串联运行与审批。 |
-| G-3.4-2 | 一键测试；新机器验证凭据与分发 | 部分完成（任务 14-15 本地） | `Makefile test` 使用 README 安装的 `.venv/bin/python` 串联 backend/frontend；当前 Windows 无 GNU Make，未虚称运行，两个实际 target 为 backend `169 passed`、frontend `48 passed`。本地 OCI loopback build/healthy/API/WebUI 已验证；独立新机器和公开 pull 仍为外部阻断。 |
+| G-3.4-2 | 一键测试；新机器验证凭据与分发 | 已完成并验证（平台限制已说明） | `Makefile test` 使用 README 安装的 `.venv/bin/python` 串联 backend/frontend；Windows 无 GNU Make，未虚称运行，但两个实际 target 已验证。公开 OCI 已由空 Docker 配置匿名 pull/run，并在 loopback 容器验证 healthy/API/WebUI；独立硬件架构仍是 README 明确限制。 |
 | G-3.5 | 个人负责 PM/架构/reviewer | 已完成并验证 | 用户作为最终决策者；PR 日志记录人工决策与修改。 |
 | G-3.6-1 | 安装并使用 Superpowers | 已完成并验证 | 本会话实际使用 `brainstorming`；后续每一步在 `AGENT_LOG.md` 记录对应官方 skill。 |
 | G-3.6-2 | 如实遵循七步流程；偏离须记录 | 部分完成（任务 1-15 本地实现） | Task 14 已以 draft PR #14 收尾。Task 15 fresh subagent 已完成本地 RED/GREEN、回归和两阶段审查；初审 C/I/M=`0/0/1`，`93f3415` 后限定复审 `0/0/0`。本机无 GNU Make、外部 CI/GHCR/部署/NJU、学生反思与分支收尾均如实保留为未完成。 |
@@ -30,19 +30,19 @@
 | G-4.6-3 | 红-绿-重构 | 部分完成（任务 1-15 本地） | 任务 1-14 的 RED/GREEN 已记录；Task 15 发布契约为 `1 failed`→`1 passed`，并用现有 Task 14 安全契约的回归 RED 驱动双语修复。 |
 | G-4.6-4 | 每 task 先 spec 合规审查，再代码质量审查 | 已完成并验证（任务 1-15 本地阶段） | Task 15 两阶段初审总计 C/I/M=`0/0/1`，唯一 PLAN 历史 Minor 由 `93f3415` 修复，限定复审 `0/0/0`；没有未关闭本地 finding。 |
 | G-4.6-5 | `finishing-a-development-branch` 决定分支去向 | 已完成并验证 | 任务 1–14 已普通 merge 且保留 branch/worktree；Task 15 在外部证据齐备后以 PR #16 普通 merge，最终 main 已同步 NJU。 |
-| G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 已完成并验证 | 公开 GitHub 的 PR #1–#16 已保留并完成普通 merge；Task 15 `487e19e`/`d56516f` 与此前本地 evidence 已同步 NJU main。历史扫描排除两处合成 fixture 后未分类候选为 0。 |
-| G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 部分完成（任务 1-15 本地） | 任务 1-14 PR 与任务 1-15 日志记录 subagent、人工调整及旧代码边界；Task 15 PR 尚未创建。 |
-| G-4.7-3 | PLAN 持续标注完成与 commit hash | 部分完成（任务 1-15 本地） | `PLAN.md` 已回填任务 15 本地提交、RED/GREEN、回归、初审 `0/0/1`、`93f3415` 修复和限定复审 `0/0/0`；PR/外部 URL 后继续更新。 |
-| G-4.7-4 | 维护 `AGENT_LOG.md` | 部分完成（任务 1-15 本地） | 日志已追加任务 1-15 的时间、agent、验证、审查、修复、人工动作和教训；Task 15 外部结果与收尾仍待追加。 |
-| G-4.8 | 一键测试、GitHub Actions push 测试、容器构建 | 已完成并验证 | `Makefile test` 使用仓库 venv；GitHub push/PR 测试+E2E+Docker job 已实现。最新 main `c633003` 的 [run 31389169084](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31389169084) 成功执行 backend、demos、frontend、Chromium E2E 与 docker-build。 |
-| G-4.9 | AGENT_LOG 包含时间、task、skill、prompt、输出、人工干预、教训 | 部分完成（任务 1-15 本地） | D0 及任务 1-15 本地日志包含上述字段和本地审查闭环；外部核验与分支收尾后继续更新。 |
-| G-4.10 | README 分发与 key 配置，CI 对应构建 | 已完成并验证 | README、Docker/GHCR workflow 与 key 安全边界均已记录；最新 main CI 通过后 GHCR publish `31389335469` 成功，匿名 pull/run 已实际验证。Railway Mock 的无认证限制仍明确保留。 |
-| G-4.11 | 服务端项目提供截止前可访问 WebUI、说明部署与 CI/CD | 部分完成（Mock 演示已验证） | 用户确认 Railway `https://safe-code-harness-v2-production.up.railway.app` 已部署，浏览器截图显示首页“暂无运行记录”，协调会话只读 HTTP 根请求返回 `200`；README 说明部署/CI/CD。该公共 HTTPS 站没有应用认证且未配置真实 Planner key，只能作为无敏感数据的 Mock 演示；认证/TLS 安全生产边界列为后续扩展。 |
-| G-5-1 | 同一个 NJU Git 链接提交所有交付 | 已完成并验证 | NJU Git `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git` 已有 Task 15 分支，并于 2026-08-10 将最终 GitHub `main` `d56516f` 快进推送为 NJU `main`。 |
-| G-5-2 | `.gitlab-ci.yml` 有名为 `unit-test` 的 job，最后 CI/CD 为 pass | 已完成并验证 | `.gitlab-ci.yml` 有顶层精确 `unit-test`，运行 backend、demos、frontend unit/build。初始 job #610227（pipeline #319719）因 Bookworm Node 缺少全局 `File` 失败；TDD 修复 `749199a` 后，用户提供的 GitLab 页面确认 job #610231（pipeline #319723，`749199a`）及 job #610232（pipeline #319724，`87b432d`）均为通过。 |
+| G-4.7-1 | 公开 GitHub、完整 commit/PR 历史、无凭据 | 已完成并验证 | 公开 GitHub 的 PR #1–#17 均已普通 merge；最后完整运行时验证基线 `a205a231` 已同步 NJU main。历史扫描排除两处合成 fixture 后未分类候选为 0。 |
+| G-4.7-2 | commit/PR 标注 subagent 和人工修改 | 已完成并验证 | 任务条目和 `AGENT_LOG.md` 保留 subagent、人工调整及旧代码边界；PR #15–#17 描述已补充协调者、独立 reviewer 与用户授权的事实。 |
+| G-4.7-3 | PLAN 持续标注完成与 commit hash | 已完成并验证 | 任务和整合记录已回填；最后完整运行时验证基线为 `a205a231`，含 GitHub CI/GHCR URL、NJU 同步和用户截图确认的 GitLab pipeline #319806/job #610513。 |
+| G-4.7-4 | 维护 `AGENT_LOG.md` | 已完成并验证 | 日志保留原始日期条目及 task 级 agent/RED/GREEN/review/人工干预；新增最终收尾条目记录 GitHub/GHCR/NJU/GitLab 外部证据和文档变更边界。 |
+| G-4.8 | 一键测试、GitHub Actions push 测试、容器构建 | 已完成并验证 | `Makefile test` 使用仓库 venv；GitHub push/PR 测试+E2E+Docker job 已实现。最后完整运行时验证基线 `a205a231` 的 [run 31390746883](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31390746883) 成功执行 backend、demos、frontend、Chromium E2E 与 docker-build。 |
+| G-4.9 | AGENT_LOG 包含时间、task、skill、prompt、输出、人工干预、教训 | 已完成并验证 | D0 及任务 1-15 的 task 级记录保留上述字段、RED/GREEN、审查与人工授权；最终条目补入外部核验/分支收尾，并解释同日历史补记的阅读顺序。 |
+| G-4.10 | README 分发与 key 配置，CI 对应构建 | 已完成并验证 | README、Docker/GHCR workflow 与 key 安全边界均已记录；最后完整运行时验证基线的 main CI `31390746883` 与 GHCR publish `31390905424` 成功，匿名 pull/run 已实际验证。Railway Mock 的无认证限制仍明确保留。 |
+| G-4.11 | 服务端项目提供截止前可访问 WebUI、说明部署与 CI/CD | 已完成并验证（Mock 演示范围） | 用户确认 Railway `https://safe-code-harness-v2-production.up.railway.app` 已部署，浏览器截图显示首页“暂无运行记录”，协调会话只读 HTTP 根请求返回 `200`；README 说明部署/CI/CD。该公共 HTTPS 站没有应用认证且未配置真实 Planner key，只作为无敏感数据的 Mock 演示；认证/TLS 安全生产边界列为后续扩展。 |
+| G-5-1 | 同一个 NJU Git 链接提交所有交付 | 已完成并验证 | NJU Git `https://git.nju.edu.cn/xzy241276010/safe-code-harness-v2.git` 已在 2026-08-10 以非 force fast-forward 同步最后完整运行时验证基线 `a205a231` 的 GitHub main。 |
+| G-5-2 | `.gitlab-ci.yml` 有名为 `unit-test` 的 job，最后 CI/CD 为 pass | 已完成并验证 | `.gitlab-ci.yml` 有顶层精确 `unit-test`，运行 backend、demos、frontend unit/build。初始 job #610227（pipeline #319719）因 Bookworm Node 缺少全局 `File` 失败；TDD 修复后已有 #319723/#319724 绿色记录，用户随后提供最终 NJU main `a205a231` 的 GitLab pipeline #319806 / `unit-test` job #610513 通过截图。 |
 | G-5-3 | `REFLECTION.md` 为学生本人 1500-2500 字 | 已完成并验证（中文汉字口径） | 用户提供的学生本人正文已原样写入，协调会话未代写或润色；中文汉字统计 `1583`，落在 1500–2500。若课程平台采取不同统计口径，学生提交前仍须本人确认。 |
 | G-5-4 | 线上 WebUI URL | 已完成并验证（Mock 演示范围） | 用户确认 Railway URL `https://safe-code-harness-v2-production.up.railway.app`，并提供首页空状态截图。它满足可访问 WebUI URL 的演示证据；无认证、无真实 key、不得上传敏感工作区，安全生产部署是后续扩展。 |
-| G-6 | 学术规范：个人手写核心处注释、第三方许可证、反思不可 AI 代写 | 部分完成 | `LICENSE`、`THIRD_PARTY_NOTICES.md` 和 README 许可证索引已完成；学生本人反思及最终人工学术规范复核仍未完成。 |
+| G-6 | 学术规范：个人手写核心处注释、第三方许可证、反思不可 AI 代写 | 部分完成（需学生最终确认） | `LICENSE`、`THIRD_PARTY_NOTICES.md` 和 README 许可证索引已完成；`REFLECTION.md` 为用户提供的原文，协调会话仅保存、未代写或润色。核心代码作者身份与课程提交前的学术规范声明只能由学生本人最终确认，不能由 agent 代替。 |
 
 ## A 赛道要求
 
@@ -55,9 +55,9 @@
 | A-4-C | 移除真实 LLM 后所有核心机制仍可单测 | 已完成并验证 | 动作、治理、工具、反馈、记忆、完整 loop、审批恢复、API 与三项机制 demo 均由 Mock/stub LLM 离线确定性测试覆盖；真实 Planner/key/网络不是测试前提。 |
 | A-4-D | 六维最低实现，并选择一个深入维度 | 已完成并验证 | 六维最低实现均已落地：决策封装、动作/工具、上下文/记忆、治理/HITL/沙箱、反馈闭环、声明式配置；治理主贡献另有规则、路径/命令护栏、审批状态机和事件证据的深入实现。 |
 | A-5 | SPEC 增加“领域与机制设计” | 已完成并验证 | `SPEC.md` 4。 |
-| A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 已完成并验证 | `backend/tests` 以 `MockLLM`/stub 覆盖 Harness 核心；最新 main CI `31389169084` 实际成功运行 backend 与三份稳定 JSON demo。 |
-| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已完成并验证 | 三份稳定 JSON demo：护栏阻断、MockLLM 反馈闭环改变动作、真实 `RunService` 的等待审批→批准→执行；真实 FastAPI/Vite/Chromium E2E 已通过。最新 main CI `31389169084` 也实际复现 demos 为绿。 |
-| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 部分完成 | 自实现 Harness、Mock 单测和三项 demo 已在 draft PR #13，CI/OCI 已在 draft PR #14；Task 15 本地 release docs/evidence 为 `9acb2ae`/`60528ae`/`84a10b4`/`93f3415`，限定复审 `0/0/0`。当前 backend `169 passed, 1 warning`、frontend `48`、build/E2E `2 passed`；Task 15 PR、外部交付与学生反思仍待完成。 |
+| A-6-1 | Mock/stub LLM 的确定性核心机制单测 | 已完成并验证 | `backend/tests` 以 `MockLLM`/stub 覆盖 Harness 核心；最后完整运行时验证基线 `a205a231` 的 GitHub CI `31390746883` 实际成功运行 backend 与三份稳定 JSON demo。 |
+| A-6-2 | 三项机制演示：危险阻断、失败反馈改变动作、主贡献行为 | 已完成并验证 | 三份稳定 JSON demo：护栏阻断、MockLLM 反馈闭环改变动作、真实 `RunService` 的等待审批→批准→执行；真实 FastAPI/Vite/Chromium E2E 已通过，基线 CI `31390746883` 也实际复现 demos 为绿。 |
+| A-7 | 提交自实现 Harness 内核、Mock 单测、机制演示 | 已完成并验证 | 自实现 Harness、Mock 单测、三项 demo、CI/OCI、发布文档和外部证据均已通过 PR #1–#17 抵达 `a205a231` 基线；GitHub CI、GHCR 匿名 pull/run、NJU GitLab `unit-test` 均有记录。 |
 
 ## 实现前绝对门禁
 
