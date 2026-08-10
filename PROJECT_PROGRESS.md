@@ -7,7 +7,7 @@
 ## 当前真实状态
 
 - 最终仓库：`https://github.com/AlterGo-xzy/safe-code-harness-v2`，公开。
-- 主分支最新已推送的流程准备提交：`5dd5da3 chore: prepare isolated task worktrees`。
+- 主分支当前已验证 merge commit：`622c472`（PR #11）；Task12 正在将其整合。
 - 冷启动门禁：已完成。Claude Code `2.1.220` 在非 `--resume` 新会话中只 Fetch `SPEC.md` 和 `PLAN.md`，提出四项规约缺口并停止；证据在 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md`，修订提交 `ecbc418`、隔离核验 `107bda3`、门禁回填 `3195ae8`。
 - 任务 1 分支/worktree：`codex/t01-foundation` / `D:\safe-code-harness-v2\.worktrees\t01-foundation`。
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
@@ -15,6 +15,10 @@
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
 - 当前源码范围：任务 1-8 的 Harness 核心与受治理运行/审批 API、任务 9 的离线安全 Planner 配置、任务 10 的安全 ZIP 上传和隔离工作区均已完成并经审查；任务 13 Task 1 已把三组真实 API 合并到同一 app factory，Task 2 的三份离线稳定 JSON 机制演示已通过三轮 scoped review，Task 3 的真实 FastAPI/Vite/Chromium 批准闭环及 320x720 视口修复也已完成初始两阶段/scoped 审查。最终全分支凭据隔离修复、复审与收尾已完成，`codex/t13-demos-e2e` 已推送并创建 [stacked draft PR #13](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/13)。任务 11 已完成只读中文运行工作台，任务 12 已在其前端基线完成审批决定、Planner 配置和 ZIP 上传的安全 UI。Task 9 的 Windows Credential Manager-only 生产存储不配置真实 API key；用户批准的策略扩展继续延后。详细续开发指令见 `HANDOFF_TO_NEXT_MODEL.md`。
 - **任务 14 当前状态（优先）：** fresh implementer `/root/t14_implementer` 在 `codex/t14-ci-distribution` / `D:\safe-code-harness-v2\.worktrees\t14-ci-distribution` 严格先 RED 后实现 CI/OCI 分发，初始源码提交 `0f2b35f`。独立 reviewer 初审为 C/I/M `0/3/3`；fix `1434a64` 先得到四个精确行为 RED，再改为仓库 venv、成功默认分支 push CI 的 `workflow_run`/被测 SHA、loopback-only Docker/Compose、根与嵌套 dotenv 规则及明确无认证/TLS gateway 边界。focused `9 passed`，完整 backend `168 passed, 1 warning`、frontend `48 passed`、build、三 demo、Chromium E2E `2 passed`；Docker 实测 `published_port=127.0.0.1:8000`、healthy、runs API/WebUI 200。本机无 GNU Make，未虚称 `make test`，其两个实际 target 命令均通过。scoped spec/security 与质量 re-review 均已通过；最终全分支 review 为 C/I/M=`0/0/1`，唯一 Minor 是 PLAN/交接/追踪/README 的陈旧状态，本次纯文档修正正在关闭。外部 CI/GHCR、Task 14 分支收尾、push/PR 仍未完成。
+## 上游集成历史（合并保留）
+- 当前源码范围：任务 1-8 的 Harness 核心与受治理运行/审批 API、任务 9 的离线安全 Planner 配置、任务 10 的安全 ZIP 上传和隔离工作区均已完成并经审查；任务 13 Task 1 已把三组真实 API 合并到同一 app factory，Task 2 的三份离线稳定 JSON 机制演示已通过三轮 scoped review，Task 3 的真实 FastAPI/Vite/Chromium 批准闭环及 320x720 视口修复也已完成初始两阶段/scoped 审查。**最终全分支审查随后发现 Playwright 启动生产 `main:app` 会让 Planner 初始 GET 触及 Windows Credential Manager；`7d66d98` 以先 RED 后最小实现增加 E2E 专用、初始为空的进程内 SecretStore 入口，生产 app 未改。修复后 backend `159 passed, 1 warning`、demo `12 passed`、前端 unit `48 passed`、build 和真实 E2E `2 passed`；最终 scoped re-review 为 Critical 0、Important 0、Minor 2，两个文档 Minor 已修正，待只读文档复核和分支收尾。**任务 11 已完成只读中文运行工作台，任务 12 已在其前端基线完成审批决定、Planner 配置和 ZIP 上传的安全 UI。Task 9 的 Windows Credential Manager-only 生产存储不配置真实 API key；用户批准的策略扩展继续延后。Task 12 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12) 仍开放；Task 13 尚未推送、尚无 PR #13。详细续开发指令见 `HANDOFF_TO_NEXT_MODEL.md`。
+## 上游历史记录（合并保留）
+- 当前源码范围：任务 1-7 的 Harness 核心及任务 8 的受治理运行/审批 API 已完成并经审查；任务 11 已完成只读中文运行工作台，任务 12 已在其前端基线完成审批决定、Planner 配置和 ZIP 上传的安全 UI。最终审查为 Critical 0、Important 0、Minor 6，六项均已用最小测试、Planner 加载反馈和文档一致性修正关闭，完整前端现为 10 files/48 tests。用户批准将策略扩展延后：任务 12 没有策略 API/UI、假保存或 workspace 切换。任务 1/2 均未读取、复制或咨询旧项目源码；旧路径只在设计中作为未来扩展调查入口，不是实现指导。任务 12 已创建目标为任务 11 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留分支/worktree 等待审查；任务 13 的真实 API/浏览器/320px E2E 仍未执行。
 
 ## 不可突破的执行纪律
 
@@ -138,3 +142,18 @@ Task 13 最终验证为 backend `159 passed, 1 warning`、三份稳定 JSON demo
 ## 2026-08-10 Task 14 分支收尾更新
 
 Task 14 已完成本地 CI/容器实现、验证与审查，并已推送 `codex/t14-ci-distribution`；已创建目标为 `codex/t13-demos-e2e` 的 [stacked draft PR #14](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/14)。保留 branch/worktree 以处理审查反馈。外部 GitHub/GitLab CI、GHCR 发布/公开性/匿名 pull-run 与任务 15 仍未验证或完成。
+## 上游集成历史（合并保留）
+## 上游历史记录（合并保留）
+8. 后续从任务 8 的 FastAPI 运行与审批 API 继续；持续即时更新过程记录。
+9. 任务 11 已在 `codex/t11-workbench-ui` / `D:\safe-code-harness-v2\.worktrees\t11-workbench-ui` 实现只读中文工作台：`893f01a` 建立 typed read-only frontend boundary，`63749f5` 以先失败回归修复两个 Important API 安全边界，`0dcdca9` 完成卡片总览、选中时间线和状态 UI，最终审查修复提交 `33b5ff0`。前端只读调用任务 8 的两个 GET 路由，严格消费列表四字段和时间线固定五字段 DTO，未读取或迁入旧前端，也未加入创建运行、审批、配置、上传、凭据或 localStorage。最终修复新增 lockfile 与声明齐全的测试依赖、完整卡片 accessible name、详情 id/乱序保护和 UTC 标注；clean install 后完整前端 4 files/15 tests passed，build 通过。独立 scoped re-review 为 Critical 0、Important 0、Minor 1；Minor 的两处旧详细计划示例已以文档最小修正关闭，不改变运行时行为或安全边界。Open Design 只有一条不可复现的历史记录：记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地没有安装包、资产 URL 或精确摘要，不能算作当前已验证证据，绝不猜测摘要。CSS 有 `44rem` 单列断点、`min-width: 0` 与 `overflow-wrap: anywhere`；没有窄屏浏览器测试，320px 证据仍为任务 13 未完成项。已按用户选择创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)，保留分支/worktree 等待审查。
+10. 任务 12 已在 `codex/t12-settings-approval-ui` / `D:\safe-code-harness-v2\.worktrees\t12-settings-approval-ui` 完成：`1a9074b` 建立只投影安全字段的审批、Planner 和 ZIP API 边界；`0369c8f` 增加三个治理面板；Task 2 两项 Important 先有失败回归，再由 `b22c56d` 修复当前选择的审批刷新与 Planner 初始加载覆盖。Task 1/2 没有读取、复制或咨询旧项目源码；旧 `ConfigPanel.tsx`、`WorkspaceUploadPanel.tsx` 和 `routes_config.py` 只是未来扩展调查入口，明确不是任务 12 的实现指导。后续最终审查为 Critical 0、Important 0、Minor 6：补齐非字符串 `approval_id`、Planner 三方法 HTTP/网络固定错误、Planner 初始加载、Planner mutation pending 和 ZIP upload pending 回归，并纠正日期、旧项目和状态归属文档。focused RED 为 1 failed/28 passed，证明缺少 Planner 加载提示；其他新增测试直接验证既有安全行为。最小实现后 focused 为 4 files/29 tests，完整前端为 10 files/48 tests，build 通过；六项 Minor 全部关闭。已按要求创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留分支/worktree 等待审查；用户批准的策略扩展和任务 13 的真实 API/浏览器/320px E2E 仍未完成。
+## 历史上游任务 8–10 记录（合并时保留）
+
+## 历史上游任务 8–10 记录（合并时保留）
+
+8. 任务 8 已在 `codex/t08-api-runs` 完成：`974d73b` 增加运行/审批 API，`7afa279` 修复 TestClient 直接依赖声明；独立复审通过，完整 backend `96 passed`、一键 unit `88 passed`。已创建目标为 `codex/t07-agent-loop` 的 [stacked draft PR #8](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/8)，保留分支/worktree 等待审查。
+9. 任务 9 已在 `codex/t09-planner-credentials` 完成：`3074085` 增加仅 Windows Credential Manager 的 Planner 凭据存储、掩码配置 API 与可注入传输的 OpenAI-compatible LLM；`51eb9c8` 修复异常链潜在泄露。未配置、读取、输出或使用真实 key，未访问网络。独立复审最终 PASS；协调会话完整 backend `110 passed`、一键 unit `96 passed`。已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)，保留分支/worktree 等待审查。下一步为任务 10 的安全 zip 上传与工作区注册。
+
+## 2026-08-10 PR #10/#11 已合并（历史集成记录）
+
+PR #10 已在完整 backend `146 passed, 1 warning`、diff/marker/credential scan clean、fresh review C/I/M=`0/0/0` 后普通 merge `696214d`；PR #11 在 backend `146 passed, 1 warning`、frontend 15 tests/build、fresh review C/I/M=`0/0/0` 后普通 merge `622c472`。两者 branch/worktree 均保留；本分支仅待完成 Task12 的同等验证与复审。
