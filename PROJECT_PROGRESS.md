@@ -7,7 +7,7 @@
 ## 当前真实状态
 
 - 最终仓库：`https://github.com/AlterGo-xzy/safe-code-harness-v2`，公开。
-- 主分支最新已推送的流程准备提交：`5dd5da3 chore: prepare isolated task worktrees`。
+- 主分支当前已验证 merge commit：`622c472`（PR #11）；Task12 正在将其整合。
 - 冷启动门禁：已完成。Claude Code `2.1.220` 在非 `--resume` 新会话中只 Fetch `SPEC.md` 和 `PLAN.md`，提出四项规约缺口并停止；证据在 `docs/evidence/cold-start-claude-code-task1.md`、`SPEC_PROCESS.md`，修订提交 `ecbc418`、隔离核验 `107bda3`、门禁回填 `3195ae8`。
 - 任务 1 分支/worktree：`codex/t01-foundation` / `D:\safe-code-harness-v2\.worktrees\t01-foundation`。
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
@@ -131,6 +131,6 @@
 8. 任务 8 已在 `codex/t08-api-runs` 完成：`974d73b` 增加运行/审批 API，`7afa279` 修复 TestClient 直接依赖声明；独立复审通过，完整 backend `96 passed`、一键 unit `88 passed`。已创建目标为 `codex/t07-agent-loop` 的 [stacked draft PR #8](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/8)，保留分支/worktree 等待审查。
 9. 任务 9 已在 `codex/t09-planner-credentials` 完成：`3074085` 增加仅 Windows Credential Manager 的 Planner 凭据存储、掩码配置 API 与可注入传输的 OpenAI-compatible LLM；`51eb9c8` 修复异常链潜在泄露。未配置、读取、输出或使用真实 key，未访问网络。独立复审最终 PASS；协调会话完整 backend `110 passed`、一键 unit `96 passed`。已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)，保留分支/worktree 等待审查。下一步为任务 10 的安全 zip 上传与工作区注册。
 
-## 2026-08-10 PR #10 与 main 的受控集成（审查待进行）
+## 2026-08-10 PR #10/#11 已合并（历史集成记录）
 
-PR #10 的 `DIRTY` 已在 `codex/t10-workspace-upload` 重现为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py` 三处冲突。根因是 Task 9 与 Task 10 都向同一 app factory 添加独立状态/路由。协调会话先新增真实 API 回归，当前冲突标记下预期 RED 为 `SyntaxError`；最小组合同时保留可注入 `SecretStore` 的 Planner、`WorkspaceRegistry` 和三条 routers。focused GREEN `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，冲突标记/diff/高置信凭据候选均为 0。fresh 只读 reviewer `/root/t10_merge_reviewer` 对 `6681ed1` 的 C/I/M=`0/0/0`，确认未丢弃路由/state，Task 9 fail-closed/redaction 和 Task 10 ZIP 预校验均保持；现仅待推送并按用户授权普通 merge。
+PR #10 已在完整 backend `146 passed, 1 warning`、diff/marker/credential scan clean、fresh review C/I/M=`0/0/0` 后普通 merge `696214d`；PR #11 在 backend `146 passed, 1 warning`、frontend 15 tests/build、fresh review C/I/M=`0/0/0` 后普通 merge `622c472`。两者 branch/worktree 均保留；本分支仅待完成 Task12 的同等验证与复审。

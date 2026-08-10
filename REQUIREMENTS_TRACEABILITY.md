@@ -66,6 +66,6 @@
 3. 使用不同类型的新 agent，仅凭 SPEC+PLAN 完成冷启动验证，并据结果修订 SPEC/PLAN。
 4. 为所有实现模块建立 worktree/PR 与 task 编号。前三项任一缺失时，不得编写实现代码。
 
-## 2026-08-10 PR #10 集成追踪（审查待进行）
+## 2026-08-10 PR #10/#11 集成追踪（已完成，历史记录）
 
-G-4.6-1/2 与 A-7 的本轮证据：Task 10 的独立 worktree 在合入已审查 Task 9 main 后，先以 real API regression 复现共享 factory 未组合的 RED，再在未修改 Planner/ZIP 独立规则的前提下同时注册 config、runs、workspaces 三路由与两类 app state。完整 backend `146 passed, 1 warning`、diff/marker/credential scans clean。fresh reviewer `/root/t10_merge_reviewer` 对 merge commit `6681ed1` 为 C/I/M=`0/0/0`；本地审查门槛已满足，但 PR #10 的推送、GitHub merge 状态仍须真实回读后才能标为已完成。
+G-4.6-1/2 当前事实：PR #10 已以 `696214d`、PR #11 已以 `622c472` 合并；两者均有完整回归、diff/marker/credential scan clean 和 fresh C/I/M=`0/0/0` 证据。Task12 仍待其自身复审和 GitHub 状态回读。

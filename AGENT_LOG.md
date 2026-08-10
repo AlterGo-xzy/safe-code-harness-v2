@@ -242,9 +242,9 @@
 - 分支收尾：用户要求按要求文件操作，故采用 `finishing-a-development-branch` 选项 2；已推送 `codex/t12-settings-approval-ui` 并创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)。保留 worktree 处理审查反馈；未合并或删除分支。
 ### 2026-08-10 — 上游 Task 9–10 集成历史（保留）
 
-### 2026-08-10 — PR #10/main 受控集成（审查待进行）
+### 2026-08-10 — PR #10/main 集成（已完成，历史记录）
 
 - 技能与诊断：协调会话依 `systematic-debugging` 在本 worktree 执行 `git merge origin/main --no-commit --no-ff`，重现三处冲突；读双方版本后确认 `main.py` 是同一工厂的独立追加，而非业务规则冲突。使用 `test-driven-development` 先新增跨路由真实 API regression。
 - RED/GREEN：新测试在未解析标记时以 `SyntaxError: <<<<<<< HEAD` collection error 失败；仅合并 `SecretStore`、`PlannerConfiguration`、`WorkspaceRegistry` 与已有 router 注册后，focused `1 passed, 1 warning`。断言可注入 fake Windows secret store 下 Planner GET 为 200/`configured=false`，且同一 app 的坏 ZIP 上传为不带路径的固定 400。
 - 验证：完整 `pytest backend/tests --basetemp .pytest-tmp\t10-main-integration -q` 为 `146 passed, 1 warning`；warning 是既有 TestClient deprecation。staged diff check、tracked marker scan 和本次差异高置信凭据形态计数均为 0。
-- 审查与后续：fresh 只读 reviewer `/root/t10_merge_reviewer` 审查 `6681ed1`，结论 C/I/M=`0/0/0`、可合并；其确认两 parent 均被保留、cross-route test 是 real API behavior、Task 9 fail-closed/redaction 与 Task 10 写入前 ZIP 预校验未被弱化。现可按用户授权推送、retarget 和普通 GitHub merge；不删除 branch/worktree。
+- 后续事实：fresh reviewer `/root/t10_merge_reviewer` C/I/M=`0/0/0` 后 PR #10 已普通 merge `696214d`；PR #11 已在相同门槛后普通 merge `622c472`。两者未删除 branch/worktree。
