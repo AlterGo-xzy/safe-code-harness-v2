@@ -106,3 +106,15 @@
 - 分支决定：依照选项 2 保留 `codex/t01-foundation` 与 `.worktrees/t01-foundation`，用于处理 PR 审查反馈；不合并、不删除。此前 connector 403 与失效 token 的日志保留为历史事实，不再构成阻断。
 - 人工干预：用户完成并授权 GitHub CLI 登录；主协调只回填真实 PR 与新鲜验证记录，未修改任务 1 功能代码。
 - 学到的教训：GitHub connector、Git 传输和 `gh` 是独立认证面；PR URL、测试输出和分支收尾决定都应在同一流程节点即时写入过程文档。
+
+## 2026-08-04 T2：动作协议、运行模型与离线 Mock LLM
+
+- worktree/分支：`D:\\safe-code-harness-v2\\.worktrees\\t02-action-protocol` / `codex/t02-action-protocol`，以任务 1 分支为 stacked 基线；后续 PR 先指向 `codex/t01-foundation`，待 PR #1 合并后改回 `main`。
+- 触发技能：`superpowers:using-git-worktrees`、`subagent-driven-development`、`test-driven-development`、`requesting-code-review`、`verification-before-completion`；`systematic-debugging` 用于确认一键脚本必须从仓库根目录调用。
+- 实现 subagent：`/root/t02_implementer`（新鲜 session），提交 `ba3116a feat: add deterministic action protocol and mock llm`。用户明确授权直接复用旧项目；仅迁入 `D:\\2026_summer_project\\backend\\src\\safe_code_harness\\core\\action.py`、`llm\\base.py`、`llm\\mock.py` 的相关概念，人工最小适配为计划接口 `parse_action`、`LLMClient.next_action` 与字符串序列 `MockLLM(responses)`；未迁入任何工具、网络、凭据或旧版内建序列。
+- TDD 与验证：RED 的 focused parser 测试预期报 `ModuleNotFoundError: safe_code_harness.core`；GREEN 的 parser/Mock 测试为 `6 passed in 0.02s`。协调会话新建本 worktree 忽略的 `.venv` 后，从其根目录运行 `scripts/test.ps1` 和 `python -m pytest backend/tests -q`，两者均为 `7 passed in 0.01s`；`git diff --check 9f5eab6..HEAD` 无输出，受跟踪源码 secret scan 为 clean。
+- 两阶段审查：独立 reviewer `/root/t02_reviewer` 先给出 Spec Compliance PASS，再给出 Task quality APPROVE；无 Critical/Important。Minor 要求保留独立完整测试输出，已通过协调会话的新鲜 full-suite 输出满足。
+- 分支收尾：依照用户已确认的 `finishing-a-development-branch` 选项 2，推送 `codex/t02-action-protocol` 并创建 [draft PR #2](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/2)，暂以 `codex/t01-foundation` 为目标；保留该分支/worktree 处理审查，待 PR #1 合并后改为 `main`。
+- 人工干预：协调会话只创建隔离 worktree、调用审查与回填真实证据；未改动任务功能源码。一次从旧项目当前目录绝对调用 `scripts/test.ps1` 导致相对路径误收集旧项目测试；检查脚本后确认规范调用方式是先进入目标仓库根目录，按此方式重跑后通过。
+- 过程记录修正：后续只读审计发现任务 2 完成记录被误插入任务 13 的同名占位符；已将该记录移回任务 2，并恢复任务 13 的未完成占位符。未修改任何任务功能代码，也未启动任务 3。
+- 学到的教训：批准复用旧代码并不等于放弃新仓库接口、离线边界或 RED/GREEN 证据；堆叠 PR 需要明确目标分支，避免把任务 1 基座变成任务 2 的重复审查范围。
