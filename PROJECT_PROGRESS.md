@@ -13,7 +13,7 @@
 - 任务 1 实现：`cc81e31 chore: establish offline test foundation`；后续过程记录 `30dc566`、`94b49ee`。
 - 任务 1 已验证：RED 为预期 `ModuleNotFoundError: safe_code_harness`；GREEN 包含 focused pytest、editable install、独立导入和 `scripts/test.ps1`。创建 PR 前重新运行 `scripts/test.ps1`，输出 `1 passed in 0.01s`，并确认 `git diff --check origin/main...HEAD` 无输出；两阶段 reviewer 无 Critical/Important/Minor。
 - 任务 1 PR：[\#1](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/1)（draft）。GitHub CLI 已由用户重新认证；连接器的历史 403 保留在日志中作为实际发生过的阻断。按 `finishing-a-development-branch`，用户选择推送并创建 PR，故保留分支/worktree 等待审查。任务 2 现可按计划启动。
-- 当前源码范围：任务 1 的包基座与测试入口、任务 2 的确定性动作协议/离线 Mock LLM、任务 3 的确定性策略/规则/失败关闭路径沙箱、任务 4 的命令护栏/非执行审批状态机，以及任务 5 的受治理工具分派已完成并经审查；尚未开始 AgentLoop、反馈、记忆、API、凭据、上传、前端、CI、容器或部署。
+- 当前源码范围：任务 1-5 的基座、动作、治理和工具，以及任务 6 的确定性反馈与有界脱敏运行记忆已完成并经审查；尚未开始 AgentLoop、API、凭据、上传、前端、CI、容器或部署。
 
 ## 不可突破的执行纪律
 
@@ -119,4 +119,5 @@
 3. 任务 3 已在 `codex/t03-governance` / `D:\safe-code-harness-v2\.worktrees\t03-governance` 完成：`843e50e` 与 `49efb0c` 实现并加固确定性规则/路径沙箱；旧项目仅复用两个明确源文件的相关逻辑。初次独立审查发现 1 Critical、2 Important，均经新失败测试、修复及 scoped re-review 清零；完整 backend 与一键测试均为 `26 passed`。已创建目标为 `codex/t02-action-protocol` 的 [stacked draft PR #3](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/3)，保留该 worktree 等待审查；上游 PR 合并后依次改为 `main`。后续从任务 4 继续，任何代码复用均须记录旧文件路径、迁入范围与人工调整。
 4. 任务 4 已在 `codex/t04-command-approval` / `D:\safe-code-harness-v2\.worktrees\t04-command-approval` 完成：`4707e49` 新增确定性命令护栏和非执行审批状态机；审查后以 `b053032` 修复等效 `rm` 参数及 policy 配置问题，并以 `eea0e4d` 修复 `env`、`sudo`、`command` 包装器绕过。旧项目仅参考两个 `guardrails` 文件的命令规范化/术语，未迁入 loop、工具或 API。所有修复先有真实 RED 回归；独立复审最终批准。协调会话新鲜完整 pytest 与一键测试均为 `51 passed`；已创建目标为 `codex/t03-governance` 的 [stacked draft PR #4](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/4)，保留该分支/worktree 等待审查，上游 PR 合并后依次改为 `main`。
 5. 任务 5 已在 `codex/t05-tools` / `D:\safe-code-harness-v2\.worktrees\t05-tools` 完成：`2795539` 新增受 `PathSandbox` 和 `CommandGuard` 约束的显式工具分派；所有测试先 RED，独立审查无 Critical/Important，协调会话一键测试为 `58 passed`。已创建目标为 `codex/t04-command-approval` 的 [stacked draft PR #5](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/5)，保留该分支/worktree 等待审查。
-6. 后续从任务 6 的确定性反馈与运行记忆继续；在每个 task、PR、CI、容器、部署、NJU Git、反思发生时即时更新本文件、`PLAN.md`、`AGENT_LOG.md` 和 `REQUIREMENTS_TRACEABILITY.md`。
+6. 任务 6 已在 `codex/t06-feedback-memory` / `D:\safe-code-harness-v2\.worktrees\t06-feedback-memory` 完成：`cc5b974` 与 `6b9676b` 实现并加固确定性反馈和有界脱敏记忆；两项 Important 经失败回归与 scoped re-review 修复，一键测试为 `77 passed`。已创建目标为 `codex/t05-tools` 的 [stacked draft PR #6](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/6)，保留分支/worktree 等待审查。
+7. 后续从任务 7 的自实现 AgentLoop 继续；在每个 task、PR、CI、容器、部署、NJU Git、反思发生时即时更新本文件、`PLAN.md`、`AGENT_LOG.md` 和 `REQUIREMENTS_TRACEABILITY.md`。

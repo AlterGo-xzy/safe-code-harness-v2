@@ -164,3 +164,12 @@
 - 收尾前新鲜验证：`scripts/test.ps1` 为 `58 passed in 0.10s`，`git diff --check 716d246..HEAD` 无输出，工作树干净。
 - 实际动作：推送 `codex/t05-tools`，创建 [draft PR #5](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/5)，API 回读确认 `OPEN`、`isDraft=true`、base `codex/t04-command-approval`、head 正确。
 - 分支决定：保留 `codex/t05-tools` 与 `.worktrees/t05-tools` 等待审查；上游 PR 合并后依次调整 base 为 `main`。
+
+## 2026-08-08 T6：确定性反馈与有界运行记忆
+
+- worktree/分支：`codex/t06-feedback-memory`；implementer `/root/t06_implementer` 提交 `cc5b974`，审查修复 `6b9676b`。RED 缺少模块；GREEN focused `12 passed`、backend `70 passed`。首审发现凭据脱敏和可变事件两项 Important；先以 `7 failed` 回归再修复为 focused `19 passed`、backend `77 passed`。scoped re-review APPROVED；协调一键测试 `77 passed in 0.11s`，diff check clean。
+- 旧代码仅在 RED 后参考 `feedback/evaluator.py` 与 `memory/store.py` 概念；未迁入 loop/API/planner/凭据。自由文本前缀分类问题明确 deferred 至任务 7 的结构化 outcome。
+
+## 2026-08-08 T6：分支收尾与 PR
+
+- 沿用收尾选项 2；已推送 `codex/t06-feedback-memory` 并创建 [draft PR #6](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/6)。API 回读确认 `OPEN`、`isDraft=true`、base `codex/t05-tools`、head 正确；保留 worktree 等待审查。
