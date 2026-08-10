@@ -165,18 +165,6 @@ Linux 容器中的 Planner key 只保存在当前容器进程内存，推荐在�
 - PR #1–#17 已普通 merge；GitHub/NJU main 为 `a205a231`，其 GitHub CI 和 GitLab `unit-test` 均有通过证据。
 - `REFLECTION.md` 由学生本人提供，中文汉字计数为 1583；agent 未代写或润色。
 
-## 外部交付核验清单
-
-以下项目只有取得真实外部结果后才能勾选：
-
-- [x] 按依赖顺序审查并合并 PR #1–#17，最终默认分支包含完整项目；
-- [x] GitHub Actions 最终 CI 成功：[run 31390746883](https://github.com/AlterGo-xzy/safe-code-harness-v2/actions/runs/31390746883)，commit `a205a231`；
-- [x] NJU Git `main` 已与 GitHub main 同步；
-- [x] GitLab `unit-test` 针对最终 NJU main 成功：pipeline `#319806` / job `#610513` / commit `a205a231`（用户截图）；
-- [x] GHCR package 为 public，未登录环境 `docker pull`/run 成功；
-- [x] Railway HTTPS Mock 演示站可访问（用户截图验证首页）；它未满足认证网关边界，真实 key/敏感工作区与生产使用仍为后续扩展；
-- [x] 学生本人提供 `REFLECTION.md`，中文汉字计数为 1583；
-- [x] 高置信历史扫描候选均为已分类的合成测试 fixture，未发现未分类真实 key。
 
 ## 许可证与第三方组件
 
