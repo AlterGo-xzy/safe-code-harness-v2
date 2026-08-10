@@ -1,6 +1,6 @@
 # SafeCodeHarness v2 进度与完整目标
 
-更新时间：2026-08-09
+更新时间：2026-08-10
 
 本文件是下一次对话的唯一 handoff 入口。先读本文件，再读 `AGENTS.md`（若后续新增）、`PLAN.md`、`REQUIREMENTS_TRACEABILITY.md` 和 `AGENT_LOG.md`；每次编辑前运行 `git status --short`，保留未说明的用户改动。
 
@@ -124,3 +124,13 @@
 8. 后续从任务 8 的 FastAPI 运行与审批 API 继续；持续即时更新过程记录。
 9. 任务 11 已在 `codex/t11-workbench-ui` / `D:\safe-code-harness-v2\.worktrees\t11-workbench-ui` 实现只读中文工作台：`893f01a` 建立 typed read-only frontend boundary，`63749f5` 以先失败回归修复两个 Important API 安全边界，`0dcdca9` 完成卡片总览、选中时间线和状态 UI，最终审查修复提交 `33b5ff0`。前端只读调用任务 8 的两个 GET 路由，严格消费列表四字段和时间线固定五字段 DTO，未读取或迁入旧前端，也未加入创建运行、审批、配置、上传、凭据或 localStorage。最终修复新增 lockfile 与声明齐全的测试依赖、完整卡片 accessible name、详情 id/乱序保护和 UTC 标注；clean install 后完整前端 4 files/15 tests passed，build 通过。独立 scoped re-review 为 Critical 0、Important 0、Minor 1；Minor 的两处旧详细计划示例已以文档最小修正关闭，不改变运行时行为或安全边界。Open Design 只有一条不可复现的历史记录：记录称当时从 `nexu-io/open-design` Windows x64 Release 安装 `0.18.1` 并做过 SHA-256 校验，但本地没有安装包、资产 URL 或精确摘要，不能算作当前已验证证据，绝不猜测摘要。CSS 有 `44rem` 单列断点、`min-width: 0` 与 `overflow-wrap: anywhere`；没有窄屏浏览器测试，320px 证据仍为任务 13 未完成项。已按用户选择创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #11](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/11)，保留分支/worktree 等待审查。
 10. 任务 12 已在 `codex/t12-settings-approval-ui` / `D:\safe-code-harness-v2\.worktrees\t12-settings-approval-ui` 完成：`1a9074b` 建立只投影安全字段的审批、Planner 和 ZIP API 边界；`0369c8f` 增加三个治理面板；Task 2 两项 Important 先有失败回归，再由 `b22c56d` 修复当前选择的审批刷新与 Planner 初始加载覆盖。Task 1/2 没有读取、复制或咨询旧项目源码；旧 `ConfigPanel.tsx`、`WorkspaceUploadPanel.tsx` 和 `routes_config.py` 只是未来扩展调查入口，明确不是任务 12 的实现指导。后续最终审查为 Critical 0、Important 0、Minor 6：补齐非字符串 `approval_id`、Planner 三方法 HTTP/网络固定错误、Planner 初始加载、Planner mutation pending 和 ZIP upload pending 回归，并纠正日期、旧项目和状态归属文档。focused RED 为 1 failed/28 passed，证明缺少 Planner 加载提示；其他新增测试直接验证既有安全行为。最小实现后 focused 为 4 files/29 tests，完整前端为 10 files/48 tests，build 通过；六项 Minor 全部关闭。已按要求创建目标为 `codex/t11-workbench-ui` 的 [stacked draft PR #12](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/12)，保留分支/worktree 等待审查；用户批准的策略扩展和任务 13 的真实 API/浏览器/320px E2E 仍未完成。
+## 历史上游任务 8–10 记录（合并时保留）
+
+## 历史上游任务 8–10 记录（合并时保留）
+
+8. 任务 8 已在 `codex/t08-api-runs` 完成：`974d73b` 增加运行/审批 API，`7afa279` 修复 TestClient 直接依赖声明；独立复审通过，完整 backend `96 passed`、一键 unit `88 passed`。已创建目标为 `codex/t07-agent-loop` 的 [stacked draft PR #8](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/8)，保留分支/worktree 等待审查。
+9. 任务 9 已在 `codex/t09-planner-credentials` 完成：`3074085` 增加仅 Windows Credential Manager 的 Planner 凭据存储、掩码配置 API 与可注入传输的 OpenAI-compatible LLM；`51eb9c8` 修复异常链潜在泄露。未配置、读取、输出或使用真实 key，未访问网络。独立复审最终 PASS；协调会话完整 backend `110 passed`、一键 unit `96 passed`。已创建目标为 `codex/t08-api-runs` 的 [stacked draft PR #9](https://github.com/AlterGo-xzy/safe-code-harness-v2/pull/9)，保留分支/worktree 等待审查。下一步为任务 10 的安全 zip 上传与工作区注册。
+
+## 2026-08-10 PR #10 与 main 的受控集成（审查待进行）
+
+PR #10 的 `DIRTY` 已在 `codex/t10-workspace-upload` 重现为 `AGENT_LOG.md`、`PROJECT_PROGRESS.md` 与 `api/main.py` 三处冲突。根因是 Task 9 与 Task 10 都向同一 app factory 添加独立状态/路由。协调会话先新增真实 API 回归，当前冲突标记下预期 RED 为 `SyntaxError`；最小组合同时保留可注入 `SecretStore` 的 Planner、`WorkspaceRegistry` 和三条 routers。focused GREEN `1 passed, 1 warning`，完整 backend `146 passed, 1 warning`，冲突标记/diff/高置信凭据候选均为 0。fresh 只读 reviewer `/root/t10_merge_reviewer` 对 `6681ed1` 的 C/I/M=`0/0/0`，确认未丢弃路由/state，Task 9 fail-closed/redaction 和 Task 10 ZIP 预校验均保持；现仅待推送并按用户授权普通 merge。
